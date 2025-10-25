@@ -1,0 +1,21 @@
+name: Delete old container images
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Midnight
+  workflow_dispatch:
+
+jobs:
+  clean-ghcr:
+    name: Delete old unused prod container images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old images
+        uses: snok/container-retention-policy@v3.0.0
+        with:
+          account: user
+          image-names: 'se-mon'
+          cut-off: 1month
+          keep-n-most-recent: 1
+          image-tags: 'sha-*,se-mon-latest'
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}

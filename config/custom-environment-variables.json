@@ -1,0 +1,9 @@
+{
+  "database": {
+    "host": "DB_HOST",
+    "port": "DB_PORT",
+    "password": "DB_PASSWORD"
+  },
+  "log_level": "LOG_LEVEL",
+  "log_to_file": "LOG_TO_FILE"
+}

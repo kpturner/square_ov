@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  se-mon:
+    container_name: ${NAME}
+    image: ghcr.io/kpturner/se-mon:${IMAGE}-latest
+    restart: unless-stopped
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    environment:
+      - container=docker
+      - REDIS_HOST=host.docker.internal
+      - REDIS_PORT=${REDIS_PORT}
+      - DB_HOST=host.docker.internal
+      - DB_PORT=3306
+      - DB_NAME=se-mon
+      - DB_USER=se-mon
+      - INSTANCE=${INSTANCE}
+      - MANUAL_MODE=${MANUAL_MODE}
+      - PROXYHOST=${PROXYHOST}
+    ports:
+      - '${PORT}:4000'

@@ -1,0 +1,71 @@
+name: Build and push image versions
+
+inputs:
+  version:
+    description: Version to tag
+    required: true
+  username-github:
+    description: User name
+    required: true
+  password-github:
+    description: Password
+    required: true
+  repo:
+    description: Repo
+    required: true
+  password:
+    description: Password
+    required: false
+    default: 'secrets/password.txt'
+  stripe_webhook_secret:
+    description: Stripe webhook secret
+    required: false
+    default: 'secrets/stripe_webhook_secret.txt'
+  stripe_secret_key:
+    description: Stripe secret key
+    required: false
+    default: 'secrets/stripe_secret_key.txt'
+  db_password_secret:
+    description: DB password secret
+    required: false
+    default: 'secrets/db_password_secret.txt'
+  brevo_api_key:
+    description: Brevo API key
+    required: false
+    default: 'secrets/brevo_api_key.txt'
+  session_secret:
+    description: Session secret
+    required: false
+    default: 'secrets/session_secret.txt'
+  social_media_login:
+    description: Social media login
+    type: boolean
+    required: false
+    default: false
+  opts:
+    description: Run time options
+    required: false
+  ecr-uri:
+    description: ECS docker image registry
+    default: 'ghcr.io'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Build and push image to GitHub
+      id: build-and-push-github
+      uses: ./.github/workflows/composites/docker-build-push
+      with:
+        username-github: ${{ inputs.username-github }}
+        password-github: ${{ inputs.password-github }}
+        dockerfile: Dockerfile
+        repo: ${{ inputs.repo }}
+        password: ${{ inputs.password }}
+        stripe_webhook_secret: ${{ inputs.stripe_webhook_secret }}
+        stripe_secret_key: ${{ inputs.stripe_secret_key }}
+        db_password_secret: ${{ inputs.db_password_secret }}
+        brevo_api_key: ${{ inputs.brevo_api_key }}
+        session_secret: ${{ inputs.session_secret }}
+        opts: ${{ inputs.opts }}
+        social_media_login: ${{ inputs.social_media_login }}
+        tag: ${{ inputs.version }}

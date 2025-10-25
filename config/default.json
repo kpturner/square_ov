@@ -1,0 +1,184 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 52001,
+    "database": "square-ov",
+    "user": "square-ov",
+    "password": "",
+    "name": "square-ov"
+  },
+  "log_level": "info",
+  "log_to_file": false,
+  "ranks": [
+    {
+      "value": "SGW",
+      "text": "Senior Grand Warden",
+      "available": true
+    },
+    {
+      "value": "JGW",
+      "text": "Junior Grand Warden",
+      "available": true
+    },
+    {
+      "value": "GTREAS",
+      "text": "Grand Treasurer",
+      "available": false
+    },
+    {
+      "value": "GCHAP",
+      "text": "Grand Chaplain",
+      "available": false
+    },
+    {
+      "value": "GREG",
+      "text": "Grand Registrar",
+      "available": false
+    },
+    {
+      "value": "GSEC",
+      "text": "Grand Secretary",
+      "available": false
+    },
+    {
+      "value": "GDC",
+      "text": "Grand Director of Ceremonies",
+      "available": false
+    },
+    {
+      "value": "GSWDB",
+      "text": "Grand Sword Bearer",
+      "available": true
+    },
+    {
+      "value": "GSUPTWKS",
+      "text": "Grand Superintendent of Works",
+      "available": false
+    },
+    {
+      "value": "DGCHAP",
+      "text": "Deputy Grand Chaplain",
+      "available": false
+    },
+    {
+      "value": "DGREG",
+      "text": "Deputy Grand Registrar",
+      "available": true
+    },
+    {
+      "value": "DGSEC",
+      "text": "Deputy Grand Secretary",
+      "available": false
+    },
+    {
+      "value": "DGDC",
+      "text": "Deputy Grand Director of Ceremonies",
+      "available": false
+    },
+    {
+      "value": "DGSWDB",
+      "text": "Deputy Grand Sword Bearer",
+      "available": true
+    },
+    {
+      "value": "DGSUPTWKS",
+      "text": "Deputy Grand Superintendent of Works",
+      "available": true
+    },
+    {
+      "value": "GALMR",
+      "text": "Grand Almoner",
+      "available": false
+    },
+    {
+      "value": "GCHARSTWD",
+      "text": "Grand Charity Steward",
+      "available": false
+    },
+    {
+      "value": "GMENTOR",
+      "text": "Grand Mentor",
+      "available": false
+    },
+    {
+      "value": "GORATOR",
+      "text": "Grand Orator",
+      "available": false
+    },
+    {
+      "value": "SGD",
+      "text": "Senior Grand Deacon",
+      "available": true
+    },
+    {
+      "value": "JGD",
+      "text": "Junior Grand Deacon",
+      "available": true
+    },
+    {
+      "value": "AGCHAP",
+      "text": "Assistant Grand Chaplain",
+      "available": false
+    },
+    {
+      "value": "AGREG",
+      "text": "Assistant Grand Registrar",
+      "available": true
+    },
+    {
+      "value": "AGSEC",
+      "text": "Assistant Grand Secretary",
+      "available": false
+    },
+    {
+      "value": "AGDC",
+      "text": "Assistant Grand Director of Ceremonies",
+      "available": true
+    },
+    {
+      "value": "AGSWDB",
+      "text": "Assistant Grand Sword Bearer",
+      "available": true
+    },
+    {
+      "value": "AGSUPTWKS",
+      "text": "Assistant Grand Superintendent of Works",
+      "available": true
+    },
+    {
+      "value": "GORG",
+      "text": "Grand Organist",
+      "available": false
+    },
+    {
+      "value": "GSTDB",
+      "text": "Grand Standard Bearer",
+      "available": true
+    },
+    {
+      "value": "AGSTDB",
+      "text": "Assistant Grand Standard Bearer",
+      "available": true
+    },
+    {
+      "value": "GPURS",
+      "text": "Grand Pursuivant",
+      "available": true
+    },
+    {
+      "value": "GSTWD",
+      "text": "Grand Steward",
+      "available": true
+    },
+    {
+      "value": "AGPURS",
+      "text": "Assistant Grand Pursuivant",
+      "available": true
+    },
+    {
+      "value": "GTYLER",
+      "text": "Grand Tyler",
+      "available": false
+    }
+  ]
+}

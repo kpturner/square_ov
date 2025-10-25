@@ -1,0 +1,20 @@
+<p>Dear {{ recipient }},</p>
+
+<p>A subscription has been created</p>
+
+<p>
+  <strong>Details</strong><br />
+  Stripe id: {{ customer.stripeCustomerId }}<br />
+  Email: {{ customer.email }}<br />
+  Name: {{ customer.name }}<br />
+  Lodge: {{ customer.lodge }}<br />
+  LodgeNo: {{ customer.lodgeNo }}<br />
+  Unit Type: {{ customer.unitType }}<br />
+  Subscribed: {{ customer.subscribed }}<br />
+  Quantity: {{ customer.quantity }}<br />
+  Unit Price: {{ customer.unitPrice }}<br />
+  Event: {{ customer.lastEvent }}<br />
+  Created At: {{ customer.createdAt }}<br />
+</p>
+
+<p></p>

@@ -1,0 +1,58 @@
+name: Publish docker images
+
+on:
+  # Run if a PR is closed (and has been merged) or on workflow_dispatch
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+  workflow_dispatch:
+    inputs:
+      instance:
+        description: Instance
+        required: true
+        default: se-mon
+        type: choice
+        options:
+          - se-mon
+
+jobs:
+  build-and-push:
+    if: github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch'
+    name: Build and push docker image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: Create secrets folder
+        run: |
+          mkdir -p secrets
+
+      - name: Debug secret value
+        run: |
+          # echo ${{secrets.STRIPE_SECRET_KEY}} | sed 's/./& /g';
+          # echo ${{secrets.STRIPE_WEBHOOK_SECRET}} | sed 's/./& /g';
+
+      - name: Store common secrets
+        run: |
+          echo "${{ secrets.PASSWORD }}" > secrets/password.txt
+          echo "${{ secrets.STRIPE_WEBHOOK_SECRET }}" > secrets/stripe_webhook_secret.txt
+          echo "${{ secrets.STRIPE_SECRET_KEY }}" > secrets/stripe_secret_key.txt
+          echo "${{ secrets.BREVO_API_KEY }}" > secrets/brevo_api_key.txt
+          echo "${{ secrets.SESSION_SECRET }}" > secrets/session_secret.txt
+          echo "${{ secrets.DB_PASSWORD_SECRET }}" > secrets/db_password_secret.txt
+
+      - name: Build and push with "latest" for se-mon
+        if: ${{ github.event.inputs.instance == 'se-mon' || github.event.inputs.instance == 'all' }}
+        uses: ./.github/workflows/composites/docker-build-push-version
+        with:
+          version: se-mon-latest
+          username-github: ${{ github.actor }}
+          password-github: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repo: 'kpturner/se-mon'

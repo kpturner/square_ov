@@ -1,0 +1,76 @@
+name: Deploy Square Events Monitor
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: The tag,port of the Docker image
+        required: true
+        type:
+          choice
+          # A comma delimited list of options for the deployment of each container
+          # 0) The instance label (used in database name etc)
+          # 1) The port to expose
+          # 2) The github runner label (if blank defaults to squareevents)
+          # 3) The image to use (if empty will use "se-mon")
+          # 4) The proxy host for the instance (if blank will default to https://<instance>.squareevents.org)
+          # 5) The docker-compose file to use (if empty will just use "docker-compose.yml")
+          # 6) Manual mode (if true will not restart the container)
+        options:
+          - monitor,4000
+
+jobs:
+  setup:
+    name: Setup parameters
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.setrunner.outputs.result }}
+    steps:
+      - name: Setup the runner matrix
+        id: setrunner
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const splits = '${{ github.event.inputs.tag }}'.split(',');
+            const result = splits[2] ? [[splits[2]]] : [['se-mon']];
+
+            return result;
+
+  deploy:
+    name: Deploy Square Events Monitor
+    needs: setup
+    strategy:
+      matrix:
+        runner: ${{fromJson(needs.setup.outputs.matrix)}}
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Deploy
+        shell: bash
+        run: |
+          # Split the comma separate string into an array
+          IFS=\, read -a fields <<<"${{ github.event.inputs.tag }}"
+          instance=${fields[0]}
+          container="${instance}"
+          port=${fields[1]}
+          image=${fields[3]:-'se-mon'}
+          proxy=${fields[4]:-"https://${instance}.squareevents.org"}
+          docker_compose=${fields[5]:-'docker-compose.yml'}
+          if [[ "$docker_compose" == *"docker-compose.yml"* ]]; then
+            redis_port=7000
+          else
+            redis_port=6379
+          fi
+          manual_mode=${fields[6]:-'false'}
+          docker login ghcr.io/kpturner -u ${{ github.actor }} -p ${{ secrets.REPO_ACCESS_TOKEN }}
+          cmd="./docker.sh -u -a up -f $docker_compose -m $image -n $container -t $instance -p $port -x $proxy -rp $redis_port"
+
+          if [[ "$manual_mode" == "true" ]]; then
+            cmd="$cmd -mm"
+          fi
+
+          $cmd
+          ./docker-cleanup.sh
