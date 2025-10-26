@@ -45,7 +45,7 @@
                 class="me-2"
                 icon="mdi-delete"
                 size="small"
-                @click="deleteOVPrompt(item)"
+                @click="deleteOV(item)"
               />
               <v-btn
                 icon="mdi-account-group"
@@ -93,41 +93,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-
-    <v-dialog
-      v-model="deleteDialog"
-      max-width="400"
-    >
-      <v-card>
-        <v-card-title>Delete OV</v-card-title>
-        <v-card-text>
-          <v-text-field
-            readonly
-            v-model="editedOV.name"
-            label="Name"
-          />
-          <v-text-field
-            readonly
-            v-model="editedOV.ovDate"
-            label="Date"
-            type="date"
-          />
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn
-            variant="text"
-            @click="deleteDialog = false"
-            >Cancel</v-btn
-          >
-          <v-btn
-            color="primary"
-            @click="deleteOV(editedOV)"
-            >Delete</v-btn
-          >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -153,7 +118,6 @@ const formattedOVs = computed(() => {
 
 const ovs = ref<OV[]>([]);
 const dialog = ref(false);
-const deleteDialog = ref(false);
 const editedOV = ref<Partial<OV>>({});
 const headers = [
   { title: 'Name', key: 'name' },
@@ -180,11 +144,6 @@ function editOV(item: OV) {
   dialog.value = true;
 }
 
-function deleteOVPrompt(item: OV) {
-  editedOV.value = { ...item, ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0] };
-  deleteDialog.value = true;
-}
-
 async function saveOV() {
   if (editedOV.value.id) {
     await $fetch(`/api/ov/${editedOV.value.id}`, {
@@ -199,8 +158,10 @@ async function saveOV() {
 }
 
 async function deleteOV(item: Partial<OV>) {
-  await $fetch(`/api/ov/${item.id}`, { method: 'DELETE' });
-  await fetchOVs();
+  if (confirm(`Delete ${item.name} Official Visit?`)) {
+    await $fetch(`/api/ov/${item.id}`, { method: 'DELETE' });
+    await fetchOVs();
+  }
 }
 
 function goToOfficers(item: OV) {

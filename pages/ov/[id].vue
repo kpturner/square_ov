@@ -30,6 +30,7 @@
       <v-data-table
         :headers
         :items="officers"
+        :items-per-page="officers.length"
         item-value="id"
         class="mt-2"
       >
@@ -124,6 +125,7 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import type { OV, Officer } from '@prisma/client';
+import { Position } from '@prisma/client';
 
 type GridOfficer = Officer & { isNew?: boolean };
 
@@ -133,7 +135,7 @@ const OV = ref<OV | null>(null);
 
 const { ranks } = useRuntimeConfig().public;
 
-const positions = ['automatic', 'rear_of_south', 'rear_of_north', 'head_of_south', 'head_of_north', 'vip'];
+const positions = Object.values(Position);
 
 const headers = [
   { title: 'Name', key: 'name' },

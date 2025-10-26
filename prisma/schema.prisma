@@ -13,6 +13,8 @@ enum Position {
   rear_of_north
   head_of_south
   head_of_north
+  sword_bearer
+  standard_bearer
   vip
 }
 
@@ -43,7 +45,7 @@ model OV {
 
 model Officer {
   id               Int      @id @default(autoincrement())
-  name             String   @unique
+  name             String
   rank             String
   grandOfficer     Boolean
   grandOfficerYear Int?
