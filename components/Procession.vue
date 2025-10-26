@@ -19,7 +19,7 @@
       >
         <v-card
           v-if="swordBearer"
-          class="pa-3 text-center mr-1 officer-card"
+          class="pa-3 text-center mr-1 officer-card sword-bearer"
           color="grey lighten-2"
         >
           <strong>{{ swordBearer.name }}</strong>
@@ -37,7 +37,7 @@
 
         <v-card
           v-if="standardBearer"
-          class="pa-3 text-center ml-1 officer-card"
+          class="pa-3 text-center ml-1 officer-card standard-bearer"
           color="grey lighten-2"
         >
           <strong>{{ standardBearer.name }}</strong>
@@ -69,8 +69,8 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
+            :class="row.south.grandOfficer ? 'grand-officer' : ''"
             :color="row.south.grandOfficer ? 'blue darken-3' : undefined"
-            :style="row.south.grandOfficer ? 'color: yellow' : undefined"
           >
             <div>{{ row.south.name }}</div>
             <div class="text-caption">{{ rankPrefix(row.south) }}{{ row.south.rank }}</div>
@@ -82,8 +82,8 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
+            :class="row.north.grandOfficer ? 'grand-officer' : ''"
             :color="row.north.grandOfficer ? 'blue darken-3' : undefined"
-            :style="row.north.grandOfficer ? 'color: yellow' : undefined"
           >
             <div>{{ row.north.name }}</div>
             <div class="text-caption">{{ rankPrefix(row.north) }}{{ row.north.rank }}</div>
@@ -265,6 +265,14 @@ function printProcession() {
   /* Hide all "no-print" buttons and controls */
   .no-print {
     display: none !important;
+  }
+
+  .sword-bearer {
+    color: black !important;
+  }
+
+  .grand-officer {
+    color: black !important;
   }
 
   @page {
