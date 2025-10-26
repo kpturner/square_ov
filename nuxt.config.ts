@@ -8,20 +8,12 @@ export default defineNuxtConfig({
     port: 4000,
   },
   runtimeConfig: {
-    password: config.get<string>('password'),
-    stripe: {
-      secretKey: config.get('stripe.secretKey'),
-      webhookSecret: config.get('stripe.webhookSecret'),
-    },
     database: {
       user: config.get<string>('database.user'),
       pass: config.get<string>('database.password'),
       host: config.get<string>('database.host'),
       port: config.get<number>('database.port'),
       name: config.get<string>('database.name'),
-    },
-    brevo: {
-      apiKey: config.get<string>('brevo_api_key'),
     },
     public: {
       logLevel: config.get('log_level'),
@@ -32,6 +24,7 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
   modules: [
+    '@pinia/nuxt',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
         // @ts-expect-error

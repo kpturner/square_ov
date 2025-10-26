@@ -1,33 +1,101 @@
 <template>
-  <v-layout class="rounded rounded-md">
-    <client-only>
-      <v-app-bar>
-        <v-app-bar-nav-icon
-          variant="text"
-          @click.stop="drawer = !drawer"
-        ></v-app-bar-nav-icon
-        ><v-toolbar-title>SquareEvents Monitor</v-toolbar-title></v-app-bar
-      >
+  <v-container
+    class="d-flex align-center justify-center"
+    style="height: 100vh"
+  >
+    <v-card
+      width="400"
+      class="pa-6"
+    >
+      <v-card-title class="text-h5">{{ mode === 'login' ? 'Login' : 'Create Account' }}</v-card-title>
 
-      <v-navigation-drawer v-model="drawer">
-        <v-list>
-          <v-list-item title="Navigation drawer"></v-list-item>
-        </v-list>
-      </v-navigation-drawer>
+      <v-text-field
+        v-show="mode === 'register'"
+        v-model="name"
+        label="Name"
+        type="name"
+        class="mt-4"
+        outlined
+      />
 
-      <v-main
-        class="d-flex"
-        style="min-height: 300px"
+      <v-text-field
+        v-model="email"
+        label="Email"
+        type="email"
+        class="mt-4"
+        outlined
+      />
+
+      <v-text-field
+        v-model="password"
+        label="Password"
+        type="password"
+        outlined
+      />
+
+      <v-btn
+        color="primary"
+        class="mt-4"
+        @click="submit"
+        block
       >
-        <Authenticate v-if="!$authenticated" />
-        <Customers v-if="$authenticated" />
-      </v-main>
-    </client-only>
-  </v-layout>
+        {{ mode === 'login' ? 'Login' : 'Register' }}
+      </v-btn>
+
+      <v-btn
+        variant="text"
+        class="mt-2"
+        @click="toggleMode"
+        block
+      >
+        {{ mode === 'login' ? 'Need an account? Register' : 'Already have an account? Login' }}
+      </v-btn>
+
+      <v-alert
+        v-if="error"
+        type="error"
+        class="mt-4"
+        density="compact"
+      >
+        {{ error }}
+      </v-alert>
+    </v-card>
+  </v-container>
 </template>
 
-<script lang="ts" setup>
-const { $authenticated } = useNuxtApp();
+<script setup lang="ts">
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuthStore } from '~/stores/auth';
+import type { AuthUser } from '~/types/user';
 
-const drawer = ref(false);
+const authStore = useAuthStore();
+
+const name = ref('');
+const email = ref('');
+const password = ref('');
+const mode = ref<'login' | 'register'>('login');
+const error = ref('');
+const router = useRouter();
+
+function toggleMode() {
+  mode.value = mode.value === 'login' ? 'register' : 'login';
+  error.value = '';
+}
+
+async function submit() {
+  error.value = '';
+  try {
+    const res = await $fetch<{ success: boolean; authUser: AuthUser }>('/api/' + mode.value, {
+      method: 'POST',
+      body: { name: name.value, email: email.value, password: password.value },
+    });
+    if (res.success) {
+      authStore.setUser(res.authUser);
+      router.push('/home');
+    }
+  } catch (err: any) {
+    error.value = err?.data?.statusMessage || 'Error';
+  }
+}
 </script>
