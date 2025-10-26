@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import type { AuthUser } from '~/types/user';
 
 export const useAuthStore = defineStore('auth', {
+  persist: true,
   state: () => ({
     user: null as AuthUser | null,
     token: null as string | null,

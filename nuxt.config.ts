@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     public: {
       logLevel: config.get('log_level'),
       logToFile: config.get<boolean>('log_to_file'),
+      ranks: config.get<{ value: string; text: string }[]>('ranks'),
     },
   },
   build: {

@@ -12,13 +12,11 @@
   "ranks": [
     {
       "value": "SGW",
-      "text": "Senior Grand Warden",
-      "available": true
+      "text": "Senior Grand Warden"
     },
     {
       "value": "JGW",
-      "text": "Junior Grand Warden",
-      "available": true
+      "text": "Junior Grand Warden"
     },
     {
       "value": "GTREAS",
@@ -47,8 +45,7 @@
     },
     {
       "value": "GSWDB",
-      "text": "Grand Sword Bearer",
-      "available": true
+      "text": "Grand Sword Bearer"
     },
     {
       "value": "GSUPTWKS",
@@ -62,8 +59,7 @@
     },
     {
       "value": "DGREG",
-      "text": "Deputy Grand Registrar",
-      "available": true
+      "text": "Deputy Grand Registrar"
     },
     {
       "value": "DGSEC",
@@ -77,13 +73,11 @@
     },
     {
       "value": "DGSWDB",
-      "text": "Deputy Grand Sword Bearer",
-      "available": true
+      "text": "Deputy Grand Sword Bearer"
     },
     {
       "value": "DGSUPTWKS",
-      "text": "Deputy Grand Superintendent of Works",
-      "available": true
+      "text": "Deputy Grand Superintendent of Works"
     },
     {
       "value": "GALMR",
@@ -107,13 +101,11 @@
     },
     {
       "value": "SGD",
-      "text": "Senior Grand Deacon",
-      "available": true
+      "text": "Senior Grand Deacon"
     },
     {
       "value": "JGD",
-      "text": "Junior Grand Deacon",
-      "available": true
+      "text": "Junior Grand Deacon"
     },
     {
       "value": "AGCHAP",
@@ -122,8 +114,7 @@
     },
     {
       "value": "AGREG",
-      "text": "Assistant Grand Registrar",
-      "available": true
+      "text": "Assistant Grand Registrar"
     },
     {
       "value": "AGSEC",
@@ -132,18 +123,15 @@
     },
     {
       "value": "AGDC",
-      "text": "Assistant Grand Director of Ceremonies",
-      "available": true
+      "text": "Assistant Grand Director of Ceremonies"
     },
     {
       "value": "AGSWDB",
-      "text": "Assistant Grand Sword Bearer",
-      "available": true
+      "text": "Assistant Grand Sword Bearer"
     },
     {
       "value": "AGSUPTWKS",
-      "text": "Assistant Grand Superintendent of Works",
-      "available": true
+      "text": "Assistant Grand Superintendent of Works"
     },
     {
       "value": "GORG",
@@ -152,28 +140,23 @@
     },
     {
       "value": "GSTDB",
-      "text": "Grand Standard Bearer",
-      "available": true
+      "text": "Grand Standard Bearer"
     },
     {
       "value": "AGSTDB",
-      "text": "Assistant Grand Standard Bearer",
-      "available": true
+      "text": "Assistant Grand Standard Bearer"
     },
     {
       "value": "GPURS",
-      "text": "Grand Pursuivant",
-      "available": true
+      "text": "Grand Pursuivant"
     },
     {
       "value": "GSTWD",
-      "text": "Grand Steward",
-      "available": true
+      "text": "Grand Steward"
     },
     {
       "value": "AGPURS",
-      "text": "Assistant Grand Pursuivant",
-      "available": true
+      "text": "Assistant Grand Pursuivant"
     },
     {
       "value": "GTYLER",

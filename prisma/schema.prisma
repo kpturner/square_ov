@@ -46,7 +46,7 @@ model Officer {
   name             String   @unique
   rank             String
   grandOfficer     Boolean
-  grandOfficerYear Int
+  grandOfficerYear Int?
   active           Boolean
   position         Position @default(automatic)
 

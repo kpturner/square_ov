@@ -3,38 +3,56 @@
     <v-row>
       <v-col>
         <v-card>
-          <v-card-title>
-            <span class="text-h5">Official Visits</span>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              @click="openDialog()"
-              >Add OV</v-btn
-            >
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div class="d-flex align-center">
+              <span class="text-h5">Official Visits</span>
+            </div>
+
+            <div class="d-flex align-center gap-2">
+              <v-btn
+                color="grey"
+                variant="text"
+                small
+                @click="logOff"
+              >
+                Log Off
+              </v-btn>
+              <v-btn
+                color="green"
+                @click="openDialog()"
+              >
+                Add OV
+              </v-btn>
+            </div>
           </v-card-title>
 
           <v-data-table
             :headers="headers"
-            :items="ovs"
+            :items="formattedOVs"
             class="mt-4"
           >
             <template #item.ovDate="{ item }">
-              {{ formatDate(item.ovDate) }}
+              {{ item.displayDate }}
             </template>
             <template #item.actions="{ item }">
               <v-btn
+                class="me-2"
                 icon="mdi-pencil"
                 size="small"
                 @click="editOV(item)"
               />
               <v-btn
+                class="me-2"
                 icon="mdi-delete"
                 size="small"
-                @click="deleteOV(item)"
+                @click="deleteOVPrompt(item)"
               />
               <v-btn
                 icon="mdi-account-group"
                 size="small"
+                color="green"
+                variant="elevated"
+                title="Procession"
                 @click="goToOfficers(item)"
               />
             </template>
@@ -75,14 +93,48 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog
+      v-model="deleteDialog"
+      max-width="400"
+    >
+      <v-card>
+        <v-card-title>Delete OV</v-card-title>
+        <v-card-text>
+          <v-text-field
+            readonly
+            v-model="editedOV.name"
+            label="Name"
+          />
+          <v-text-field
+            readonly
+            v-model="editedOV.ovDate"
+            label="Date"
+            type="date"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn
+            variant="text"
+            @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
+          <v-btn
+            color="primary"
+            @click="deleteOV(editedOV)"
+            >Delete</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import type { OV } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
-import type { AuthUser } from '~/types/user';
 
 const authStore = useAuthStore();
 
@@ -92,8 +144,16 @@ function formatDate(dateStr: string | Date) {
   return date.toLocaleDateString();
 }
 
+const formattedOVs = computed(() => {
+  return ovs.value.map((ov) => ({
+    ...ov,
+    displayDate: formatDate(ov.ovDate),
+  }));
+});
+
 const ovs = ref<OV[]>([]);
 const dialog = ref(false);
+const deleteDialog = ref(false);
 const editedOV = ref<Partial<OV>>({});
 const headers = [
   { title: 'Name', key: 'name' },
@@ -102,7 +162,12 @@ const headers = [
 ];
 
 async function fetchOVs() {
-  ovs.value = await $fetch<OV[]>('/api/ov');
+  ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
+}
+
+function logOff() {
+  authStore.user = null;
+  navigateTo('/');
 }
 
 function openDialog() {
@@ -111,8 +176,13 @@ function openDialog() {
 }
 
 function editOV(item: OV) {
-  editedOV.value = { ...item };
+  editedOV.value = { ...item, ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0] };
   dialog.value = true;
+}
+
+function deleteOVPrompt(item: OV) {
+  editedOV.value = { ...item, ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0] };
+  deleteDialog.value = true;
 }
 
 async function saveOV() {
@@ -128,7 +198,7 @@ async function saveOV() {
   await fetchOVs();
 }
 
-async function deleteOV(item: OV) {
+async function deleteOV(item: Partial<OV>) {
   await $fetch(`/api/ov/${item.id}`, { method: 'DELETE' });
   await fetchOVs();
 }
