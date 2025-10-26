@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-card>
+    <v-card class="no-print">
       <v-card-title class="d-flex justify-space-between align-center">
         <div
           class="d-flex flex-column"
@@ -116,8 +116,11 @@
         </template>
       </v-data-table>
     </v-card>
-
-    <Procession :officers="officers" />
+    <hr />
+    <Procession
+      :officers
+      :OV
+    />
   </v-container>
 </template>
 
@@ -203,4 +206,15 @@ async function saveAll() {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+@media print {
+  /* Hide everything except the Procession component */
+  body * {
+    visibility: hidden;
+  }
+  /* Hide all "no-print" buttons and controls */
+  .no-print {
+    display: none !important;
+  }
+}
+</style>

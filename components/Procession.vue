@@ -1,15 +1,25 @@
 <template>
   <v-card class="pa-4">
-    <v-card-title>Procession</v-card-title>
+    <v-card-title class="d-flex justify-space-between mb-2"
+      >Procession for OV to {{ OV?.name || '...' }}
+      <v-btn
+        color="primary"
+        prepend-icon="mdi-printer"
+        class="mb-4 no-print"
+        @click="printProcession"
+      >
+        Print
+      </v-btn>
+    </v-card-title>
     <v-card-text>
-      <!-- VIP row at the rear/top with sword and banner bearers -->
+      <!-- VIP row at the rear/top with sword and standard bearers -->
       <div
-        v-if="vip || swordBearer || bannerBearer"
+        v-if="vip || swordBearer || standardBearer"
         class="d-flex justify-center mb-4"
       >
         <v-card
           v-if="swordBearer"
-          class="pa-3 text-center mr-1"
+          class="pa-3 text-center mr-1 officer-card"
           color="grey lighten-2"
         >
           <strong>{{ swordBearer.name }}</strong>
@@ -18,7 +28,7 @@
 
         <v-card
           v-if="vip"
-          class="pa-3 text-center"
+          class="pa-3 text-center officer-card"
           color="yellow lighten-2"
         >
           <strong>{{ vip.name }}</strong>
@@ -26,16 +36,28 @@
         </v-card>
 
         <v-card
-          v-if="bannerBearer"
-          class="pa-3 text-center ml-1"
+          v-if="standardBearer"
+          class="pa-3 text-center ml-1 officer-card"
           color="grey lighten-2"
         >
-          <strong>{{ bannerBearer.name }}</strong>
-          <div class="text-caption">Banner Bearer</div>
+          <strong>{{ standardBearer.name }}</strong>
+          <div class="text-caption">Standard Bearer</div>
         </v-card>
       </div>
 
       <!-- Rows of officers, top = rear, bottom = front -->
+      <div class="d-flex justify-space-between mb-2">
+        <div class="flex-1 pl-1">
+          <div class="pa-2 text-center">
+            <strong>SOUTH</strong>
+          </div>
+        </div>
+        <div class="flex-1 pl-1">
+          <div class="pa-2 text-center">
+            <strong>NORTH</strong>
+          </div>
+        </div>
+      </div>
       <div
         v-for="(row, idx) in rows"
         :key="idx"
@@ -46,12 +68,12 @@
           class="flex-1 pr-1"
         >
           <v-card
-            class="pa-2 text-center"
+            class="pa-2 text-center officer-card"
             :color="row.south.grandOfficer ? 'blue darken-3' : undefined"
             :style="row.south.grandOfficer ? 'color: yellow' : undefined"
           >
             <div>{{ row.south.name }}</div>
-            <div class="text-caption">{{ row.south.rank }}</div>
+            <div class="text-caption">{{ rankPrefix(row.south) }}{{ row.south.rank }}</div>
           </v-card>
         </div>
         <div
@@ -59,12 +81,12 @@
           class="flex-1 pl-1"
         >
           <v-card
-            class="pa-2 text-center"
+            class="pa-2 text-center officer-card"
             :color="row.north.grandOfficer ? 'blue darken-3' : undefined"
             :style="row.north.grandOfficer ? 'color: yellow' : undefined"
           >
             <div>{{ row.north.name }}</div>
-            <div class="text-caption">{{ row.north.rank }}</div>
+            <div class="text-caption">{{ rankPrefix(row.north) }}{{ row.north.rank }}</div>
           </v-card>
         </div>
       </div>
@@ -73,23 +95,38 @@
 </template>
 
 <script setup lang="ts">
-import type { Officer } from '@prisma/client';
+import type { Officer, OV } from '@prisma/client';
 import { computed } from 'vue';
 
 const { ranks } = useRuntimeConfig().public;
 
-const props = defineProps<{ officers: Officer[] }>();
+const props = defineProps<{ officers: Officer[]; OV: OV | null }>();
 
 // Special roles
 const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
 const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'));
-const bannerBearer = computed(() => props.officers.find((o) => o.position === 'banner_bearer'));
+const standardBearer = computed(() => props.officers.find((o) => o.position === 'standard_bearer'));
 
 // Rear/front/head positions
 const rearSouth = computed(() => props.officers.find((o) => o.position === 'rear_of_south'));
 const rearNorth = computed(() => props.officers.find((o) => o.position === 'rear_of_north'));
 const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
 const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
+
+const rankPrefix = (officer: Officer) => {
+  if (officer.grandOfficer) {
+    if (!officer.active) {
+      return 'P';
+    }
+  } else {
+    if (officer.active) {
+      return 'Prov';
+    } else {
+      return 'P';
+    }
+  }
+  return '';
+};
 
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
@@ -123,11 +160,11 @@ const automatic = computed(() =>
 const rows = computed(() => {
   const result: { south?: Officer; north?: Officer; centre?: Officer[] }[] = [];
 
-  // VIP + sword/banner first (rear)
+  // VIP + sword/standard first (rear)
   const centreRow: Officer[] = [];
   if (swordBearer.value) centreRow.push(swordBearer.value);
   if (vip.value) centreRow.push(vip.value);
-  if (bannerBearer.value) centreRow.push(bannerBearer.value);
+  if (standardBearer.value) centreRow.push(standardBearer.value);
   if (centreRow.length > 0) result.push({ centre: centreRow });
 
   let nextRow: { south?: Officer; north?: Officer } = {};
@@ -191,11 +228,48 @@ const rows = computed(() => {
 
   return result;
 });
+
+function printProcession() {
+  window.print();
+}
 </script>
 
 <style scoped>
 .v-card-text {
   display: flex;
   flex-direction: column;
+}
+
+.officer-card {
+  min-width: 300px;
+}
+
+@media print {
+  /* Hide everything except the Procession component */
+  body * {
+    visibility: hidden;
+  }
+
+  .procession-print,
+  .procession-print * {
+    visibility: visible;
+  }
+
+  .procession-print {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+
+  /* Hide all "no-print" buttons and controls */
+  .no-print {
+    display: none !important;
+  }
+
+  @page {
+    size: portrait;
+    margin: 1.5cm;
+  }
 }
 </style>
