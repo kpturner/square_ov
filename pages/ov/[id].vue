@@ -115,6 +115,8 @@
         </template>
       </v-data-table>
     </v-card>
+
+    <Procession :officers="officers" />
   </v-container>
 </template>
 
