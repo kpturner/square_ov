@@ -14,9 +14,7 @@ function usage {
     echo "--file               | -f   [docker-compose.yml(default)]"
     echo "--action             | -a   ['up'(default), 'down']"
     echo "--update             | -u   [Fetch updated docker images]"
-    echo "--proxy              | -x   [Proxy host  https://squareevents.org(default)]"
-    echo "--redis_port         | -rp  [Redis port  7000(default)]"
-    echo "--manual_mode        | -mm  [Manual mode - Manual start for debugging]"
+    echo "--proxy              | -x   [Proxy host  https://ov.kpturner.co.uk(default)]"
 }
 
 name="se-mon"
@@ -26,7 +24,7 @@ update=""
 port=4000
 pull=''
 instance=se-mon
-proxy=https://monitor.squareevents.org
+proxy=https://ov.kpturner.co.uk
 redisPort=7000
 
 while [[ "$#" -gt 0 ]]; do
@@ -39,10 +37,8 @@ while [[ "$#" -gt 0 ]]; do
         -x|--proxy) proxy="$2"; shift ;;
         -t|--instance) instance="$2"; shift ;;
         -m|--image) image="$2"; shift ;;
-        -rp|--redis_port) redisPort="$2"; shift ;;
         -i|--install) install=1;;
         -u|--update) update=1;;
-        -mm|--manual_mode) manual_mode=1;;
         *)
         echo "Unknown parameter passed: $1";
         usage;
@@ -66,18 +62,14 @@ export PORT=$port
 export NAME=$name 
 export INSTANCE=$instance 
 export PROXYHOST=$proxy 
-export REDIS_PORT=$redisPort 
 export IMAGE=$image
-export MANUAL_MODE=$manual_mode
 
 echo "Running docker-compose"
 echo "Name: $name"
 echo "Image: $image-latest"
 echo "Port: $port"
 echo "Instance: $instance"
-echo "Redis Port: $redisPort"
 echo "Proxy: $proxy"
-echo "Manual Mode: $manual_mode"
 
 if [[ $update ]]; then
     echo Update Mode

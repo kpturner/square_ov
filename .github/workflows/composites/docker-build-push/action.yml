@@ -10,33 +10,13 @@ inputs:
   repo:
     description: Repo
     required: true
-  password:
-    description: Password
-    required: true
-  stripe_webhook_secret:
-    description: Stripe webhook secret
-    required: true
-  stripe_secret_key:
-    description: Stripe secret key
-    required: true
   db_password_secret:
     description: DB password secret
-    required: true
-  brevo_api_key:
-    description: Brevo API key
-    required: true
-  session_secret:
-    description: Session secret
     required: true
   opts:
     description: Run time options
     default: --prod
     required: false
-  social_media_login:
-    description: Social media login
-    type: boolean
-    required: false
-    default: false
   tag:
     description: Tag
     required: true
@@ -50,7 +30,7 @@ inputs:
     default: Dockerfile
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Login to Docker Hub
       uses: docker/login-action@v2
@@ -70,15 +50,9 @@ runs:
         builder: ${{ steps.buildx.outputs.name }}
         file: ${{ inputs.dockerfile }}
         secret-files: |
-          "PASSWORD=${{ inputs.password }}"
-          "STRIPE_WEBHOOK_SECRET=${{ inputs.stripe_webhook_secret }}"
-          "STRIPE_SECRET_KEY=${{ inputs.stripe_secret_key }}"
           "DB_PASSWORD_SECRET=${{ inputs.db_password_secret }}"
-          "BREVO_API_KEY=${{ inputs.brevo_api_key }}"
-          "SESSION_SECRET=${{ inputs.session_secret }}"
         build-args: |
           OPTS=${{ inputs.opts }}
-          SOCIAL_MEDIA_LOGIN=${{ inputs.social_media_login }}
         push: true
         tags: ${{ inputs.registry }}/${{ inputs.repo }}:${{ inputs.tag }}
         # CAREFUL of caching as our test and live images will end up the same

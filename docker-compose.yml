@@ -1,22 +1,20 @@
-version: '3'
+version: "3"
 
 services:
-  se-mon:
+  square-ov:
     container_name: ${NAME}
-    image: ghcr.io/kpturner/se-mon:${IMAGE}-latest
+    image: ghcr.io/kpturner/square-ov:${IMAGE}-latest
     restart: unless-stopped
     extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      - "host.docker.internal:host-gateway"
     environment:
       - container=docker
       - REDIS_HOST=host.docker.internal
       - REDIS_PORT=${REDIS_PORT}
       - DB_HOST=host.docker.internal
       - DB_PORT=3306
-      - DB_NAME=se-mon
-      - DB_USER=se-mon
-      - INSTANCE=${INSTANCE}
-      - MANUAL_MODE=${MANUAL_MODE}
+      - DB_NAME=square-ov
+      - DB_USER=square-ov
       - PROXYHOST=${PROXYHOST}
     ports:
-      - '${PORT}:4000'
+      - "${PORT}:4000"

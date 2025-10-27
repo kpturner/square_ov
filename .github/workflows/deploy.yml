@@ -1,4 +1,4 @@
-name: Deploy Square Events Monitor
+name: Deploy Square OV
 
 on:
   workflow_dispatch:
@@ -11,13 +11,12 @@ on:
           # A comma delimited list of options for the deployment of each container
           # 0) The instance label (used in database name etc)
           # 1) The port to expose
-          # 2) The github runner label (if blank defaults to squareevents)
-          # 3) The image to use (if empty will use "se-mon")
-          # 4) The proxy host for the instance (if blank will default to https://<instance>.squareevents.org)
+          # 2) The github runner label (if blank defaults to kpturner)
+          # 3) The image to use (if empty will use "square-ov")
+          # 4) The proxy host for the instance (if blank will default to https://<instance>.kpturner.co.uk)
           # 5) The docker-compose file to use (if empty will just use "docker-compose.yml")
-          # 6) Manual mode (if true will not restart the container)
         options:
-          - monitor,4000
+          - ov,4000
 
 jobs:
   setup:
@@ -32,12 +31,12 @@ jobs:
         with:
           script: |
             const splits = '${{ github.event.inputs.tag }}'.split(',');
-            const result = splits[2] ? [[splits[2]]] : [['se-mon']];
+            const result = splits[2] ? [[splits[2]]] : [['square-ov']];
 
             return result;
 
   deploy:
-    name: Deploy Square Events Monitor
+    name: Deploy Square OV
     needs: setup
     strategy:
       matrix:
@@ -56,17 +55,11 @@ jobs:
           instance=${fields[0]}
           container="${instance}"
           port=${fields[1]}
-          image=${fields[3]:-'se-mon'}
-          proxy=${fields[4]:-"https://${instance}.squareevents.org"}
+          image=${fields[3]:-'square-ov'}
+          proxy=${fields[4]:-"https://${instance}.kpturner.co.uk"}
           docker_compose=${fields[5]:-'docker-compose.yml'}
-          if [[ "$docker_compose" == *"docker-compose.yml"* ]]; then
-            redis_port=7000
-          else
-            redis_port=6379
-          fi
-          manual_mode=${fields[6]:-'false'}
           docker login ghcr.io/kpturner -u ${{ github.actor }} -p ${{ secrets.REPO_ACCESS_TOKEN }}
-          cmd="./docker.sh -u -a up -f $docker_compose -m $image -n $container -t $instance -p $port -x $proxy -rp $redis_port"
+          cmd="./docker.sh -u -a up -f $docker_compose -m $image -n $container -t $instance -p $port -x $proxy"
 
           if [[ "$manual_mode" == "true" ]]; then
             cmd="$cmd -mm"

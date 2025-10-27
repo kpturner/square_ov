@@ -2,7 +2,7 @@ name: Delete old container images
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Midnight
+    - cron: "0 0 * * *" # Midnight
   workflow_dispatch:
 
 jobs:
@@ -14,8 +14,8 @@ jobs:
         uses: snok/container-retention-policy@v3.0.0
         with:
           account: user
-          image-names: 'se-mon'
+          image-names: "square-ov"
           cut-off: 1month
           keep-n-most-recent: 1
-          image-tags: 'sha-*,se-mon-latest'
+          image-tags: "sha-*,square-ov-latest"
           token: ${{ secrets.REPO_ACCESS_TOKEN }}

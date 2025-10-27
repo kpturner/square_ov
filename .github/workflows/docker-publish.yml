@@ -12,10 +12,10 @@ on:
       instance:
         description: Instance
         required: true
-        default: se-mon
+        default: square-ov
         type: choice
         options:
-          - se-mon
+          - square-ov
 
 jobs:
   build-and-push:
@@ -34,25 +34,15 @@ jobs:
         run: |
           mkdir -p secrets
 
-      - name: Debug secret value
-        run: |
-          # echo ${{secrets.STRIPE_SECRET_KEY}} | sed 's/./& /g';
-          # echo ${{secrets.STRIPE_WEBHOOK_SECRET}} | sed 's/./& /g';
-
       - name: Store common secrets
         run: |
-          echo "${{ secrets.PASSWORD }}" > secrets/password.txt
-          echo "${{ secrets.STRIPE_WEBHOOK_SECRET }}" > secrets/stripe_webhook_secret.txt
-          echo "${{ secrets.STRIPE_SECRET_KEY }}" > secrets/stripe_secret_key.txt
-          echo "${{ secrets.BREVO_API_KEY }}" > secrets/brevo_api_key.txt
-          echo "${{ secrets.SESSION_SECRET }}" > secrets/session_secret.txt
           echo "${{ secrets.DB_PASSWORD_SECRET }}" > secrets/db_password_secret.txt
 
-      - name: Build and push with "latest" for se-mon
-        if: ${{ github.event.inputs.instance == 'se-mon' || github.event.inputs.instance == 'all' }}
+      - name: Build and push with "latest" for square-ov
+        if: ${{ github.event.inputs.instance == 'square-ov' || github.event.inputs.instance == 'all' }}
         uses: ./.github/workflows/composites/docker-build-push-version
         with:
-          version: se-mon-latest
+          version: square-ov-latest
           username-github: ${{ github.actor }}
           password-github: ${{ secrets.REPO_ACCESS_TOKEN }}
-          repo: 'kpturner/se-mon'
+          repo: "kpturner/square-ov"
