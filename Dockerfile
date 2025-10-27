@@ -11,9 +11,6 @@ COPY . .
 
 RUN mkdir -p ./config/secrets
 
-RUN --mount=type=secret,id=PASSWORD \
-    cp /run/secrets/PASSWORD ./config/secrets/password.txt
-
 RUN --mount=type=secret,id=DB_PASSWORD_SECRET \
     cp /run/secrets/DB_PASSWORD_SECRET ./config/secrets/db_password_secret.txt
 

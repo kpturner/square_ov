@@ -7,8 +7,8 @@ set -e
 function usage {
     echo "Usage: ./docker.sh"
     echo "--install            | -i   [Install docker]"
-    echo "--name               | -n   [se-mon(default)]"
-    echo "--instance           | -t   [se-mon(default)]"
+    echo "--name               | -n   [square-ov(default)]"
+    echo "--instance           | -t   [square-ov(default)]"
     echo "--image              | -m   [image for container to use (appended with -latest) (default=$instance)]"
     echo "--port               | -p   [4000(default)]"
     echo "--file               | -f   [docker-compose.yml(default)]"
@@ -17,13 +17,13 @@ function usage {
     echo "--proxy              | -x   [Proxy host  https://ov.kpturner.co.uk(default)]"
 }
 
-name="se-mon"
+name="square-ov"
 file="docker-compose.yml"
 action="up -d"
 update=""
 port=4000
 pull=''
-instance=se-mon
+instance=square-ov
 proxy=https://ov.kpturner.co.uk
 redisPort=7000
 
