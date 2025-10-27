@@ -17,14 +17,14 @@ RUN --mount=type=secret,id=DB_PASSWORD_SECRET \
 ENV OPTS=${OPTS}
 ENV NITRO_PORT=4000
 
-RUN npm i
+RUN yarn
 RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     DB_HOST=host.docker.internal \
     DB_PORT=3306 \
     DB_NAME=square-ov \
     DB_USER=square-ov \
     LOG_LEVEL=debug \
-    npm run build
+    yarn build
 
 RUN apt-get update
 RUN apt-get install default-mysql-client -y
