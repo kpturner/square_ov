@@ -26,7 +26,6 @@
     />
 
     <v-card-text>
-      <!-- VIP row at the rear/top with sword and standard bearers -->
       <div
         v-if="vip || swordBearer || standardBearer"
         class="d-flex justify-center mb-4"
@@ -34,16 +33,16 @@
         <v-card
           v-if="swordBearer"
           class="pa-3 text-center mr-1 officer-card sword-bearer"
-          color="grey lighten-2"
+          color="#FFF59D"
         >
           <strong>{{ swordBearer.name }}</strong>
-          <div class="text-caption">{{ rankCaption(swordBearer) }}</div>
+          <div class="text-caption">Sword Bearer</div>
         </v-card>
 
         <v-card
           v-if="vip"
           class="pa-3 text-center officer-card"
-          color="yellow lighten-2"
+          color="yellow"
         >
           <strong>{{ vip.name }}</strong>
           <div class="text-caption">{{ rankCaption(vip) }}</div>
@@ -52,10 +51,10 @@
         <v-card
           v-if="standardBearer"
           class="pa-3 text-center ml-1 officer-card standard-bearer"
-          color="grey lighten-2"
+          color="#FFF59D"
         >
           <strong>{{ standardBearer.name }}</strong>
-          <div class="text-caption">{{ rankCaption(standardBearer) }}</div>
+          <div class="text-caption">Standard Bearer</div>
         </v-card>
       </div>
 
@@ -84,7 +83,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.south.grandOfficer ? 'grand-officer' : ''"
-            :color="row.south.grandOfficer ? 'blue darken-3' : undefined"
+            :color="row.south.grandOfficer ? 'blue' : 'grey '"
           >
             <div>{{ row.south.name }}</div>
             <div class="text-caption">{{ rankCaption(row.south) }}</div>
@@ -97,7 +96,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.north.grandOfficer ? 'grand-officer' : ''"
-            :color="row.north.grandOfficer ? 'blue darken-3' : undefined"
+            :color="row.north.grandOfficer ? 'blue' : 'grey '"
           >
             <div>{{ row.north.name }}</div>
             <div class="text-caption">

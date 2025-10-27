@@ -1,171 +1,195 @@
 <template>
-  <v-container
-    fluid
-    class="pa-4"
-  >
-    <v-overlay
-      v-model="loading"
-      absolute
-      class="d-flex align-center justify-center"
+  <v-app>
+    <v-app-bar
+      flat
+      class="mb-4"
     >
-      <v-progress-circular
-        indeterminate
-        size="64"
-        color="primary"
-      />
-    </v-overlay>
-    <v-card class="no-print">
-      <v-card-title class="d-flex justify-space-between align-center">
-        <div
-          class="d-flex flex-column"
-          style="align-items: flex-start"
-        >
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-home"
-            @click="$router.push('/home')"
-            class="mb-2"
-            small
-          >
-            Home
-          </v-btn>
-          <span>Officers for OV to {{ OV?.name || '...' }}</span>
-        </div>
-
-        <v-btn
-          color="green"
-          @click="addOfficer"
-          prepend-icon="mdi-plus"
-        >
-          Add Officer
-        </v-btn>
-      </v-card-title>
-
-      <v-data-table
-        :headers
-        :items="officers"
-        :items-per-page="officers.length"
-        item-value="id"
-        class="mt-2"
+      <v-btn
+        color="grey"
+        variant="text"
+        small
+        @click="logOff"
       >
-        <template #item.name="{ item }">
-          <v-text-field
-            v-model="item.name"
-            density="compact"
-            hide-details
-            placeholder="Name"
+        Log Off
+      </v-btn>
+      <v-spacer />
+      <v-btn
+        :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
+        @click="toggleTheme"
+        variant="text"
+      />
+    </v-app-bar>
+    <v-main>
+      <v-container
+        fluid
+        class="pa-4"
+      >
+        <v-overlay
+          v-model="loading"
+          absolute
+          class="d-flex align-center justify-center"
+        >
+          <v-progress-circular
+            indeterminate
+            size="64"
+            color="primary"
           />
-        </template>
-
-        <template #item.rank="{ item }">
-          <v-select
-            v-model="item.rank"
-            :items="[{ value: '' }, ...ranks]"
-            item-title="value"
-            item-value="value"
-            density="compact"
-            hide-details
-            placeholder="Prov rank"
-          />
-        </template>
-
-        <template #item.active="{ item }">
-          <div class="checkbox-cell">
-            <v-checkbox
-              v-model="item.active"
-              hide-details
-              density="compact"
-            />
-          </div>
-        </template>
-
-        <template #item.grandOfficer="{ item }">
-          <div class="checkbox-cell">
-            <v-checkbox
-              v-model="item.grandOfficer"
-              hide-details
-              density="compact"
-            />
-          </div>
-        </template>
-
-        <template #item.grandOfficerYear="{ item }">
-          <v-text-field
-            v-model="item.grandOfficerYear"
-            type="number"
-            density="compact"
-            hide-details
-            :disabled="!item.grandOfficer"
-          />
-        </template>
-
-        <template #item.grandRank="{ item }">
-          <v-select
-            v-model="item.grandRank"
-            :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
-            item-title="value"
-            item-value="value"
-            density="compact"
-            hide-details
-            placeholder="Grand rank"
-            :disabled="!item.grandOfficer"
-          />
-        </template>
-
-        <template #item.grandActive="{ item }">
-          <div class="checkbox-cell">
-            <v-checkbox
-              v-model="item.grandActive"
-              hide-details
-              density="compact"
-              :disabled="!item.grandOfficer"
-            />
-          </div>
-        </template>
-
-        <template #item.position="{ item }">
-          <v-select
-            v-model="item.position"
-            :items="availablePositions"
-            density="compact"
-            hide-details
-          />
-        </template>
-
-        <template #item.actions="{ item }">
-          <v-btn
-            icon="mdi-delete"
-            size="small"
-            color="red"
-            @click="deleteOfficer(item)"
-          />
-        </template>
-
-        <template #bottom>
-          <div class="d-flex justify-end pa-2">
-            <v-btn
-              color="primary"
-              @click="saveAll"
-              prepend-icon="mdi-content-save"
+        </v-overlay>
+        <v-card class="no-print">
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div
+              class="d-flex flex-column"
+              style="align-items: flex-start"
             >
-              Save Changes
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-home"
+                @click="$router.push('/home')"
+                class="mb-2"
+                small
+              >
+                Home
+              </v-btn>
+              <span>Officers for OV to {{ OV?.name || '...' }}</span>
+            </div>
+
+            <v-btn
+              color="green"
+              @click="addOfficer"
+              prepend-icon="mdi-plus"
+            >
+              Add Officer
             </v-btn>
-          </div>
-        </template>
-      </v-data-table>
-    </v-card>
-    <hr />
-    <Procession
-      :officers
-      :OV
-    />
-  </v-container>
+          </v-card-title>
+
+          <v-data-table
+            :headers
+            :items="officers"
+            :items-per-page="officers.length"
+            item-value="id"
+            class="mt-2"
+          >
+            <template #item.name="{ item }">
+              <v-text-field
+                v-model="item.name"
+                density="compact"
+                hide-details
+                placeholder="Name"
+              />
+            </template>
+
+            <template #item.rank="{ item }">
+              <v-select
+                v-model="item.rank"
+                :items="[{ value: '' }, ...ranks]"
+                item-title="value"
+                item-value="value"
+                density="compact"
+                hide-details
+                placeholder="Prov rank"
+              />
+            </template>
+
+            <template #item.active="{ item }">
+              <div class="checkbox-cell">
+                <v-checkbox
+                  v-model="item.active"
+                  hide-details
+                  density="compact"
+                />
+              </div>
+            </template>
+
+            <template #item.grandOfficer="{ item }">
+              <div class="checkbox-cell">
+                <v-checkbox
+                  v-model="item.grandOfficer"
+                  hide-details
+                  density="compact"
+                />
+              </div>
+            </template>
+
+            <template #item.grandOfficerYear="{ item }">
+              <v-text-field
+                v-model="item.grandOfficerYear"
+                type="number"
+                density="compact"
+                hide-details
+                :disabled="!item.grandOfficer"
+              />
+            </template>
+
+            <template #item.grandRank="{ item }">
+              <v-select
+                v-model="item.grandRank"
+                :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
+                item-title="value"
+                item-value="value"
+                density="compact"
+                hide-details
+                placeholder="Grand rank"
+                :disabled="!item.grandOfficer"
+              />
+            </template>
+
+            <template #item.grandActive="{ item }">
+              <div class="checkbox-cell">
+                <v-checkbox
+                  v-model="item.grandActive"
+                  hide-details
+                  density="compact"
+                  :disabled="!item.grandOfficer"
+                />
+              </div>
+            </template>
+
+            <template #item.position="{ item }">
+              <v-select
+                v-model="item.position"
+                :items="availablePositions"
+                density="compact"
+                hide-details
+              />
+            </template>
+
+            <template #item.actions="{ item }">
+              <v-btn
+                icon="mdi-delete"
+                size="small"
+                color="red"
+                @click="deleteOfficer(item)"
+              />
+            </template>
+
+            <template #bottom>
+              <div class="d-flex justify-end pa-2">
+                <v-btn
+                  color="primary"
+                  @click="saveAll"
+                  prepend-icon="mdi-content-save"
+                >
+                  Save Changes
+                </v-btn>
+              </div>
+            </template>
+          </v-data-table>
+        </v-card>
+        <hr />
+        <Procession
+          :officers
+          :OV
+        />
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import type { OV, Officer } from '@prisma/client';
+
+const { theme, toggleTheme } = useSetTheme();
 
 type GridOfficer = Officer & { isNew?: boolean };
 
@@ -216,7 +240,8 @@ async function loadOfficers() {
   loading.value = false;
 }
 
-function addOfficer() {
+async function addOfficer() {
+  await saveAll();
   officers.value.push({
     id: 0,
     name: '',
