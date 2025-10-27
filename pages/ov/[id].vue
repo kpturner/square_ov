@@ -65,7 +65,7 @@
             item-value="value"
             density="compact"
             hide-details
-            placeholder="Prov Rank"
+            placeholder="Prov rank"
           />
         </template>
 
@@ -190,7 +190,7 @@ const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Provincial Rank', key: 'rank', width: '200px' },
   { title: 'Active', key: 'active', align: 'center' as const, width: '80px' },
-  { title: 'Position', key: 'position', width: '210px' },
+  { title: 'Position in procession', key: 'position', width: '210px' },
   { title: 'Grand Officer', key: 'grandOfficer', align: 'center' as const, width: '80px' },
   { title: 'Grand Rank', key: 'grandRank', width: '200px' },
   { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
@@ -220,10 +220,12 @@ function addOfficer() {
   officers.value.push({
     id: 0,
     name: '',
-    rank: '',
+    rank: null,
     grandRank: '',
     grandOfficer: false,
     grandOfficerYear: null,
+    grandActive: false,
+    grandRank: null,
     active: true,
     position: 'automatic',
     ovId: Number(route.params.id),

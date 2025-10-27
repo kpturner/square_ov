@@ -12,10 +12,10 @@ export default defineEventHandler(async (event) => {
           where: { id: o.id },
           data: {
             name: o.name,
-            rank: o.rank ?? null,
+            rank: o.rank?.trim() ? o.rank : null,
             active: o.active,
             grandOfficer: o.grandOfficer,
-            grandRank: o.grandRank ?? null,
+            grandRank: o.grandRank?.trim() ? o.grandRank : null,
             grandOfficerYear: o.grandOfficerYear,
             grandActive: o.grandActive,
             position: o.position,
@@ -25,10 +25,10 @@ export default defineEventHandler(async (event) => {
         await prisma.officer.create({
           data: {
             name: o.name,
-            rank: o.rank ?? null,
+            rank: o.rank?.trim() ? o.rank : null,
             active: o.active,
             grandOfficer: o.grandOfficer,
-            grandRank: o.grandRank ?? null,
+            grandRank: o.grandRank?.trim() ? o.grandRank : null,
             grandOfficerYear: o.grandOfficerYear,
             grandActive: o.grandActive,
             position: o.position,

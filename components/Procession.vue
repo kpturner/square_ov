@@ -4,13 +4,6 @@
       <!-- Left side: title + checkbox -->
       <div class="d-flex align-center">
         <span class="mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
-
-        <v-checkbox
-          v-model="activeDCsFront"
-          label="Active DCs at front"
-          dense
-          hide-details
-        />
       </div>
 
       <!-- Right side: print button -->
@@ -23,6 +16,14 @@
         Print
       </v-btn>
     </v-card-title>
+
+    <v-checkbox
+      class="no-print"
+      v-model="activeDCsFront"
+      label="Active DCs at front"
+      dense
+      hide-details
+    />
 
     <v-card-text>
       <!-- VIP row at the rear/top with sword and standard bearers -->

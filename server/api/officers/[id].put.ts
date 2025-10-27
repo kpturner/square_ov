@@ -8,11 +8,11 @@ export default defineEventHandler(async (event) => {
     prisma.officer.update({
       where: { id: o.id },
       data: {
-        rank: o.rank ?? null,
+        rank: o.rank?.trim() ? o.rank : null,
         active: o.active,
         grandOfficer: o.grandOfficer,
         grandOfficerYear: o.grandOfficerYear,
-        grandRank: o.grandRank ?? null,
+        grandRank: o.grandRank?.trim() ? o.grandRank : null,
         grandActive: o.grandActive,
         position: o.position,
       },
