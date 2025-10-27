@@ -215,7 +215,9 @@ const rows = computed(() => {
   let nextRow: { south?: Officer; north?: Officer } = {};
 
   // Traverse the automatic officers and add rows
-  const activeDCs = automatic.value.filter((o) => o.active && (o.rank === 'AGDC' || o.rank === 'DGDC')).reverse();
+  const activeDCs = automatic.value
+    .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DGDC' || o.rank === 'AGDC'))
+    .reverse();
   const automaticOfficers = activeDCsFront.value
     ? automatic.value.filter((ao) => !activeDCs.includes(ao))
     : automatic.value;
