@@ -1,5 +1,16 @@
 <template>
   <v-container>
+    <v-overlay
+      v-model="loading"
+      absolute
+      class="d-flex align-center justify-center"
+    >
+      <v-progress-circular
+        indeterminate
+        size="64"
+        color="primary"
+      />
+    </v-overlay>
     <v-row>
       <v-col>
         <v-card>
@@ -103,6 +114,8 @@ import { useAuthStore } from '~/stores/auth';
 
 const authStore = useAuthStore();
 
+const loading = ref(true);
+
 function formatDate(dateStr: string | Date) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -127,6 +140,7 @@ const headers = [
 
 async function fetchOVs() {
   ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
+  loading.value = false;
 }
 
 function logOff() {

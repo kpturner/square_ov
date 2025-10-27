@@ -7,6 +7,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  ovs       OV[]
+}
+
+model OV {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  ovDate    DateTime
+  createdAt DateTime  @default(now())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  officers  Officer[]
+
+  @@index([userId], map: "OV_userId_fkey")
+}
+
+model Officer {
+  id               Int      @id @default(autoincrement())
+  name             String
+  rank             String?
+  grandOfficer     Boolean
+  grandOfficerYear Int?
+  active           Boolean
+  ovId             Int
+  position         Position @default(automatic)
+  grandActive      Boolean?
+  grandRank        String?
+  ov               OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
+
+  @@index([ovId], map: "Officer_ovId_fkey")
+}
+
 enum Position {
   automatic
   rear_of_south
@@ -16,43 +53,4 @@ enum Position {
   sword_bearer
   standard_bearer
   vip
-}
-
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
-
-  // One user can have many OVs
-  ovs OV[]
-}
-
-model OV {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  ovDate    DateTime
-  createdAt DateTime @default(now())
-
-  // Foreign key linking OV → User
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // One OV can have many Officers
-  officers Officer[]
-}
-
-model Officer {
-  id               Int      @id @default(autoincrement())
-  name             String
-  rank             String
-  grandOfficer     Boolean
-  grandOfficerYear Int?
-  active           Boolean
-  position         Position @default(automatic)
-
-  // Foreign key linking Officer → OV
-  ovId Int
-  ov   OV  @relation(fields: [ovId], references: [id], onDelete: Cascade)
 }

@@ -1,5 +1,19 @@
 <template>
-  <v-container>
+  <v-container
+    fluid
+    class="pa-4"
+  >
+    <v-overlay
+      v-model="loading"
+      absolute
+      class="d-flex align-center justify-center"
+    >
+      <v-progress-circular
+        indeterminate
+        size="64"
+        color="primary"
+      />
+    </v-overlay>
     <v-card class="no-print">
       <v-card-title class="d-flex justify-space-between align-center">
         <div
@@ -46,13 +60,23 @@
         <template #item.rank="{ item }">
           <v-select
             v-model="item.rank"
-            :items="ranks"
+            :items="[{ value: '' }, ...ranks]"
             item-title="value"
             item-value="value"
             density="compact"
             hide-details
-            placeholder="Rank"
+            placeholder="Prov Rank"
           />
+        </template>
+
+        <template #item.active="{ item }">
+          <div class="checkbox-cell">
+            <v-checkbox
+              v-model="item.active"
+              hide-details
+              density="compact"
+            />
+          </div>
         </template>
 
         <template #item.grandOfficer="{ item }">
@@ -75,12 +99,26 @@
           />
         </template>
 
-        <template #item.active="{ item }">
+        <template #item.grandRank="{ item }">
+          <v-select
+            v-model="item.grandRank"
+            :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
+            item-title="value"
+            item-value="value"
+            density="compact"
+            hide-details
+            placeholder="Grand rank"
+            :disabled="!item.grandOfficer"
+          />
+        </template>
+
+        <template #item.grandActive="{ item }">
           <div class="checkbox-cell">
             <v-checkbox
-              v-model="item.active"
+              v-model="item.grandActive"
               hide-details
               density="compact"
+              :disabled="!item.grandOfficer"
             />
           </div>
         </template>
@@ -88,7 +126,7 @@
         <template #item.position="{ item }">
           <v-select
             v-model="item.position"
-            :items="positions"
+            :items="availablePositions"
             density="compact"
             hide-details
           />
@@ -128,7 +166,6 @@
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import type { OV, Officer } from '@prisma/client';
-import { Position } from '@prisma/client';
 
 type GridOfficer = Officer & { isNew?: boolean };
 
@@ -136,16 +173,27 @@ const route = useRoute();
 const officers = ref<GridOfficer[]>([]);
 const OV = ref<OV | null>(null);
 
+const loading = ref(true);
+
 const { ranks } = useRuntimeConfig().public;
 
-const positions = Object.values(Position);
+const positionsRes = await $fetch('/api/ov/positions');
+const positions = positionsRes ?? [];
+
+const availablePositions = computed(() => {
+  return positions.filter((pos: string) => {
+    return pos === 'automatic' || !officers.value.some((officer) => officer.position === pos);
+  });
+});
 
 const headers = [
   { title: 'Name', key: 'name' },
-  { title: 'Rank', key: 'rank', width: '200px' },
+  { title: 'Provincial Rank', key: 'rank', width: '200px' },
   { title: 'Active', key: 'active', align: 'center' as const, width: '80px' },
   { title: 'Position', key: 'position', width: '210px' },
   { title: 'Grand Officer', key: 'grandOfficer', align: 'center' as const, width: '80px' },
+  { title: 'Grand Rank', key: 'grandRank', width: '200px' },
+  { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
   { title: 'Year', key: 'grandOfficerYear', width: '115px' },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
 ];
@@ -165,6 +213,7 @@ async function loadOfficers() {
         ovDate: new Date(res.ov.ovDate),
       }
     : null;
+  loading.value = false;
 }
 
 function addOfficer() {
@@ -172,6 +221,7 @@ function addOfficer() {
     id: 0,
     name: '',
     rank: '',
+    grandRank: '',
     grandOfficer: false,
     grandOfficerYear: null,
     active: true,

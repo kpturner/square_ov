@@ -11,6 +11,18 @@
   "log_to_file": false,
   "ranks": [
     {
+      "value": "PGM",
+      "text": "Provincial Grand Master"
+    },
+    {
+      "value": "DPGM",
+      "text": "Deputy Provincial Grand Master"
+    },
+    {
+      "value": "APGM",
+      "text": "Assistant Provincial Grand Master"
+    },
+    {
       "value": "SGW",
       "text": "Senior Grand Warden"
     },

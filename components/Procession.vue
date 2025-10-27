@@ -1,16 +1,29 @@
 <template>
   <v-card class="pa-4">
-    <v-card-title class="d-flex justify-space-between mb-2"
-      >Procession for OV to {{ OV?.name || '...' }}
+    <v-card-title class="d-flex justify-space-between align-center mb-2">
+      <!-- Left side: title + checkbox -->
+      <div class="d-flex align-center">
+        <span class="mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
+
+        <v-checkbox
+          v-model="activeDCsFront"
+          label="Active DCs at front"
+          dense
+          hide-details
+        />
+      </div>
+
+      <!-- Right side: print button -->
       <v-btn
         color="primary"
         prepend-icon="mdi-printer"
-        class="mb-4 no-print"
+        class="no-print"
         @click="printProcession"
       >
         Print
       </v-btn>
     </v-card-title>
+
     <v-card-text>
       <!-- VIP row at the rear/top with sword and standard bearers -->
       <div
@@ -23,7 +36,7 @@
           color="grey lighten-2"
         >
           <strong>{{ swordBearer.name }}</strong>
-          <div class="text-caption">Sword Bearer</div>
+          <div class="text-caption">{{ rankCaption(swordBearer) }}</div>
         </v-card>
 
         <v-card
@@ -32,7 +45,7 @@
           color="yellow lighten-2"
         >
           <strong>{{ vip.name }}</strong>
-          <div class="text-caption">VIP</div>
+          <div class="text-caption">{{ rankCaption(vip) }}</div>
         </v-card>
 
         <v-card
@@ -41,7 +54,7 @@
           color="grey lighten-2"
         >
           <strong>{{ standardBearer.name }}</strong>
-          <div class="text-caption">Standard Bearer</div>
+          <div class="text-caption">{{ rankCaption(standardBearer) }}</div>
         </v-card>
       </div>
 
@@ -73,7 +86,7 @@
             :color="row.south.grandOfficer ? 'blue darken-3' : undefined"
           >
             <div>{{ row.south.name }}</div>
-            <div class="text-caption">{{ rankPrefix(row.south) }}{{ row.south.rank }}</div>
+            <div class="text-caption">{{ rankCaption(row.south) }}</div>
           </v-card>
         </div>
         <div
@@ -86,7 +99,9 @@
             :color="row.north.grandOfficer ? 'blue darken-3' : undefined"
           >
             <div>{{ row.north.name }}</div>
-            <div class="text-caption">{{ rankPrefix(row.north) }}{{ row.north.rank }}</div>
+            <div class="text-caption">
+              {{ rankCaption(row.north) }}
+            </div>
           </v-card>
         </div>
       </div>
@@ -113,19 +128,42 @@ const rearNorth = computed(() => props.officers.find((o) => o.position === 'rear
 const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
 const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
 
+const activeDCsFront = ref(false);
+
 const rankPrefix = (officer: Officer) => {
-  if (officer.grandOfficer) {
-    if (!officer.active) {
-      return 'P';
-    }
+  if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
+    return '';
+  }
+  if (officer.active) {
+    return 'Prov';
   } else {
-    if (officer.active) {
-      return 'Prov';
-    } else {
-      return 'P';
+    return 'PP';
+  }
+};
+
+const grandRankPrefix = (officer: Officer) => {
+  if (officer.grandActive) {
+    return '';
+  } else {
+    return 'P';
+  }
+};
+
+const rankCaption = (officer: Officer) => {
+  let caption = '';
+  if (officer.rank) {
+    caption += `${rankPrefix(officer)}${officer.rank}`;
+  }
+  if (officer.grandOfficer) {
+    if (caption.length) {
+      caption += ' - ';
+    }
+    caption += `${grandRankPrefix(officer)}${officer.grandRank}`;
+    if (officer.grandOfficerYear) {
+      caption += ` (${officer.grandOfficerYear})`;
     }
   }
-  return '';
+  return caption;
 };
 
 // Automatic officers sorted by seniority
@@ -133,18 +171,28 @@ const automatic = computed(() =>
   props.officers
     .filter((o) => o.position === 'automatic')
     .sort((a, b) => {
+      const rankToConsider = (officer: Officer) => {
+        return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
+      };
+
       // Grand officer first
       if (a.grandOfficer && !b.grandOfficer) return -1;
       if (!a.grandOfficer && b.grandOfficer) return 1;
 
       // Grand year
-      if (a.grandOfficer && b.grandOfficer && a.grandOfficerYear && b.grandOfficerYear) {
+      if (
+        a.grandOfficer &&
+        b.grandOfficer &&
+        a.grandOfficerYear &&
+        b.grandOfficerYear &&
+        rankToConsider(a) === rankToConsider(b)
+      ) {
         if (a.grandOfficerYear !== b.grandOfficerYear) return a.grandOfficerYear - b.grandOfficerYear;
       }
 
       // Rank seniority
-      const aRankIndex = ranks.findIndex((r: any) => r.value === a.rank);
-      const bRankIndex = ranks.findIndex((r: any) => r.value === b.rank);
+      const aRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(a));
+      const bRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(b));
       if (aRankIndex !== bRankIndex)
         return (aRankIndex !== -1 ? aRankIndex : ranks.length) - (bRankIndex !== -1 ? bRankIndex : ranks.length);
 
@@ -173,13 +221,30 @@ const rows = computed(() => {
   if (Object.keys(nextRow).length > 0) result.push(nextRow);
 
   // Traverse the automatic officers and add rows
-  for (const officer of automatic.value) {
+  const activeDCs = automatic.value.filter((o) => o.active && (o.rank === 'AGDC' || o.rank === 'DGDC')).reverse();
+  const automaticOfficers = activeDCsFront.value
+    ? automatic.value.filter((ao) => !activeDCs.includes(ao))
+    : automatic.value;
+
+  for (const officer of automaticOfficers) {
     if (!nextRow.south) {
       nextRow.south = officer;
     } else if (!nextRow.north) {
       nextRow.north = officer;
       result.push(nextRow);
       nextRow = {};
+    }
+  }
+
+  if (activeDCsFront.value) {
+    for (const officer of activeDCs) {
+      if (!nextRow.south) {
+        nextRow.south = officer;
+      } else if (!nextRow.north) {
+        nextRow.north = officer;
+        result.push(nextRow);
+        nextRow = {};
+      }
     }
   }
 

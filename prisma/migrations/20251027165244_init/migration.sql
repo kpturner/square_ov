@@ -19,6 +19,7 @@ CREATE TABLE `OV` (
     `userId` INTEGER NOT NULL,
 
     UNIQUE INDEX `OV_name_key`(`name`),
+    INDEX `OV_userId_fkey`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -26,13 +27,16 @@ CREATE TABLE `OV` (
 CREATE TABLE `Officer` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(191) NOT NULL,
-    `rank` VARCHAR(191) NOT NULL,
+    `rank` VARCHAR(191) NULL,
     `grandOfficer` BOOLEAN NOT NULL,
-    `grandOfficerYear` INTEGER NOT NULL,
+    `grandOfficerYear` INTEGER NULL,
     `active` BOOLEAN NOT NULL,
     `ovId` INTEGER NOT NULL,
+    `position` ENUM('automatic', 'rear_of_south', 'rear_of_north', 'head_of_south', 'head_of_north', 'sword_bearer', 'standard_bearer', 'vip') NOT NULL DEFAULT 'automatic',
+    `grandActive` BOOLEAN NULL,
+    `grandRank` VARCHAR(191) NULL,
 
-    UNIQUE INDEX `Officer_name_key`(`name`),
+    INDEX `Officer_ovId_fkey`(`ovId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
