@@ -34,7 +34,7 @@ runs:
         username-github: ${{ inputs.username-github }}
         password-github: ${{ inputs.password-github }}
         dockerfile: Dockerfile
-        repo: ${{ inputs.repo }}}
+        repo: ${{ inputs.repo }}
         db_password_secret: ${{ inputs.db_password_secret }}
         opts: ${{ inputs.opts }}
         tag: ${{ inputs.version }}
