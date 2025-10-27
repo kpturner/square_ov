@@ -188,7 +188,9 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
 import type { OV, Officer } from '@prisma/client';
+import { useAuthStore } from '~/stores/auth';
 
+const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
 
 type GridOfficer = Officer & { isNew?: boolean };
@@ -225,6 +227,11 @@ const headers = [
 onMounted(async () => {
   await loadOfficers();
 });
+
+function logOff() {
+  authStore.user = null;
+  navigateTo('/');
+}
 
 async function loadOfficers() {
   const ovId = Number(route.params.id);
