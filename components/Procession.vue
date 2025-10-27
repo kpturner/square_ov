@@ -83,7 +83,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.south.grandOfficer ? 'grand-officer' : ''"
-            :color="row.south.grandOfficer ? 'blue' : 'grey '"
+            :color="row.south.grandOfficer ? 'blue' : 'grey'"
           >
             <div>{{ row.south.name }}</div>
             <div class="text-caption">{{ rankCaption(row.south) }}</div>
@@ -96,7 +96,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.north.grandOfficer ? 'grand-officer' : ''"
-            :color="row.north.grandOfficer ? 'blue' : 'grey '"
+            :color="row.north.grandOfficer ? 'blue' : 'grey'"
           >
             <div>{{ row.north.name }}</div>
             <div class="text-caption">
@@ -337,6 +337,10 @@ function printProcession() {
   }
 
   .grand-officer {
+    color: black !important;
+  }
+
+  .officer-card {
     color: black !important;
   }
 

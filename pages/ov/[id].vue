@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar
       flat
-      class="mb-4"
+      class="mb-4 no-print"
     >
       <v-btn
         color="grey"
