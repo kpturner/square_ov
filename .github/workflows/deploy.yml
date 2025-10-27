@@ -56,7 +56,7 @@ jobs:
           container="${instance}"
           port=${fields[1]}
           image=${fields[3]:-'square-ov'}
-          proxy=${fields[4]:-"https://${instance}.kpturner.co.uk"}
+          proxy=${fields[4]:-"https://ov.kpturner.co.uk"}
           docker_compose=${fields[5]:-'docker-compose.yml'}
           docker login ghcr.io/kpturner -u ${{ github.actor }} -p ${{ secrets.REPO_ACCESS_TOKEN }}
           cmd="./docker.sh -u -a up -f $docker_compose -m $image -n $container -t $instance -p $port -x $proxy"
