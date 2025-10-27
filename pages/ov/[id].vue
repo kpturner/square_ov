@@ -273,7 +273,6 @@ async function addOfficer() {
     id: 0,
     name: '',
     rank: null,
-    grandRank: '',
     grandOfficer: false,
     grandOfficerYear: null,
     grandActive: false,
