@@ -16,7 +16,7 @@ on:
           # 4) The proxy host for the instance (if blank will default to https://<instance>.kpturner.co.uk)
           # 5) The docker-compose file to use (if empty will just use "docker-compose.yml")
         options:
-          - ov,4000
+          - square-ov,4000
 
 jobs:
   setup:
