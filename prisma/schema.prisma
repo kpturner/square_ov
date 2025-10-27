@@ -46,8 +46,6 @@ model Officer {
 
 enum Position {
   automatic
-  rear_of_south
-  rear_of_north
   head_of_south
   head_of_north
   sword_bearer

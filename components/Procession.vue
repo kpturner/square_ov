@@ -83,7 +83,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.south.grandOfficer ? 'grand-officer' : ''"
-            :color="row.south.grandOfficer ? 'blue' : 'grey'"
+            :color="row.south.grandOfficer ? 'blue-darken-3' : 'grey-lighten-3'"
           >
             <div>{{ row.south.name }}</div>
             <div class="text-caption">{{ rankCaption(row.south) }}</div>
@@ -96,7 +96,7 @@
           <v-card
             class="pa-2 text-center officer-card"
             :class="row.north.grandOfficer ? 'grand-officer' : ''"
-            :color="row.north.grandOfficer ? 'blue' : 'grey'"
+            :color="row.north.grandOfficer ? 'blue-darken-3' : 'grey-lighten-3'"
           >
             <div>{{ row.north.name }}</div>
             <div class="text-caption">
@@ -122,9 +122,6 @@ const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
 const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'));
 const standardBearer = computed(() => props.officers.find((o) => o.position === 'standard_bearer'));
 
-// Rear/front/head positions
-const rearSouth = computed(() => props.officers.find((o) => o.position === 'rear_of_south'));
-const rearNorth = computed(() => props.officers.find((o) => o.position === 'rear_of_north'));
 const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
 const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
 
@@ -216,9 +213,6 @@ const rows = computed(() => {
   if (centreRow.length > 0) result.push({ centre: centreRow });
 
   let nextRow: { south?: Officer; north?: Officer } = {};
-  if (rearSouth.value) nextRow.south = rearSouth.value;
-  if (rearNorth.value) nextRow.north = rearNorth.value;
-  if (Object.keys(nextRow).length > 0) result.push(nextRow);
 
   // Traverse the automatic officers and add rows
   const activeDCs = automatic.value.filter((o) => o.active && (o.rank === 'AGDC' || o.rank === 'DGDC')).reverse();

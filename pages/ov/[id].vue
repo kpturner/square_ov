@@ -53,13 +53,23 @@
               <span>Officers for OV to {{ OV?.name || '...' }}</span>
             </div>
 
-            <v-btn
-              color="green"
-              @click="addOfficer"
-              prepend-icon="mdi-plus"
-            >
-              Add Officer
-            </v-btn>
+            <div class="d-flex">
+              <v-btn
+                class="me-2"
+                color="green"
+                @click="addOfficer"
+                prepend-icon="mdi-plus"
+              >
+                Add Officer
+              </v-btn>
+              <v-btn
+                color="primary"
+                @click="saveAll"
+                prepend-icon="mdi-content-save"
+              >
+                Save Changes
+              </v-btn>
+            </div>
           </v-card-title>
 
           <v-data-table
@@ -164,13 +174,23 @@
 
             <template #bottom>
               <div class="d-flex justify-end pa-2">
-                <v-btn
-                  color="primary"
-                  @click="saveAll"
-                  prepend-icon="mdi-content-save"
-                >
-                  Save Changes
-                </v-btn>
+                <div class="d-flex">
+                  <v-btn
+                    class="me-2"
+                    color="green"
+                    @click="addOfficer"
+                    prepend-icon="mdi-plus"
+                  >
+                    Add Officer
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    @click="saveAll"
+                    prepend-icon="mdi-content-save"
+                  >
+                    Save Changes
+                  </v-btn>
+                </div>
               </div>
             </template>
           </v-data-table>
