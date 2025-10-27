@@ -11,7 +11,7 @@ export default defineNuxtPlugin((app) => {
   const vuetify = createVuetify({
     //directives,
     theme: {
-      defaultTheme: 'dark', // can be 'light' if you prefer
+      defaultTheme: 'light',
       themes: {
         light: {
           dark: false,
