@@ -52,24 +52,6 @@
               </v-btn>
               <span>Officers for OV to {{ OV?.name || '...' }}</span>
             </div>
-
-            <div class="d-flex">
-              <v-btn
-                class="me-2"
-                color="green"
-                @click="addOfficer"
-                prepend-icon="mdi-plus"
-              >
-                Add Officer
-              </v-btn>
-              <v-btn
-                color="primary"
-                @click="saveAll"
-                prepend-icon="mdi-content-save"
-              >
-                Save Changes
-              </v-btn>
-            </div>
           </v-card-title>
 
           <v-data-table
@@ -79,6 +61,27 @@
             item-value="id"
             class="mt-2"
           >
+            <template #top>
+              <div class="d-flex justify-end pa-2">
+                <div class="d-flex">
+                  <v-btn
+                    class="me-2"
+                    color="green"
+                    @click="addOfficer"
+                    prepend-icon="mdi-plus"
+                  >
+                    Add Officer
+                  </v-btn>
+                  <v-btn
+                    color="primary"
+                    @click="saveAll"
+                    prepend-icon="mdi-content-save"
+                  >
+                    Save Changes
+                  </v-btn>
+                </div>
+              </div>
+            </template>
             <template #item.name="{ item }">
               <v-text-field
                 v-model="item.name"
@@ -97,6 +100,15 @@
                 density="compact"
                 hide-details
                 placeholder="Prov rank"
+              />
+            </template>
+
+            <template #item.provOfficerYear="{ item }">
+              <v-text-field
+                v-model="item.provOfficerYear"
+                type="number"
+                density="compact"
+                hide-details
               />
             </template>
 
@@ -236,11 +248,12 @@ const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Provincial Rank', key: 'rank', width: '200px' },
   { title: 'Active', key: 'active', align: 'center' as const, width: '80px' },
+  { title: 'Prov year', key: 'provOfficerYear', width: '115px' },
   { title: 'Position in procession', key: 'position', width: '210px' },
   { title: 'Grand Officer', key: 'grandOfficer', align: 'center' as const, width: '80px' },
   { title: 'Grand Rank', key: 'grandRank', width: '200px' },
   { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
-  { title: 'Year', key: 'grandOfficerYear', width: '115px' },
+  { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
 ];
 
@@ -273,6 +286,7 @@ async function addOfficer() {
     id: 0,
     name: '',
     rank: null,
+    provOfficerYear: null,
     grandOfficer: false,
     grandOfficerYear: null,
     grandActive: false,
@@ -302,6 +316,7 @@ async function saveAll() {
     method: 'PUT',
     body: officers.value.map((o) => ({
       ...o,
+      provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
     })),
   });

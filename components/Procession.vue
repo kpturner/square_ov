@@ -17,13 +17,23 @@
       </v-btn>
     </v-card-title>
 
-    <v-checkbox
-      class="no-print"
-      v-model="activeDCsFront"
-      label="Active DCs at front"
-      dense
-      hide-details
-    />
+    <div class="d-flex align-center">
+      <v-checkbox
+        class="no-print"
+        v-model="activeDCsFront"
+        label="Active DCs at front"
+        dense
+        hide-details
+      />
+
+      <v-checkbox
+        class="ms-3 no-print"
+        v-model="alignActiveWardens"
+        label="Align active wardens?"
+        dense
+        hide-details
+      />
+    </div>
 
     <v-card-text>
       <div
@@ -35,7 +45,15 @@
           class="pa-3 text-center mr-1 officer-card sword-bearer"
           color="#FFF59D"
         >
-          <strong>{{ swordBearer.name }}</strong>
+          <div class="d-flex justify-center align-center">
+            <strong>{{ swordBearer.name }}</strong>
+            <v-icon
+              color="black"
+              icon="mdi-sword"
+              size="small"
+              class="ms-2"
+            ></v-icon>
+          </div>
           <div class="text-caption">Sword Bearer</div>
         </v-card>
 
@@ -44,7 +62,15 @@
           class="pa-3 text-center officer-card"
           color="yellow"
         >
-          <strong>{{ vip.name }}</strong>
+          <div class="d-flex justify-center align-center">
+            <strong>{{ vip.name }}</strong>
+            <v-icon
+              color="black"
+              icon="mdi-star"
+              size="large"
+              class="ms-2"
+            ></v-icon>
+          </div>
           <div class="text-caption">{{ rankCaption(vip) }}</div>
         </v-card>
 
@@ -53,7 +79,15 @@
           class="pa-3 text-center ml-1 officer-card standard-bearer"
           color="#FFF59D"
         >
-          <strong>{{ standardBearer.name }}</strong>
+          <div class="d-flex justify-center align-center">
+            <strong>{{ standardBearer.name }}</strong>
+            <v-icon
+              color="black"
+              icon="mdi-flag"
+              size="small"
+              class="ms-2"
+            ></v-icon>
+          </div>
           <div class="text-caption">Standard Bearer</div>
         </v-card>
       </div>
@@ -67,7 +101,7 @@
         </div>
         <div class="flex-1 pl-1">
           <div class="pa-2 text-center">
-            <strong>NORTH</strong>
+            <strong>NORTH </strong>
           </div>
         </div>
       </div>
@@ -82,10 +116,33 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
-            :class="row.south.grandOfficer ? 'grand-officer' : ''"
-            :color="row.south.grandOfficer ? 'blue-darken-3' : 'grey-lighten-3'"
+            :class="row.south.grandOfficer ? 'grand-officer' : 'prov-officer'"
+            :color="row.south.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
           >
-            <div>{{ row.south.name }}</div>
+            <div class="d-flex justify-center align-center">
+              {{ row.south.name }}
+              <v-icon
+                v-if="row.south.rank === 'AGDC' && row.south.active"
+                color="white"
+                icon="mdi-auto-fix"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+              <v-icon
+                v-if="['GDC', 'DGDC'].includes(row.south.rank ?? '') && row.south.active"
+                color="white"
+                icon="mdi-magic-staff"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+              <v-icon
+                v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
+                color="white"
+                icon="mdi-star"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+            </div>
             <div class="text-caption">{{ rankCaption(row.south) }}</div>
           </v-card>
         </div>
@@ -95,10 +152,33 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
-            :class="row.north.grandOfficer ? 'grand-officer' : ''"
-            :color="row.north.grandOfficer ? 'blue-darken-3' : 'grey-lighten-3'"
+            :class="row.north.grandOfficer ? 'grand-officer' : 'prov-officer'"
+            :color="row.north.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
           >
-            <div>{{ row.north.name }}</div>
+            <div class="d-flex justify-center align-center">
+              {{ row.north.name }}
+              <v-icon
+                v-if="row.north.rank === 'AGDC' && row.north.active"
+                color="white"
+                icon="mdi-auto-fix"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+              <v-icon
+                v-if="['GDC', 'DGDC'].includes(row.north.rank ?? '') && row.north.active"
+                color="white"
+                icon="mdi-magic-staff"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+              <v-icon
+                v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
+                color="white"
+                icon="mdi-star"
+                size="small"
+                class="ms-2"
+              ></v-icon>
+            </div>
             <div class="text-caption">
               {{ rankCaption(row.north) }}
             </div>
@@ -124,12 +204,23 @@ const standardBearer = computed(() => props.officers.find((o) => o.position === 
 
 const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
 const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
+const seniorWarden = computed(() =>
+  props.officers.find((o) => o.position === 'automatic' && o.rank === 'SGW' && o.active)
+);
+const juniorWarden = computed(() =>
+  props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
+);
 
 const activeDCsFront = ref(false);
+const alignActiveWardens = ref(true);
 
 const rankPrefix = (officer: Officer) => {
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
-    return '';
+    if (officer.active) {
+      return '';
+    } else {
+      return 'P';
+    }
   }
   if (officer.active) {
     return 'Prov';
@@ -163,28 +254,34 @@ const rankCaption = (officer: Officer) => {
   return caption;
 };
 
+const rankToConsider = (officer: Officer) => {
+  return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
+};
+
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
   props.officers
     .filter((o) => o.position === 'automatic')
     .sort((a, b) => {
-      const rankToConsider = (officer: Officer) => {
-        return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
-      };
-
       // Grand officer first
       if (a.grandOfficer && !b.grandOfficer) return -1;
       if (!a.grandOfficer && b.grandOfficer) return 1;
 
-      // Grand year
+      // Grand year for equal rank and active status
       if (
         a.grandOfficer &&
         b.grandOfficer &&
+        a.grandActive === b.grandActive &&
         a.grandOfficerYear &&
         b.grandOfficerYear &&
         rankToConsider(a) === rankToConsider(b)
       ) {
         if (a.grandOfficerYear !== b.grandOfficerYear) return a.grandOfficerYear - b.grandOfficerYear;
+      }
+
+      // Prov year for equal rank and active status
+      if (a.active === b.active && a.provOfficerYear && b.provOfficerYear && rankToConsider(a) === rankToConsider(b)) {
+        if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
       }
 
       // Rank seniority
@@ -193,9 +290,17 @@ const automatic = computed(() =>
       if (aRankIndex !== bRankIndex)
         return (aRankIndex !== -1 ? aRankIndex : ranks.length) - (bRankIndex !== -1 ? bRankIndex : ranks.length);
 
-      // Active only matters if rank and grand status are equal
-      if (a.active && !b.active) return -1;
-      if (!a.active && b.active) return 1;
+      // Grand Officers: active grand rank outranks non-active
+      if (a.grandOfficer && b.grandOfficer && rankToConsider(a) === rankToConsider(b)) {
+        if (a.grandActive && !b.grandActive) return -1;
+        if (!a.grandActive && b.grandActive) return 1;
+      }
+
+      // Prov Officers: active prov rank outranks non-active
+      if (rankToConsider(a) === rankToConsider(b)) {
+        if (a.active && !b.active) return -1;
+        if (!a.active && b.active) return 1;
+      }
 
       return 0;
     })
@@ -287,6 +392,43 @@ const rows = computed(() => {
     }
   }
 
+  // Now if we have both the ProvSGW and the ProvJGW, ensure they are in the same row
+  if (seniorWarden.value && juniorWarden.value && alignActiveWardens.value) {
+    let sgwRowIndex = -1;
+    let jgwRowIndex = -1;
+    result.forEach((row, idx) => {
+      if (row.south?.id === seniorWarden.value?.id || row.north?.id === seniorWarden.value?.id) {
+        sgwRowIndex = idx;
+      }
+      if (row.south?.id === juniorWarden.value?.id || row.north?.id === juniorWarden.value?.id) {
+        jgwRowIndex = idx;
+      }
+    });
+    if (sgwRowIndex !== -1 && jgwRowIndex !== -1 && sgwRowIndex !== jgwRowIndex) {
+      const swRow = result[sgwRowIndex];
+      const jwRow = result[jgwRowIndex];
+      // Is the SGW in the north or the south?
+      if (result[sgwRowIndex]?.south?.id === seniorWarden.value.id) {
+        // In the right place already, so swap the JGW into the north of that row
+        if (swRow && jwRow) {
+          const officerToMove = { ...swRow.north };
+          swRow.north = juniorWarden.value;
+          jwRow.north = officerToMove as Officer;
+        }
+      } else {
+        // SW is in a the north
+        if (swRow && jwRow) {
+          const officerInNorthOfJWRow = { ...jwRow.north };
+          const officerInSouthOfJWRow = { ...jwRow.south };
+          const officerToMove = officerInNorthOfJWRow.rank === 'JGW' ? officerInSouthOfJWRow : officerInNorthOfJWRow;
+          jwRow.south = seniorWarden.value;
+          jwRow.north = juniorWarden.value;
+          swRow.north = officerToMove as Officer;
+        }
+      }
+    }
+  }
+
   return result;
 });
 
@@ -303,6 +445,20 @@ function printProcession() {
 
 .officer-card {
   min-width: 300px;
+}
+
+.grand-officer {
+  border: 8px solid yellow;
+}
+
+.prov-officer {
+  border: 4px solid yellow;
+}
+
+@media (max-width: 600px) {
+  .officer-card {
+    min-width: 175px;
+  }
 }
 
 @media print {
@@ -334,10 +490,17 @@ function printProcession() {
 
   .grand-officer {
     color: black !important;
+    border: none;
+  }
+
+  .prov-officer {
+    color: black !important;
+    border: none;
   }
 
   .officer-card {
     color: black !important;
+    margin-bottom: 50px;
   }
 
   @page {

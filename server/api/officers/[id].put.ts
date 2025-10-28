@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
       where: { id: o.id },
       data: {
         rank: o.rank?.trim() ? o.rank : null,
+        provOfficerYear: o.provOfficerYear,
         active: o.active,
         grandOfficer: o.grandOfficer,
         grandOfficerYear: o.grandOfficerYear,

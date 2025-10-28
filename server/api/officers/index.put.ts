@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
           data: {
             name: o.name,
             rank: o.rank?.trim() ? o.rank : null,
+            provOfficerYear: o.provOfficerYear,
             active: o.active,
             grandOfficer: o.grandOfficer,
             grandRank: o.grandRank?.trim() ? o.grandRank : null,
@@ -26,6 +27,7 @@ export default defineEventHandler(async (event) => {
           data: {
             name: o.name,
             rank: o.rank?.trim() ? o.rank : null,
+            provOfficerYear: o.provOfficerYear,
             active: o.active,
             grandOfficer: o.grandOfficer,
             grandRank: o.grandRank?.trim() ? o.grandRank : null,
