@@ -209,6 +209,7 @@
         </v-card>
         <hr />
         <Procession
+          v-if="!loading && OV"
           :officers
           :OV
         />

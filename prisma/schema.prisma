@@ -17,13 +17,16 @@ model User {
 }
 
 model OV {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
-  ovDate    DateTime
-  createdAt DateTime  @default(now())
-  userId    Int
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  officers  Officer[]
+  id                   Int       @id @default(autoincrement())
+  name                 String    @unique
+  ovDate               DateTime
+  createdAt            DateTime  @default(now())
+  userId               Int
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  officers             Officer[]
+  alignWardens         Boolean   @default(true)
+  activeDCsFront       Boolean   @default(false)
+  includeGrandOfficers Boolean   @default(false)
 
   @@index([userId], map: "OV_userId_fkey")
 }

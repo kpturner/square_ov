@@ -20,16 +20,23 @@
     <div class="d-flex align-center">
       <v-checkbox
         class="no-print"
-        v-model="activeDCsFront"
-        label="Active DCs at front"
+        v-model="alignActiveWardens"
+        label="Align active wardens?"
         dense
         hide-details
       />
-
       <v-checkbox
         class="ms-3 no-print"
-        v-model="alignActiveWardens"
-        label="Align active wardens?"
+        v-model="activeDCsFront"
+        label="Active DCs at front?"
+        dense
+        hide-details
+      />
+      <v-checkbox
+        v-if="activeDCsFront"
+        class="ms-3 no-print"
+        v-model="includeGrandOfficers"
+        label="Including Grand Officers?"
         dense
         hide-details
       />
@@ -212,7 +219,16 @@ const juniorWarden = computed(() =>
 );
 
 const activeDCsFront = ref(false);
-const alignActiveWardens = ref(true);
+const includeGrandOfficers = ref(false);
+const alignActiveWardens = ref(false);
+
+onMounted(() => {
+  if (props.OV) {
+    activeDCsFront.value = props.OV.activeDCsFront;
+    includeGrandOfficers.value = props.OV.includeGrandOfficers;
+    alignActiveWardens.value = props.OV.alignWardens;
+  }
+});
 
 const rankPrefix = (officer: Officer) => {
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
@@ -322,6 +338,7 @@ const rows = computed(() => {
   // Traverse the automatic officers and add rows
   const activeDCs = automatic.value
     .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DGDC' || o.rank === 'AGDC'))
+    .filter((o) => (includeGrandOfficers.value ? true : !o.grandOfficer))
     .reverse();
   const automaticOfficers = activeDCsFront.value
     ? automatic.value.filter((ao) => !activeDCs.includes(ao))
@@ -435,6 +452,29 @@ const rows = computed(() => {
 function printProcession() {
   window.print();
 }
+
+let timeout: ReturnType<typeof setTimeout>;
+const saveBooleans = () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(async () => {
+    try {
+      const body = {
+        ...props.OV,
+        alignWardens: alignActiveWardens.value,
+        activeDCsFront: activeDCsFront.value,
+        includeGrandOfficers: includeGrandOfficers.value,
+      };
+      await $fetch(`/api/ov/${props.OV?.id}.put`, {
+        method: 'PUT',
+        body,
+      });
+    } catch (err) {
+      console.error('Failed to update booleans:', err);
+    }
+  }, 400);
+};
+
+watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
 </script>
 
 <style scoped>
