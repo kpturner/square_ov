@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `OV` MODIFY `activeDCsFront` BOOLEAN NOT NULL DEFAULT true;
