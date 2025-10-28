@@ -32,28 +32,23 @@
     },
     {
       "value": "GTREAS",
-      "text": "Grand Treasurer",
-      "available": false
+      "text": "Grand Treasurer"
     },
     {
       "value": "GCHAP",
-      "text": "Grand Chaplain",
-      "available": false
+      "text": "Grand Chaplain"
     },
     {
       "value": "GREG",
-      "text": "Grand Registrar",
-      "available": false
+      "text": "Grand Registrar"
     },
     {
       "value": "GSEC",
-      "text": "Grand Secretary",
-      "available": false
+      "text": "Grand Secretary"
     },
     {
       "value": "GDC",
-      "text": "Grand Director of Ceremonies",
-      "available": false
+      "text": "Grand Director of Ceremonies"
     },
     {
       "value": "GSWDB",
@@ -61,13 +56,11 @@
     },
     {
       "value": "GSUPTWKS",
-      "text": "Grand Superintendent of Works",
-      "available": false
+      "text": "Grand Superintendent of Works"
     },
     {
       "value": "DGCHAP",
-      "text": "Deputy Grand Chaplain",
-      "available": false
+      "text": "Deputy Grand Chaplain"
     },
     {
       "value": "DGREG",
@@ -75,13 +68,11 @@
     },
     {
       "value": "DGSEC",
-      "text": "Deputy Grand Secretary",
-      "available": false
+      "text": "Deputy Grand Secretary"
     },
     {
       "value": "DGDC",
-      "text": "Deputy Grand Director of Ceremonies",
-      "available": false
+      "text": "Deputy Grand Director of Ceremonies"
     },
     {
       "value": "DGSWDB",
@@ -93,33 +84,27 @@
     },
     {
       "value": "GALMR",
-      "text": "Grand Almoner",
-      "available": false
+      "text": "Grand Almoner"
     },
     {
       "value": "GCHARSTWD",
-      "text": "Grand Charity Steward",
-      "available": false
+      "text": "Grand Charity Steward"
     },
     {
       "value": "GMO",
-      "text": "Grand Membership Officer",
-      "available": false
+      "text": "Grand Membership Officer"
     },
     {
       "value": "GCO",
-      "text": "Grand Communications Officer",
-      "available": false
+      "text": "Grand Communications Officer"
     },
     {
       "value": "GMENT",
-      "text": "Grand Mentor",
-      "available": false
+      "text": "Grand Mentor"
     },
     {
-      "value": "GORATOR",
-      "text": "Grand Orator",
-      "available": false
+      "value": "GLDO",
+      "text": "Grand Learning & Development Officer"
     },
     {
       "value": "SGD",
@@ -131,8 +116,7 @@
     },
     {
       "value": "AGCHAP",
-      "text": "Assistant Grand Chaplain",
-      "available": false
+      "text": "Assistant Grand Chaplain"
     },
     {
       "value": "AGREG",
@@ -140,8 +124,7 @@
     },
     {
       "value": "AGSEC",
-      "text": "Assistant Grand Secretary",
-      "available": false
+      "text": "Assistant Grand Secretary"
     },
     {
       "value": "AGDC",
@@ -157,8 +140,7 @@
     },
     {
       "value": "GORG",
-      "text": "Grand Organist",
-      "available": false
+      "text": "Grand Organist"
     },
     {
       "value": "GSTDB",
@@ -182,8 +164,7 @@
     },
     {
       "value": "GTYLER",
-      "text": "Grand Tyler",
-      "available": false
+      "text": "Grand Tyler"
     }
   ]
 }
