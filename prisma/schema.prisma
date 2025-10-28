@@ -25,7 +25,7 @@ model OV {
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   officers             Officer[]
   alignWardens         Boolean   @default(true)
-  activeDCsFront       Boolean   @default(false)
+  activeDCsFront       Boolean   @default(true)
   includeGrandOfficers Boolean   @default(false)
 
   @@index([userId], map: "OV_userId_fkey")
