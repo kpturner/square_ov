@@ -9,7 +9,10 @@ export default defineEventHandler(async (event) => {
   return prisma.oV.update({
     where: { id },
     data: {
-      ...body,
+      name: body.name,
+      alignWardens: body.alignWardens,
+      activeDCsFront: body.activeDCsFront,
+      includeGrandOfficers: body.includeGrandOfficers,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
     },
   });
