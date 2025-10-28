@@ -102,7 +102,17 @@
       "available": false
     },
     {
-      "value": "GMENTOR",
+      "value": "GMO",
+      "text": "Grand Membership Officer",
+      "available": false
+    },
+    {
+      "value": "GCO",
+      "text": "Grand Communications Officer",
+      "available": false
+    },
+    {
+      "value": "GMENT",
       "text": "Grand Mentor",
       "available": false
     },
