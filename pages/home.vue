@@ -49,47 +49,132 @@
                   </v-btn>
                 </div>
               </v-card-title>
+              <!-- DESKTOP -->
+              <v-responsive class="hidden-md-and-down">
+                <v-data-table
+                  :headers="headers"
+                  :items="formattedOVs"
+                  class="mt-4"
+                >
+                  <template #item.ovDate="{ item }">
+                    {{ item.displayDate }}
+                  </template>
+                  <template #item.actions="{ item }">
+                    <v-btn
+                      class="me-2"
+                      icon="mdi-pencil"
+                      size="small"
+                      @click="editOV(item)"
+                    />
+                    <v-btn
+                      class="me-2"
+                      icon="mdi-content-copy"
+                      size="small"
+                      color="blue"
+                      variant="elevated"
+                      title="Copy OV"
+                      @click="copyOV(item)"
+                    />
+                    <v-btn
+                      class="me-2"
+                      icon="mdi-account-group"
+                      size="small"
+                      color="green"
+                      variant="elevated"
+                      title="Procession"
+                      @click="goToOfficers(item)"
+                    />
+                    <v-btn
+                      icon="mdi-delete"
+                      size="small"
+                      color="red"
+                      variant="elevated"
+                      title="Delete OV"
+                      @click="deleteOV(item)"
+                    />
+                  </template>
+                </v-data-table>
+              </v-responsive>
 
-              <v-data-table
-                :headers="headers"
-                :items="formattedOVs"
-                class="mt-4"
-              >
-                <template #item.ovDate="{ item }">
-                  {{ item.displayDate }}
-                </template>
-                <template #item.actions="{ item }">
-                  <v-btn
-                    class="me-2"
-                    icon="mdi-pencil"
-                    size="small"
-                    @click="editOV(item)"
-                  />
-                  <v-btn
-                    class="me-2"
-                    icon="mdi-delete"
-                    size="small"
-                    @click="deleteOV(item)"
-                  />
-                  <v-btn
-                    class="me-2"
-                    icon="mdi-content-copy"
-                    size="small"
-                    color="blue"
-                    variant="elevated"
-                    title="Copy OV"
-                    @click="copyOV(item)"
-                  />
-                  <v-btn
-                    icon="mdi-account-group"
-                    size="small"
-                    color="green"
-                    variant="elevated"
-                    title="Procession"
-                    @click="goToOfficers(item)"
-                  />
-                </template>
-              </v-data-table>
+              <!-- MOBILE -->
+              <v-responsive class="hidden-lg-and-up"
+                ><v-row dense>
+                  <v-col
+                    v-for="(item, i) in formattedOVs"
+                    :key="item.id ?? i"
+                    cols="12"
+                  >
+                    <v-card
+                      class="officer-card pa-3 mb-2"
+                      elevation="3"
+                      variant="tonal"
+                    >
+                      <v-row dense>
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="item.name"
+                            label="Date"
+                            density="compact"
+                            readonly
+                          />
+                        </v-col>
+
+                        <v-col cols="12">
+                          <v-text-field
+                            v-model="item.displayDate"
+                            label="Date"
+                            density="compact"
+                            readonly
+                          />
+                        </v-col>
+                      </v-row>
+                      <v-row
+                        dense
+                        align="center"
+                        justify="end"
+                        class="mt-2"
+                      >
+                        <v-btn
+                          icon="mdi-pencil"
+                          size="small"
+                          variant="text"
+                          title="Edit OV"
+                          class="me-2"
+                          @click="editOV(item)"
+                        />
+
+                        <v-btn
+                          icon="mdi-content-copy"
+                          size="small"
+                          color="blue"
+                          variant="elevated"
+                          title="Copy OV"
+                          class="me-2"
+                          @click="copyOV(item)"
+                        />
+
+                        <v-btn
+                          icon="mdi-account-group"
+                          size="small"
+                          color="green"
+                          variant="elevated"
+                          title="Procession"
+                          class="me-2"
+                          @click="goToOfficers(item)"
+                        />
+
+                        <v-btn
+                          icon="mdi-delete"
+                          size="small"
+                          color="red"
+                          variant="elevated"
+                          title="Delete OV"
+                          @click="deleteOV(item)"
+                        />
+                      </v-row>
+                    </v-card>
+                  </v-col> </v-row
+              ></v-responsive>
             </v-card>
           </v-col>
         </v-row>
