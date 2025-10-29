@@ -104,27 +104,30 @@
         </v-card>
       </div>
 
-      <!-- Rows of officers, top = rear, bottom = front -->
-      <div class="d-flex justify-space-between mb-2">
-        <div class="flex-1 pl-1">
-          <div class="pa-2 text-center">
-            <strong>SOUTH</strong>
-          </div>
+      <div class="d-flex justify-center flex-wrap mb-2">
+        <div
+          class="pa-1"
+          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
+        >
+          <strong>SOUTH</strong>
         </div>
-        <div class="flex-1 pl-1">
-          <div class="pa-2 text-center">
-            <strong>NORTH </strong>
-          </div>
+        <div
+          class="pa-1"
+          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
+        >
+          <strong>NORTH</strong>
         </div>
       </div>
       <div
         v-for="(row, idx) in rows"
         :key="idx"
-        class="d-flex justify-space-between mb-2"
+        class="d-flex justify-center flex-wrap mb-2"
       >
+        <!-- South column -->
         <div
           v-if="row.south"
-          class="flex-1 pr-1"
+          class="pa-1"
+          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
         >
           <v-card
             class="pa-2 text-center officer-card"
@@ -139,28 +142,31 @@
                 icon="mdi-auto-fix"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
               <v-icon
                 v-if="['GDC', 'DGDC'].includes(row.south.rank ?? '') && row.south.active"
                 color="white"
                 icon="mdi-magic-staff"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
               <v-icon
                 v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
                 color="white"
                 icon="mdi-star"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
             </div>
             <div class="text-caption">{{ rankCaption(row.south) }}</div>
           </v-card>
         </div>
+
+        <!-- North column -->
         <div
           v-if="row.north"
-          class="flex-1 pl-1"
+          class="pa-1"
+          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
         >
           <v-card
             class="pa-2 text-center officer-card"
@@ -175,25 +181,23 @@
                 icon="mdi-auto-fix"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
               <v-icon
                 v-if="['GDC', 'DGDC'].includes(row.north.rank ?? '') && row.north.active"
                 color="white"
                 icon="mdi-magic-staff"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
               <v-icon
                 v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
                 color="white"
                 icon="mdi-star"
                 size="small"
                 class="ms-2"
-              ></v-icon>
+              />
             </div>
-            <div class="text-caption">
-              {{ rankCaption(row.north) }}
-            </div>
+            <div class="text-caption">{{ rankCaption(row.north) }}</div>
           </v-card>
         </div>
       </div>
@@ -488,23 +492,12 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
   flex-direction: column;
 }
 
-.officer-card {
-  min-width: 300px;
-}
-
 .grand-officer {
   border: 8px solid yellow;
 }
 
 .prov-officer {
   border: 4px solid yellow;
-}
-
-@media (max-width: 600px) {
-  .officer-card {
-    min-width: 175px;
-    max-width: 175px;
-  }
 }
 
 @media print {
