@@ -10,7 +10,7 @@ export function useSetTheme() {
 
   onMounted(async () => {
     const saved = localStorage.getItem('theme');
-    if (saved) theme.global.name.value = saved;
+    if (saved) theme.change(saved);
   });
 
   watch(
