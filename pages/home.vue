@@ -72,6 +72,15 @@
                     @click="deleteOV(item)"
                   />
                   <v-btn
+                    class="me-2"
+                    icon="mdi-content-copy"
+                    size="small"
+                    color="blue"
+                    variant="elevated"
+                    title="Copy OV"
+                    @click="copyOV(item)"
+                  />
+                  <v-btn
                     icon="mdi-account-group"
                     size="small"
                     color="green"
@@ -171,6 +180,21 @@ function openDialog() {
 function editOV(item: OV) {
   editedOV.value = { ...item, ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0] };
   dialog.value = true;
+}
+
+async function copyOV(item: OV) {
+  if (!item.id) return;
+
+  loading.value = true;
+  try {
+    await $fetch(`/api/ov/${item.id}/copy`, { method: 'POST' });
+    await fetchOVs();
+  } catch (err) {
+    console.error('Failed to copy OV:', err);
+    alert('An error occurred while copying this OV.');
+  } finally {
+    loading.value = false;
+  }
 }
 
 async function saveOV() {
