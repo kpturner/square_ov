@@ -40,14 +40,14 @@
         <v-card class="no-print">
           <v-card-title class="d-flex justify-space-between align-center">
             <div
-              class="d-flex flex-column"
+              class="w-100 d-flex flex-column"
               style="align-items: flex-start"
             >
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"
                 @click="$router.push('/home')"
-                class="mb-2"
+                class="mb-2 w-100 w-sm-auto"
                 small
               >
                 Home
@@ -63,21 +63,25 @@
             <!-- Top Actions -->
             <div
               v-if="!loading"
-              class="d-flex justify-end mb-2 no-print"
+              class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
             >
               <v-btn
                 color="green"
-                class="me-2"
+                class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
                 prepend-icon="mdi-plus"
                 @click="addOfficer"
-                >Add Officer</v-btn
               >
+                Add Officer
+              </v-btn>
+
               <v-btn
                 color="primary"
                 prepend-icon="mdi-content-save"
                 @click="saveAll"
-                >Save Changes</v-btn
+                class="w-100 w-sm-auto"
               >
+                Save Changes
+              </v-btn>
             </div>
 
             <Officers
@@ -90,21 +94,25 @@
             <!-- Bottom Actions -->
             <div
               v-if="!loading"
-              class="d-flex justify-end mt-4 no-print"
+              class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
             >
               <v-btn
                 color="green"
-                class="me-2"
+                class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
                 prepend-icon="mdi-plus"
                 @click="addOfficer"
-                >Add Officer</v-btn
               >
+                Add Officer
+              </v-btn>
+
               <v-btn
                 color="primary"
                 prepend-icon="mdi-content-save"
                 @click="saveAll"
-                >Save Changes</v-btn
+                class="w-100 w-sm-auto"
               >
+                Save Changes
+              </v-btn>
             </div>
           </v-container>
         </v-card>
