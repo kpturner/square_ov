@@ -200,6 +200,13 @@
             <div class="text-caption">{{ rankCaption(row.north) }}</div>
           </v-card>
         </div>
+        <div
+          v-else
+          class="pa-1"
+          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
+        >
+          <!-- Nobody here! -->
+        </div>
       </div>
     </v-card-text>
   </v-card>

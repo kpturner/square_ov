@@ -124,6 +124,14 @@
         />
       </v-container>
     </v-main>
+    <ConfirmDialog
+      v-model="showDeleteConfirm"
+      title="Delete Officer"
+      :message="`Are you sure you want to delete
+    '${officerToDelete?.name}'?`"
+      color="red"
+      @confirm="confirmedDeletion"
+    />
   </v-app>
 </template>
 
@@ -136,6 +144,8 @@ import { useAuthStore } from '~/stores/auth';
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
 
+const showDeleteConfirm = ref(false);
+const officerToDelete = ref<GridOfficer>(null);
 const route = useRoute();
 const officers = ref<GridOfficer[]>([]);
 const OV = ref<OV | null>(null);
@@ -189,10 +199,13 @@ async function deleteOfficer(officer: GridOfficer) {
     return;
   }
 
-  if (confirm(`Delete officer ${officer.name}?`)) {
-    await $fetch(`/api/officers/${officer.id}`, { method: 'DELETE' });
-    await loadOfficers();
-  }
+  officerToDelete.value = officer;
+  showDeleteConfirm.value = true;
+}
+
+async function confirmedDeletion() {
+  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
+  await loadOfficers();
 }
 
 async function saveAll() {

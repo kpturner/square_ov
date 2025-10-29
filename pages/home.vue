@@ -97,7 +97,7 @@
                       color="red"
                       variant="elevated"
                       title="Delete OV"
-                      @click="deleteOV(item)"
+                      @click="confirmOVDeletion(item)"
                     />
                   </template>
                 </v-data-table>
@@ -176,7 +176,7 @@
                           color="red"
                           variant="elevated"
                           title="Delete OV"
-                          @click="deleteOV(item)"
+                          @click="confirmOVDeletion(item)"
                         />
                       </v-row>
                     </v-card>
@@ -234,12 +234,24 @@
         </v-dialog>
       </v-container>
     </v-main>
+
+    <ConfirmDialog
+      v-model="showDeleteConfirm"
+      title="Delete Official Visit"
+      :message="`Are you sure you want to delete
+    '${ovToDelete?.name}'?`"
+      color="red"
+      @confirm="deleteOV()"
+    />
   </v-app>
 </template>
 
 <script setup lang="ts">
 import type { OV } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
+
+const showDeleteConfirm = ref(false);
+const ovToDelete = ref<Partial<OV>>(null);
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
@@ -316,11 +328,14 @@ async function saveOV() {
   await fetchOVs();
 }
 
-async function deleteOV(item: Partial<OV>) {
-  if (confirm(`Delete ${item.name} Official Visit?`)) {
-    await $fetch(`/api/ov/${item.id}`, { method: 'DELETE' });
-    await fetchOVs();
-  }
+function confirmOVDeletion(item: Partial<OV>) {
+  ovToDelete.value = item;
+  showDeleteConfirm.value = true;
+}
+
+async function deleteOV() {
+  await $fetch(`/api/ov/${ovToDelete.value.id}`, { method: 'DELETE' });
+  await fetchOVs();
 }
 
 function goToOfficers(item: OV) {
