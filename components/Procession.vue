@@ -1,5 +1,5 @@
 <template>
-  <v-card class="pa-4">
+  <v-card class="pa-0 pa-lg-4">
     <v-card-title class="d-flex justify-space-between align-center mb-2">
       <!-- Left side: title + checkbox -->
       <div class="d-flex align-center hidden-md-and-down">
