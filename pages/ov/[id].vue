@@ -54,158 +54,62 @@
             </div>
           </v-card-title>
 
-          <v-data-table
-            :headers
-            :items="officers"
-            :items-per-page="officers.length"
-            item-value="id"
-            class="mt-2"
+          <v-container
+            fluid
+            class="pa-4"
           >
-            <template #top>
-              <div class="d-flex justify-end pa-2">
-                <div class="d-flex">
-                  <v-btn
-                    class="me-2"
-                    color="green"
-                    @click="addOfficer"
-                    prepend-icon="mdi-plus"
-                  >
-                    Add Officer
-                  </v-btn>
-                  <v-btn
-                    color="primary"
-                    @click="saveAll"
-                    prepend-icon="mdi-content-save"
-                  >
-                    Save Changes
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-            <template #item.name="{ item }">
-              <v-text-field
-                v-model="item.name"
-                density="compact"
-                hide-details
-                placeholder="Name"
+            <v-overlay
+              v-model="loading"
+              absolute
+              class="d-flex align-center justify-center"
+            >
+              <v-progress-circular
+                indeterminate
+                size="64"
+                color="primary"
               />
-            </template>
+            </v-overlay>
 
-            <template #item.rank="{ item }">
-              <v-select
-                v-model="item.rank"
-                :items="[{ value: '' }, ...ranks]"
-                item-title="value"
-                item-value="value"
-                density="compact"
-                hide-details
-                placeholder="Prov rank"
-              />
-            </template>
-
-            <template #item.provOfficerYear="{ item }">
-              <v-text-field
-                v-model="item.provOfficerYear"
-                type="number"
-                density="compact"
-                hide-details
-              />
-            </template>
-
-            <template #item.active="{ item }">
-              <div class="checkbox-cell">
-                <v-checkbox
-                  v-model="item.active"
-                  hide-details
-                  density="compact"
-                />
-              </div>
-            </template>
-
-            <template #item.grandOfficer="{ item }">
-              <div class="checkbox-cell">
-                <v-checkbox
-                  v-model="item.grandOfficer"
-                  hide-details
-                  density="compact"
-                />
-              </div>
-            </template>
-
-            <template #item.grandOfficerYear="{ item }">
-              <v-text-field
-                v-model="item.grandOfficerYear"
-                type="number"
-                density="compact"
-                hide-details
-                :disabled="!item.grandOfficer"
-              />
-            </template>
-
-            <template #item.grandRank="{ item }">
-              <v-select
-                v-model="item.grandRank"
-                :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
-                item-title="value"
-                item-value="value"
-                density="compact"
-                hide-details
-                placeholder="Grand rank"
-                :disabled="!item.grandOfficer"
-              />
-            </template>
-
-            <template #item.grandActive="{ item }">
-              <div class="checkbox-cell">
-                <v-checkbox
-                  v-model="item.grandActive"
-                  hide-details
-                  density="compact"
-                  :disabled="!item.grandOfficer"
-                />
-              </div>
-            </template>
-
-            <template #item.position="{ item }">
-              <v-select
-                v-model="item.position"
-                :items="availablePositions"
-                density="compact"
-                hide-details
-              />
-            </template>
-
-            <template #item.actions="{ item }">
+            <!-- Top Actions -->
+            <div class="d-flex justify-end mb-2 no-print">
               <v-btn
-                icon="mdi-delete"
-                size="small"
-                color="red"
-                @click="deleteOfficer(item)"
-              />
-            </template>
+                color="green"
+                class="me-2"
+                prepend-icon="mdi-plus"
+                @click="addOfficer"
+                >Add Officer</v-btn
+              >
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-content-save"
+                @click="saveAll"
+                >Save Changes</v-btn
+              >
+            </div>
 
-            <template #bottom>
-              <div class="d-flex justify-end pa-2">
-                <div class="d-flex">
-                  <v-btn
-                    class="me-2"
-                    color="green"
-                    @click="addOfficer"
-                    prepend-icon="mdi-plus"
-                  >
-                    Add Officer
-                  </v-btn>
-                  <v-btn
-                    color="primary"
-                    @click="saveAll"
-                    prepend-icon="mdi-content-save"
-                  >
-                    Save Changes
-                  </v-btn>
-                </div>
-              </div>
-            </template>
-          </v-data-table>
+            <Officers
+              :officers
+              @load-officers="loadOfficers"
+              @delete-officer="deleteOfficer"
+            />
+
+            <!-- Bottom Actions -->
+            <div class="d-flex justify-end mt-4 no-print">
+              <v-btn
+                color="green"
+                class="me-2"
+                prepend-icon="mdi-plus"
+                @click="addOfficer"
+                >Add Officer</v-btn
+              >
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-content-save"
+                @click="saveAll"
+                >Save Changes</v-btn
+              >
+            </div>
+          </v-container>
         </v-card>
         <hr />
         <Procession
@@ -220,43 +124,18 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import type { OV, Officer } from '@prisma/client';
+import type { OV } from '@prisma/client';
+import type { GridOfficer } from '~/types/officers';
 import { useAuthStore } from '~/stores/auth';
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
-
-type GridOfficer = Officer & { isNew?: boolean };
 
 const route = useRoute();
 const officers = ref<GridOfficer[]>([]);
 const OV = ref<OV | null>(null);
 
 const loading = ref(true);
-
-const { ranks } = useRuntimeConfig().public;
-
-const positionsRes = await $fetch('/api/ov/positions');
-const positions = positionsRes ?? [];
-
-const availablePositions = computed(() => {
-  return positions.filter((pos: string) => {
-    return pos === 'automatic' || !officers.value.some((officer) => officer.position === pos);
-  });
-});
-
-const headers = [
-  { title: 'Name', key: 'name' },
-  { title: 'Provincial Rank', key: 'rank', width: '200px' },
-  { title: 'Active', key: 'active', align: 'center' as const, width: '80px' },
-  { title: 'Prov year', key: 'provOfficerYear', width: '115px' },
-  { title: 'Position in procession', key: 'position', width: '210px' },
-  { title: 'Grand Officer', key: 'grandOfficer', align: 'center' as const, width: '80px' },
-  { title: 'Grand Rank', key: 'grandRank', width: '200px' },
-  { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
-  { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
-];
 
 onMounted(async () => {
   await loadOfficers();

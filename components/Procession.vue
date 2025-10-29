@@ -44,7 +44,29 @@
 
     <v-card-text>
       <div
-        v-if="vip || swordBearer || standardBearer"
+        v-if="vip"
+        class="d-flex justify-center mb-4"
+      >
+        <v-card
+          v-if="vip"
+          class="pa-3 text-center officer-card"
+          color="yellow"
+        >
+          <div class="d-flex justify-center align-center">
+            <strong>{{ vip.name }}</strong>
+            <v-icon
+              color="black"
+              icon="mdi-star"
+              size="large"
+              class="ms-2"
+            ></v-icon>
+          </div>
+          <div class="text-caption">{{ rankCaption(vip) }}</div>
+        </v-card>
+      </div>
+
+      <div
+        v-if="swordBearer || standardBearer"
         class="d-flex justify-center mb-4"
       >
         <v-card
@@ -62,23 +84,6 @@
             ></v-icon>
           </div>
           <div class="text-caption">Sword Bearer</div>
-        </v-card>
-
-        <v-card
-          v-if="vip"
-          class="pa-3 text-center officer-card"
-          color="yellow"
-        >
-          <div class="d-flex justify-center align-center">
-            <strong>{{ vip.name }}</strong>
-            <v-icon
-              color="black"
-              icon="mdi-star"
-              size="large"
-              class="ms-2"
-            ></v-icon>
-          </div>
-          <div class="text-caption">{{ rankCaption(vip) }}</div>
         </v-card>
 
         <v-card
