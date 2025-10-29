@@ -136,11 +136,12 @@
             <v-col cols="12">
               <v-select
                 v-model="item.rank"
-                :items="ranks"
+                :items="[{ value: '' }, ...ranks]"
                 item-title="value"
                 item-value="value"
                 label="Provincial Rank"
                 density="compact"
+                placeholder="Prov rank"
               />
             </v-col>
 
@@ -201,11 +202,12 @@
             >
               <v-select
                 v-model="item.grandRank"
-                :items="ranks"
+                :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
                 item-title="value"
                 item-value="value"
                 label="Grand rank"
                 density="compact"
+                placeholder="Grand rank"
               />
             </v-col>
 
@@ -220,18 +222,28 @@
                 density="compact"
               />
             </v-col>
-
-            <v-col
-              cols="12"
-              class="text-right"
-            >
-              <v-btn
-                icon="mdi-delete"
-                color="red"
-                size="small"
-                @click="emits('delete-officer', item)"
-              />
-            </v-col>
+          </v-row>
+          <v-row
+            dense
+            align="center"
+            justify="end"
+            class="mt-2"
+          >
+            <v-btn
+              class="me-2"
+              icon="mdi-content-save"
+              color="success"
+              size="small"
+              title="save changes"
+              @click="emits('save-changes')"
+            />
+            <v-btn
+              icon="mdi-delete"
+              color="red"
+              size="small"
+              title="Delete officer"
+              @click="emits('delete-officer', item)"
+            />
           </v-row>
         </v-card>
       </v-col>
@@ -244,7 +256,7 @@ import type { GridOfficer } from '~/types/officers';
 
 const props = defineProps<{ officers: GridOfficer[] }>();
 
-const emits = defineEmits(['load-officers', 'delete-officer']);
+const emits = defineEmits(['load-officers', 'delete-officer', 'save-changes']);
 
 const { ranks } = useRuntimeConfig().public;
 

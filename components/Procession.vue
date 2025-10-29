@@ -2,15 +2,15 @@
   <v-card class="pa-4">
     <v-card-title class="d-flex justify-space-between align-center mb-2">
       <!-- Left side: title + checkbox -->
-      <div class="d-flex align-center">
-        <span class="mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
+      <div class="d-flex align-center hidden-md-and-down">
+        <span class="text-subtitle-1 text-lg-h6 mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
       </div>
 
       <!-- Right side: print button -->
       <v-btn
         color="primary"
         prepend-icon="mdi-printer"
-        class="no-print"
+        class="d-none d-lg-flex no-print"
         @click="printProcession"
       >
         Print
@@ -503,6 +503,7 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
 @media (max-width: 600px) {
   .officer-card {
     min-width: 175px;
+    max-width: 175px;
   }
 }
 

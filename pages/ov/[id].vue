@@ -50,7 +50,7 @@
               >
                 Home
               </v-btn>
-              <span>Officers for OV to {{ OV?.name || '...' }}</span>
+              <span class="text-subtitle-1 text-lg-h6">Officers for OV to {{ OV?.name || '...' }}</span>
             </div>
           </v-card-title>
 
@@ -71,7 +71,10 @@
             </v-overlay>
 
             <!-- Top Actions -->
-            <div class="d-flex justify-end mb-2 no-print">
+            <div
+              v-if="!loading"
+              class="d-flex justify-end mb-2 no-print"
+            >
               <v-btn
                 color="green"
                 class="me-2"
@@ -91,10 +94,14 @@
               :officers
               @load-officers="loadOfficers"
               @delete-officer="deleteOfficer"
+              @save-changes="saveAll"
             />
 
             <!-- Bottom Actions -->
-            <div class="d-flex justify-end mt-4 no-print">
+            <div
+              v-if="!loading"
+              class="d-flex justify-end mt-4 no-print"
+            >
               <v-btn
                 color="green"
                 class="me-2"
