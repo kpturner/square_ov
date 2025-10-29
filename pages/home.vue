@@ -41,16 +41,21 @@
                 <div class="d-flex align-center">
                   <span class="text-h5">Official Visits</span>
                 </div>
-
-                <div class="d-flex align-center gap-2">
-                  <v-btn
-                    color="green"
-                    @click="openDialog()"
-                  >
-                    Add OV
-                  </v-btn>
-                </div>
               </v-card-title>
+              <!-- Top Actions -->
+              <div
+                v-if="!loading"
+                class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
+              >
+                <v-btn
+                  color="green"
+                  class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+                  prepend-icon="mdi-plus"
+                  @click="openDialog()"
+                >
+                  Add Official Visit
+                </v-btn>
+              </div>
               <!-- DESKTOP -->
               <v-responsive class="hidden-md-and-down">
                 <v-data-table
@@ -177,6 +182,20 @@
                     </v-card>
                   </v-col> </v-row
               ></v-responsive>
+              <!-- Bottom Actions -->
+              <div
+                v-if="!loading"
+                class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
+              >
+                <v-btn
+                  color="green"
+                  class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+                  prepend-icon="mdi-plus"
+                  @click="openDialog()"
+                >
+                  Add Official Visit
+                </v-btn>
+              </div>
             </v-card>
           </v-col>
         </v-row>
