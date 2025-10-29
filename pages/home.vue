@@ -21,17 +21,19 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <v-overlay
-          v-model="loading"
-          absolute
-          class="d-flex align-center justify-center"
-        >
-          <v-progress-circular
-            indeterminate
-            size="64"
-            color="primary"
-          />
-        </v-overlay>
+        <client-only>
+          <v-overlay
+            v-model="loading"
+            absolute
+            class="d-flex align-center justify-center"
+          >
+            <v-progress-circular
+              indeterminate
+              size="64"
+              color="primary"
+            />
+          </v-overlay>
+        </client-only>
         <v-row>
           <v-col>
             <v-card>

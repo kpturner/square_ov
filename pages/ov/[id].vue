@@ -24,17 +24,19 @@
         fluid
         class="pa-4"
       >
-        <v-overlay
-          v-model="loading"
-          absolute
-          class="d-flex align-center justify-center"
-        >
-          <v-progress-circular
-            indeterminate
-            size="64"
-            color="primary"
-          />
-        </v-overlay>
+        <client-only>
+          <v-overlay
+            v-model="loading"
+            absolute
+            class="d-flex align-center justify-center"
+          >
+            <v-progress-circular
+              indeterminate
+              size="64"
+              color="primary"
+            />
+          </v-overlay>
+        </client-only>
         <v-card class="no-print">
           <v-card-title class="d-flex justify-space-between align-center">
             <div
@@ -58,18 +60,6 @@
             fluid
             class="pa-4"
           >
-            <v-overlay
-              v-model="loading"
-              absolute
-              class="d-flex align-center justify-center"
-            >
-              <v-progress-circular
-                indeterminate
-                size="64"
-                color="primary"
-              />
-            </v-overlay>
-
             <!-- Top Actions -->
             <div
               v-if="!loading"
