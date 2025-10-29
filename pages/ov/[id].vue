@@ -52,7 +52,11 @@
               >
                 Home
               </v-btn>
-              <span class="text-subtitle-1 text-lg-h6">Officers for OV to {{ OV?.name || '...' }}</span>
+              <span
+                v-if="OV"
+                class="text-subtitle-1 text-lg-h6"
+                >Officers for OV to {{ OV?.name || '...' }}</span
+              >
             </div>
           </v-card-title>
 
@@ -122,6 +126,28 @@
           :officers
           :OV
         />
+
+        <v-card
+          v-if="!loading"
+          class="no-print"
+        >
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div
+              class="w-100 d-flex flex-column"
+              style="align-items: flex-start"
+            >
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-home"
+                @click="$router.push('/home')"
+                class="mb-2 w-100 w-sm-auto"
+                small
+              >
+                Home
+              </v-btn>
+            </div>
+          </v-card-title>
+        </v-card>
       </v-container>
     </v-main>
     <ConfirmDialog

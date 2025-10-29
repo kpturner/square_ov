@@ -1,12 +1,10 @@
 <template>
   <v-card class="pa-0 pa-lg-4">
     <v-card-title class="d-flex justify-space-between align-center mb-2">
-      <!-- Left side: title + checkbox -->
-      <div class="d-flex align-center hidden-md-and-down">
+      <div class="d-flex align-center procession-header">
         <span class="text-subtitle-1 text-lg-h6 mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
       </div>
 
-      <!-- Right side: print button -->
       <v-btn
         color="primary"
         prepend-icon="mdi-printer"
@@ -547,6 +545,10 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
   .officer-card {
     color: black !important;
     margin-bottom: 50px;
+  }
+
+  .procession-header {
+    color: black !important;
   }
 
   @page {
