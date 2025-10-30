@@ -4,7 +4,7 @@
       <v-card
         class="reservation-card mb-1"
         :elevation="printMode ? '0' : '3'"
-        :variant="printMode ? 'default' : 'tonal'"
+        :variant="printMode ? 'elevated' : 'tonal'"
       >
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
@@ -37,7 +37,7 @@
       <v-card
         class="reservation-card mb-1"
         :elevation="printMode ? '0' : '3'"
-        :variant="printMode ? 'default' : 'tonal'"
+        :variant="printMode ? 'elevated' : 'tonal'"
       >
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
@@ -61,7 +61,7 @@
 import type { GridOfficer } from '~/types/officers'
 import hiowCrest from '~/assets/images/hiowcrest.png'
 
-const props = defineProps<{ officers: GridOfficer[]; spares: number; printMode: boolean }>()
+const props = defineProps<{ officers: GridOfficer[]; spares: number; printMode?: boolean }>()
 
 const { ranks } = useRuntimeConfig().public
 
