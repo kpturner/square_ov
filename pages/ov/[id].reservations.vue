@@ -63,16 +63,6 @@
           />
         </v-card>
 
-        <SeatReservations
-          class="only-print"
-          :officers
-          printMode
-          :spares
-          @load-officers="loadOfficers"
-          @delete-officer="deleteOfficer"
-          @save-changes="saveAll"
-        />
-
         <v-card v-if="!loading" class="no-print">
           <v-card-title
             class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
@@ -98,6 +88,15 @@
         </v-card>
       </v-container>
     </v-main>
+    <SeatReservations
+      class="only-print"
+      :officers
+      printMode
+      :spares
+      @load-officers="loadOfficers"
+      @delete-officer="deleteOfficer"
+      @save-changes="saveAll"
+    />
   </v-app>
 </template>
 

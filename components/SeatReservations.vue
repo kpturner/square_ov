@@ -9,7 +9,7 @@
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
-            <img class="w-50" :src="hiowCrest" alt="HIoW Crest" />
+            <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
           </v-col>
 
           <!-- Right Column: Text -->
@@ -18,14 +18,14 @@
               Provincial Grand Lodge of Hampshire & Isle of Wight
             </v-row>
             <v-row class="mb-1 justify-center">
-              <div class="text-h5 font-weight-bold">
+              <div class="text-h4 font-weight-bold">
                 {{ salutation(item) }} {{ item.name.toUpperCase() }}
               </div>
             </v-row>
-            <v-row class="mb-1 justify-center">
+            <v-row class="justify-center">
               <div class="text-h5">{{ provincialRankPrefix(item) }} {{ provincialRank(item) }}</div>
             </v-row>
-            <v-row class="mb-1 justify-center">
+            <v-row class="justify-center">
               <div class="text-h5">{{ grandRankPrefix(item) }} {{ grandRank(item) }}</div>
             </v-row>
           </v-col>
@@ -109,17 +109,21 @@ const grandRankPrefix = (officer: GridOfficer) => {
 
 <style lang="scss" scoped>
 .reservation-card {
-  min-height: 200px;
-  border: 4px solid #1565c0;
+  min-height: 180px;
+  border: 1px solid #1565c0;
   padding: 0;
   box-sizing: border-box;
 }
 
+.crest {
+  width: 80%;
+}
+
 .crest-column {
-  border-right: 4px solid #1565c0; /* Single divider */
+  border-right: 1px solid #1565c0; /* Single divider */
   padding: 16px;
   box-sizing: border-box;
-  min-height: 200px;
+  min-height: 180px;
 }
 
 .text-column {
