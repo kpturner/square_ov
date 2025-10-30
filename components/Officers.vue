@@ -283,7 +283,7 @@ const headers = [
 ];
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 ::v-deep(.v-data-table th),
 ::v-deep(.v-data-table td) {
   padding-left: 4px !important;
@@ -296,16 +296,5 @@ const headers = [
 
 .theme--light .officer-card {
   border-color: rgba(0, 0, 0, 0.12);
-}
-
-@media print {
-  /* Hide everything except the Procession component */
-  body * {
-    visibility: hidden;
-  }
-  /* Hide all "no-print" buttons and controls */
-  .no-print {
-    display: none !important;
-  }
 }
 </style>

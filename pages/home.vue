@@ -92,6 +92,15 @@
                       @click="goToOfficers(item)"
                     />
                     <v-btn
+                      class="me-2"
+                      icon="mdi-seat"
+                      size="small"
+                      color="secondary"
+                      variant="elevated"
+                      title="Procession"
+                      @click="$router.push(`/ov/${item.id}.reservations`)"
+                    />
+                    <v-btn
                       icon="mdi-delete"
                       size="small"
                       color="red"
@@ -168,6 +177,16 @@
                           title="Procession"
                           class="me-2"
                           @click="goToOfficers(item)"
+                        />
+
+                        <v-btn
+                          class="me-2"
+                          icon="mdi-seat"
+                          size="small"
+                          color="secondary"
+                          variant="elevated"
+                          title="Procession"
+                          @click="$router.push(`/ov/${item.id}.reservations`)"
                         />
 
                         <v-btn

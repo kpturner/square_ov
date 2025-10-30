@@ -1,0 +1,17 @@
+.old-english {
+  font-family: 'UnifrakturMaguntia', cursive !important;
+}
+
+.only-print {
+  display: none !important;
+}
+
+@media print {
+  /* Hide all "no-print" buttons and controls */
+  .no-print {
+    display: none !important;
+  }
+  .only-print {
+    display: block !important;
+  }
+}

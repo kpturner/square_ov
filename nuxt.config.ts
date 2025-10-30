@@ -3,6 +3,7 @@ import config from 'config';
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
+  css: ['@/assets/css/global.scss'],
   devtools: { enabled: true },
   devServer: {
     port: 4000,
@@ -12,7 +13,7 @@ export default defineNuxtConfig({
       user: config.get<string>('database.user'),
       pass: config.get<string>('database.password'),
       host: config.get<string>('database.host'),
-      port: config.get<number>('database.port'),
+      port: config.get<string>('database.port'),
       name: config.get<string>('database.name'),
     },
     public: {

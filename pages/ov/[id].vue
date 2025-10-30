@@ -1,17 +1,7 @@
 <template>
   <v-app>
-    <v-app-bar
-      flat
-      class="mb-4 no-print"
-    >
-      <v-btn
-        color="grey"
-        variant="text"
-        small
-        @click="logOff"
-      >
-        Log Off
-      </v-btn>
+    <v-app-bar flat class="mb-4 no-print">
+      <v-btn color="grey" variant="text" small @click="logOff"> Log Off </v-btn>
       <v-spacer />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
@@ -19,30 +9,16 @@
         variant="text"
       />
     </v-app-bar>
-    <v-main>
-      <v-container
-        fluid
-        class="pa-4"
-      >
+    <v-main class="no-print">
+      <v-container fluid class="pa-4">
         <client-only>
-          <v-overlay
-            v-model="loading"
-            absolute
-            class="d-flex align-center justify-center"
-          >
-            <v-progress-circular
-              indeterminate
-              size="64"
-              color="primary"
-            />
+          <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
+            <v-progress-circular indeterminate size="64" color="primary" />
           </v-overlay>
         </client-only>
-        <v-card class="no-print">
+        <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
-            <div
-              class="w-100 d-flex flex-column"
-              style="align-items: flex-start"
-            >
+            <div class="w-100 d-flex flex-column" style="align-items: flex-start">
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"
@@ -52,23 +28,25 @@
               >
                 Home
               </v-btn>
-              <span
-                v-if="OV"
-                class="text-subtitle-1 text-lg-h6"
+              <span v-if="OV" class="text-subtitle-1 text-lg-h6"
                 >Officers for OV to {{ OV?.name || '...' }}</span
               >
+              <v-btn
+                v-if="OV"
+                color="secondary"
+                prepend-icon="mdi-seat"
+                @click="$router.push(`/ov/${OV.id}.reservations`)"
+                class="mb-2 w-100 w-sm-auto"
+                small
+              >
+                Seat reservations
+              </v-btn>
             </div>
           </v-card-title>
 
-          <v-container
-            fluid
-            class="pa-4"
-          >
+          <v-container fluid class="pa-4">
             <!-- Top Actions -->
-            <div
-              v-if="!loading"
-              class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
-            >
+            <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
               <v-btn
                 color="green"
                 class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -96,10 +74,7 @@
             />
 
             <!-- Bottom Actions -->
-            <div
-              v-if="!loading"
-              class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
-            >
+            <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
               <v-btn
                 color="green"
                 class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -121,21 +96,21 @@
           </v-container>
         </v-card>
         <hr />
-        <Procession
-          v-if="!loading && OV"
-          :officers
-          :OV
-        />
+        <Procession v-if="!loading && OV" :officers :OV />
 
-        <v-card
-          v-if="!loading"
-          class="no-print"
-        >
+        <v-card v-if="!loading">
           <v-card-title class="d-flex justify-space-between align-center">
-            <div
-              class="w-100 d-flex flex-column"
-              style="align-items: flex-start"
-            >
+            <div class="w-100 d-flex flex-column" style="align-items: flex-start">
+              <v-btn
+                v-if="OV"
+                color="secondary"
+                prepend-icon="mdi-seat"
+                @click="$router.push(`/ov/${OV.id}.reservations`)"
+                class="mb-2 w-100 w-sm-auto"
+                small
+              >
+                Seat reservations
+              </v-btn>
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"
@@ -158,51 +133,52 @@
       color="red"
       @confirm="confirmedDeletion"
     />
+    <Procession class="only-print" :officers :OV />
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import type { OV } from '@prisma/client';
-import type { GridOfficer } from '~/types/officers';
-import { useAuthStore } from '~/stores/auth';
+import { useRoute } from 'vue-router'
+import type { OV } from '@prisma/client'
+import type { GridOfficer } from '~/types/officers'
+import { useAuthStore } from '~/stores/auth'
 
-const authStore = useAuthStore();
-const { theme, toggleTheme } = useSetTheme();
+const authStore = useAuthStore()
+const { theme, toggleTheme } = useSetTheme()
 
-const showDeleteConfirm = ref(false);
-const officerToDelete = ref<GridOfficer>(null);
-const route = useRoute();
-const officers = ref<GridOfficer[]>([]);
-const OV = ref<OV | null>(null);
+const showDeleteConfirm = ref(false)
+const officerToDelete = ref<GridOfficer>(null)
+const route = useRoute()
+const officers = ref<GridOfficer[]>([])
+const OV = ref<OV | null>(null)
 
-const loading = ref(true);
+const loading = ref(true)
 
 onMounted(async () => {
-  await loadOfficers();
-});
+  await loadOfficers()
+})
 
 function logOff() {
-  authStore.user = null;
-  navigateTo('/');
+  authStore.user = null
+  navigateTo('/')
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id);
-  const res = await $fetch(`/api/officers?ovId=${ovId}`);
-  officers.value = res.officers;
+  const ovId = Number(route.params.id)
+  const res = await $fetch(`/api/officers?ovId=${ovId}`)
+  officers.value = res.officers
   OV.value = res.ov
     ? {
         ...res.ov,
         createdAt: new Date(res.ov.createdAt),
         ovDate: new Date(res.ov.ovDate),
       }
-    : null;
-  loading.value = false;
+    : null
+  loading.value = false
 }
 
 async function addOfficer() {
-  await saveAll();
+  await saveAll()
   officers.value.push({
     id: 0,
     name: '',
@@ -216,26 +192,26 @@ async function addOfficer() {
     position: 'automatic',
     ovId: Number(route.params.id),
     isNew: true,
-  });
+  })
 }
 
 async function deleteOfficer(officer: GridOfficer) {
   if (!officer.id) {
-    officers.value = officers.value.filter((o) => o !== officer);
-    return;
+    officers.value = officers.value.filter((o) => o !== officer)
+    return
   }
 
-  officerToDelete.value = officer;
-  showDeleteConfirm.value = true;
+  officerToDelete.value = officer
+  showDeleteConfirm.value = true
 }
 
 async function confirmedDeletion() {
-  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
-  await loadOfficers();
+  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' })
+  await loadOfficers()
 }
 
 async function saveAll() {
-  const ovId = Number(route.params.id);
+  const ovId = Number(route.params.id)
   await $fetch(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
     body: officers.value.map((o) => ({
@@ -243,20 +219,9 @@ async function saveAll() {
       provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
     })),
-  });
-  await loadOfficers();
+  })
+  await loadOfficers()
 }
 </script>
 
-<style scoped>
-@media print {
-  /* Hide everything except the Procession component */
-  body * {
-    visibility: hidden;
-  }
-  /* Hide all "no-print" buttons and controls */
-  .no-print {
-    display: none !important;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

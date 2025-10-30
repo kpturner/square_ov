@@ -2,15 +2,12 @@
   <v-card class="pa-0 pa-lg-4">
     <v-card-title class="d-flex justify-space-between align-center mb-2">
       <div class="d-flex align-center procession-header">
-        <span class="text-subtitle-1 text-lg-h6 mr-4">Procession for OV to {{ OV?.name || '...' }}</span>
+        <span class="text-subtitle-1 text-lg-h6 mr-4"
+          >Procession for OV to {{ OV?.name || '...' }}</span
+        >
       </div>
 
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-printer"
-        class="d-none d-lg-flex no-print"
-        @click="printProcession"
-      >
+      <v-btn color="primary" prepend-icon="mdi-printer" class="no-print" @click="printProcession">
         Print
       </v-btn>
     </v-card-title>
@@ -41,32 +38,17 @@
     </div>
 
     <v-card-text>
-      <div
-        v-if="vip"
-        class="d-flex justify-center mb-4"
-      >
-        <v-card
-          v-if="vip"
-          class="pa-3 text-center officer-card"
-          color="yellow"
-        >
+      <div v-if="vip" class="d-flex justify-center mb-4">
+        <v-card v-if="vip" class="pa-3 text-center officer-card" color="yellow">
           <div class="d-flex justify-center align-center">
             <strong>{{ vip.name }}</strong>
-            <v-icon
-              color="black"
-              icon="mdi-star"
-              size="large"
-              class="ms-2"
-            ></v-icon>
+            <v-icon color="black" icon="mdi-star" size="large" class="ms-2"></v-icon>
           </div>
           <div class="text-caption">{{ rankCaption(vip) }}</div>
         </v-card>
       </div>
 
-      <div
-        v-if="swordBearer || standardBearer"
-        class="d-flex justify-center mb-4"
-      >
+      <div v-if="swordBearer || standardBearer" class="d-flex justify-center mb-4">
         <v-card
           v-if="swordBearer"
           class="pa-3 text-center mr-1 officer-card sword-bearer"
@@ -74,12 +56,7 @@
         >
           <div class="d-flex justify-center align-center">
             <strong>{{ swordBearer.name }}</strong>
-            <v-icon
-              color="black"
-              icon="mdi-sword"
-              size="small"
-              class="ms-2"
-            ></v-icon>
+            <v-icon color="black" icon="mdi-sword" size="small" class="ms-2"></v-icon>
           </div>
           <div class="text-caption">Sword Bearer</div>
         </v-card>
@@ -91,36 +68,21 @@
         >
           <div class="d-flex justify-center align-center">
             <strong>{{ standardBearer.name }}</strong>
-            <v-icon
-              color="black"
-              icon="mdi-flag"
-              size="small"
-              class="ms-2"
-            ></v-icon>
+            <v-icon color="black" icon="mdi-flag" size="small" class="ms-2"></v-icon>
           </div>
           <div class="text-caption">Standard Bearer</div>
         </v-card>
       </div>
 
       <div class="d-flex justify-center flex-wrap mb-2">
-        <div
-          class="pa-1"
-          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
-        >
+        <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
           <strong>SOUTH</strong>
         </div>
-        <div
-          class="pa-1"
-          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
-        >
+        <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
           <strong>NORTH</strong>
         </div>
       </div>
-      <div
-        v-for="(row, idx) in rows"
-        :key="idx"
-        class="d-flex justify-center flex-wrap mb-2"
-      >
+      <div v-for="(row, idx) in rows" :key="idx" class="d-flex justify-center flex-wrap mb-2">
         <!-- South column -->
         <div
           v-if="row.south"
@@ -198,11 +160,7 @@
             <div class="text-caption">{{ rankCaption(row.north) }}</div>
           </v-card>
         </div>
-        <div
-          v-else
-          class="pa-1"
-          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
-        >
+        <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
         </div>
       </div>
@@ -211,82 +169,82 @@
 </template>
 
 <script setup lang="ts">
-import type { Officer, OV } from '@prisma/client';
-import { computed } from 'vue';
+import type { Officer, OV } from '@prisma/client'
+import { computed } from 'vue'
 
-const { ranks } = useRuntimeConfig().public;
+const { ranks } = useRuntimeConfig().public
 
-const props = defineProps<{ officers: Officer[]; OV: OV | null }>();
+const props = defineProps<{ officers: Officer[]; OV: OV | null }>()
 
 // Special roles
-const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
-const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'));
-const standardBearer = computed(() => props.officers.find((o) => o.position === 'standard_bearer'));
+const vip = computed(() => props.officers.find((o) => o.position === 'vip'))
+const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'))
+const standardBearer = computed(() => props.officers.find((o) => o.position === 'standard_bearer'))
 
-const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
-const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
+const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'))
+const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'))
 const seniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'SGW' && o.active)
-);
+)
 const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
-);
+)
 
-const activeDCsFront = ref(false);
-const includeGrandOfficers = ref(false);
-const alignActiveWardens = ref(false);
+const activeDCsFront = ref(false)
+const includeGrandOfficers = ref(false)
+const alignActiveWardens = ref(false)
 
 onMounted(() => {
   if (props.OV) {
-    activeDCsFront.value = props.OV.activeDCsFront;
-    includeGrandOfficers.value = props.OV.includeGrandOfficers;
-    alignActiveWardens.value = props.OV.alignWardens;
+    activeDCsFront.value = props.OV.activeDCsFront
+    includeGrandOfficers.value = props.OV.includeGrandOfficers
+    alignActiveWardens.value = props.OV.alignWardens
   }
-});
+})
 
 const rankPrefix = (officer: Officer) => {
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
     if (officer.active) {
-      return '';
+      return ''
     } else {
-      return 'P';
+      return 'P'
     }
   }
   if (officer.active) {
-    return 'Prov';
+    return 'Prov'
   } else {
-    return 'PP';
+    return 'PP'
   }
-};
+}
 
 const grandRankPrefix = (officer: Officer) => {
   if (officer.grandActive) {
-    return '';
+    return ''
   } else {
-    return 'P';
+    return 'P'
   }
-};
+}
 
 const rankCaption = (officer: Officer) => {
-  let caption = '';
+  let caption = ''
   if (officer.rank) {
-    caption += `${rankPrefix(officer)}${officer.rank}`;
+    caption += `${rankPrefix(officer)}${officer.rank}`
   }
   if (officer.grandOfficer) {
     if (caption.length) {
-      caption += ' - ';
+      caption += ' - '
     }
-    caption += `${grandRankPrefix(officer)}${officer.grandRank}`;
+    caption += `${grandRankPrefix(officer)}${officer.grandRank}`
     if (officer.grandOfficerYear) {
-      caption += ` (${officer.grandOfficerYear})`;
+      caption += ` (${officer.grandOfficerYear})`
     }
   }
-  return caption;
-};
+  return caption
+}
 
 const rankToConsider = (officer: Officer) => {
-  return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
-};
+  return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank
+}
 
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
@@ -294,8 +252,8 @@ const automatic = computed(() =>
     .filter((o) => o.position === 'automatic')
     .sort((a, b) => {
       // Grand officer first
-      if (a.grandOfficer && !b.grandOfficer) return -1;
-      if (!a.grandOfficer && b.grandOfficer) return 1;
+      if (a.grandOfficer && !b.grandOfficer) return -1
+      if (!a.grandOfficer && b.grandOfficer) return 1
 
       // Grand year for equal rank and active status
       if (
@@ -306,76 +264,85 @@ const automatic = computed(() =>
         b.grandOfficerYear &&
         rankToConsider(a) === rankToConsider(b)
       ) {
-        if (a.grandOfficerYear !== b.grandOfficerYear) return a.grandOfficerYear - b.grandOfficerYear;
+        if (a.grandOfficerYear !== b.grandOfficerYear)
+          return a.grandOfficerYear - b.grandOfficerYear
       }
 
       // Prov year for equal rank and active status
-      if (a.active === b.active && a.provOfficerYear && b.provOfficerYear && rankToConsider(a) === rankToConsider(b)) {
-        if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
+      if (
+        a.active === b.active &&
+        a.provOfficerYear &&
+        b.provOfficerYear &&
+        rankToConsider(a) === rankToConsider(b)
+      ) {
+        if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear
       }
 
       // Rank seniority
-      const aRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(a));
-      const bRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(b));
+      const aRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(a))
+      const bRankIndex = ranks.findIndex((r: any) => r.value === rankToConsider(b))
       if (aRankIndex !== bRankIndex)
-        return (aRankIndex !== -1 ? aRankIndex : ranks.length) - (bRankIndex !== -1 ? bRankIndex : ranks.length);
+        return (
+          (aRankIndex !== -1 ? aRankIndex : ranks.length) -
+          (bRankIndex !== -1 ? bRankIndex : ranks.length)
+        )
 
       // Grand Officers: active grand rank outranks non-active
       if (a.grandOfficer && b.grandOfficer && rankToConsider(a) === rankToConsider(b)) {
-        if (a.grandActive && !b.grandActive) return -1;
-        if (!a.grandActive && b.grandActive) return 1;
+        if (a.grandActive && !b.grandActive) return -1
+        if (!a.grandActive && b.grandActive) return 1
       }
 
       // Prov Officers: active prov rank outranks non-active
       if (rankToConsider(a) === rankToConsider(b)) {
-        if (a.active && !b.active) return -1;
-        if (!a.active && b.active) return 1;
+        if (a.active && !b.active) return -1
+        if (!a.active && b.active) return 1
       }
 
-      return 0;
+      return 0
     })
-);
+)
 
 // Build marching rows (top = rear, bottom = front)
 const rows = computed(() => {
-  const result: { south?: Officer; north?: Officer; centre?: Officer[] }[] = [];
+  const result: { south?: Officer; north?: Officer; centre?: Officer[] }[] = []
 
   // VIP + sword/standard first (rear)
-  const centreRow: Officer[] = [];
-  if (swordBearer.value) centreRow.push(swordBearer.value);
-  if (vip.value) centreRow.push(vip.value);
-  if (standardBearer.value) centreRow.push(standardBearer.value);
-  if (centreRow.length > 0) result.push({ centre: centreRow });
+  const centreRow: Officer[] = []
+  if (swordBearer.value) centreRow.push(swordBearer.value)
+  if (vip.value) centreRow.push(vip.value)
+  if (standardBearer.value) centreRow.push(standardBearer.value)
+  if (centreRow.length > 0) result.push({ centre: centreRow })
 
-  let nextRow: { south?: Officer; north?: Officer } = {};
+  let nextRow: { south?: Officer; north?: Officer } = {}
 
   // Traverse the automatic officers and add rows
   const activeDCs = automatic.value
     .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DGDC' || o.rank === 'AGDC'))
     .filter((o) => (includeGrandOfficers.value ? true : !o.grandOfficer))
-    .reverse();
+    .reverse()
   const automaticOfficers = activeDCsFront.value
     ? automatic.value.filter((ao) => !activeDCs.includes(ao))
-    : automatic.value;
+    : automatic.value
 
   for (const officer of automaticOfficers) {
     if (!nextRow.south) {
-      nextRow.south = officer;
+      nextRow.south = officer
     } else if (!nextRow.north) {
-      nextRow.north = officer;
-      result.push(nextRow);
-      nextRow = {};
+      nextRow.north = officer
+      result.push(nextRow)
+      nextRow = {}
     }
   }
 
   if (activeDCsFront.value) {
     for (const officer of activeDCs) {
       if (!nextRow.south) {
-        nextRow.south = officer;
+        nextRow.south = officer
       } else if (!nextRow.north) {
-        nextRow.north = officer;
-        result.push(nextRow);
-        nextRow = {};
+        nextRow.north = officer
+        result.push(nextRow)
+        nextRow = {}
       }
     }
   }
@@ -384,92 +351,93 @@ const rows = computed(() => {
   if (headSouth.value || headNorth.value) {
     if (Object.keys(nextRow).length === 0) {
       if (headSouth.value) {
-        nextRow.south = headSouth.value;
+        nextRow.south = headSouth.value
       }
       if (headNorth.value) {
-        nextRow.north = headNorth.value;
+        nextRow.north = headNorth.value
       }
-      result.push(nextRow);
-      nextRow = {};
+      result.push(nextRow)
+      nextRow = {}
     } else {
-      let hs = headSouth.value;
-      let hn = headNorth.value;
+      let hs = headSouth.value
+      let hn = headNorth.value
       if (hs && hn) {
-        nextRow.north = hn;
-        hn = undefined;
-        result.push(nextRow);
-        nextRow = {};
+        nextRow.north = hn
+        hn = undefined
+        result.push(nextRow)
+        nextRow = {}
       }
       if (hs) {
         if (nextRow.south) {
           // Swap
-          nextRow.north = nextRow.south;
-          nextRow.south = hs;
-          result.push(nextRow);
-          nextRow = {};
+          nextRow.north = nextRow.south
+          nextRow.south = hs
+          result.push(nextRow)
+          nextRow = {}
         } else {
-          nextRow.south = hs;
+          nextRow.south = hs
         }
       }
       if (hn) {
-        nextRow.north = hn;
-        result.push(nextRow);
-        nextRow = {};
+        nextRow.north = hn
+        result.push(nextRow)
+        nextRow = {}
       }
       if (Object.keys(nextRow).length > 0) {
-        result.push(nextRow);
-        nextRow = {};
+        result.push(nextRow)
+        nextRow = {}
       }
     }
   }
 
   // Now if we have both the ProvSGW and the ProvJGW, ensure they are in the same row
   if (seniorWarden.value && juniorWarden.value && alignActiveWardens.value) {
-    let sgwRowIndex = -1;
-    let jgwRowIndex = -1;
+    let sgwRowIndex = -1
+    let jgwRowIndex = -1
     result.forEach((row, idx) => {
       if (row.south?.id === seniorWarden.value?.id || row.north?.id === seniorWarden.value?.id) {
-        sgwRowIndex = idx;
+        sgwRowIndex = idx
       }
       if (row.south?.id === juniorWarden.value?.id || row.north?.id === juniorWarden.value?.id) {
-        jgwRowIndex = idx;
+        jgwRowIndex = idx
       }
-    });
+    })
     if (sgwRowIndex !== -1 && jgwRowIndex !== -1 && sgwRowIndex !== jgwRowIndex) {
-      const swRow = result[sgwRowIndex];
-      const jwRow = result[jgwRowIndex];
+      const swRow = result[sgwRowIndex]
+      const jwRow = result[jgwRowIndex]
       // Is the SGW in the north or the south?
       if (result[sgwRowIndex]?.south?.id === seniorWarden.value.id) {
         // In the right place already, so swap the JGW into the north of that row
         if (swRow && jwRow) {
-          const officerToMove = { ...swRow.north };
-          swRow.north = juniorWarden.value;
-          jwRow.north = officerToMove as Officer;
+          const officerToMove = { ...swRow.north }
+          swRow.north = juniorWarden.value
+          jwRow.north = officerToMove as Officer
         }
       } else {
         // SW is in a the north
         if (swRow && jwRow) {
-          const officerInNorthOfJWRow = { ...jwRow.north };
-          const officerInSouthOfJWRow = { ...jwRow.south };
-          const officerToMove = officerInNorthOfJWRow.rank === 'JGW' ? officerInSouthOfJWRow : officerInNorthOfJWRow;
-          jwRow.south = seniorWarden.value;
-          jwRow.north = juniorWarden.value;
-          swRow.north = officerToMove as Officer;
+          const officerInNorthOfJWRow = { ...jwRow.north }
+          const officerInSouthOfJWRow = { ...jwRow.south }
+          const officerToMove =
+            officerInNorthOfJWRow.rank === 'JGW' ? officerInSouthOfJWRow : officerInNorthOfJWRow
+          jwRow.south = seniorWarden.value
+          jwRow.north = juniorWarden.value
+          swRow.north = officerToMove as Officer
         }
       }
     }
   }
 
-  return result;
-});
+  return result
+})
 
 function printProcession() {
-  window.print();
+  window.print()
 }
 
-let timeout: ReturnType<typeof setTimeout>;
+let timeout: ReturnType<typeof setTimeout>
 const saveBooleans = () => {
-  clearTimeout(timeout);
+  clearTimeout(timeout)
   timeout = setTimeout(async () => {
     try {
       const body = {
@@ -477,21 +445,21 @@ const saveBooleans = () => {
         alignWardens: alignActiveWardens.value,
         activeDCsFront: activeDCsFront.value,
         includeGrandOfficers: includeGrandOfficers.value,
-      };
+      }
       await $fetch(`/api/ov/${props.OV?.id}.put`, {
         method: 'PUT',
         body,
-      });
+      })
     } catch (err) {
-      console.error('Failed to update booleans:', err);
+      console.error('Failed to update booleans:', err)
     }
-  }, 400);
-};
+  }, 400)
+}
 
-watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
+watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans)
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .v-card-text {
   display: flex;
   flex-direction: column;
@@ -506,11 +474,6 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
 }
 
 @media print {
-  /* Hide everything except the Procession component */
-  body * {
-    visibility: hidden;
-  }
-
   .procession-print,
   .procession-print * {
     visibility: visible;
@@ -521,11 +484,6 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
     left: 0;
     top: 0;
     width: 100%;
-  }
-
-  /* Hide all "no-print" buttons and controls */
-  .no-print {
-    display: none !important;
   }
 
   .sword-bearer {
@@ -545,15 +503,12 @@ watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
   .officer-card {
     color: black !important;
     margin-bottom: 50px;
+    page-break-inside: avoid; /* Prevent splitting across pages */
+    break-inside: avoid;
   }
 
   .procession-header {
     color: black !important;
-  }
-
-  @page {
-    size: portrait;
-    margin: 1.5cm;
   }
 }
 </style>
