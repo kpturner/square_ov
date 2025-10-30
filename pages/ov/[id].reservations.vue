@@ -28,19 +28,35 @@
               Back
             </v-btn>
 
-            <div class="d-flex justify-space-between align-center w-100">
-              <div v-if="OV" class="text-subtitle-1 text-lg-h6">
+            <div
+              class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
+            >
+              <div v-if="OV" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0">
                 Seat reservations for OV to {{ OV?.name || '...' }}
               </div>
 
-              <v-btn color="primary" prepend-icon="mdi-printer" @click="printReservations">
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-printer"
+                class="w-100 w-sm-auto"
+                @click="printReservations"
+              >
                 Print
               </v-btn>
             </div>
           </v-card-title>
 
+          <v-text-field
+            v-model="spares"
+            type="number"
+            label="Spares"
+            class="w-auto"
+            style="max-width: 100px"
+          />
+
           <SeatReservations
             :officers
+            :spares
             @load-officers="loadOfficers"
             @delete-officer="deleteOfficer"
             @save-changes="saveAll"
@@ -51,13 +67,16 @@
           class="only-print"
           :officers
           printMode
+          :spares
           @load-officers="loadOfficers"
           @delete-officer="deleteOfficer"
           @save-changes="saveAll"
         />
 
         <v-card v-if="!loading" class="no-print">
-          <v-card-title class="d-flex justify-space-between align-center">
+          <v-card-title
+            class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
+          >
             <v-btn
               color="primary"
               prepend-icon="mdi-home"
@@ -70,7 +89,7 @@
             <v-btn
               color="primary"
               prepend-icon="mdi-printer"
-              class="no-print"
+              class="w-100 w-sm-auto no-print"
               @click="printReservations"
             >
               Print
@@ -96,6 +115,7 @@ const officerToDelete = ref<GridOfficer>(null)
 const route = useRoute()
 const officers = ref<GridOfficer[]>([])
 const OV = ref<OV | null>(null)
+const spares = ref(2)
 
 const loading = ref(true)
 

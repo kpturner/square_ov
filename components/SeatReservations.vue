@@ -32,6 +32,28 @@
         </v-row>
       </v-card>
     </v-col>
+
+    <v-col v-if="Number(spares)" v-for="i in Number(spares)" :key="i" cols="12">
+      <v-card
+        class="reservation-card mb-1"
+        :elevation="printMode ? '0' : '3'"
+        :variant="printMode ? 'default' : 'tonal'"
+      >
+        <v-row dense class="align-center text-center no-gutters">
+          <!-- Left Column: Crest with right border -->
+          <v-col cols="2" class="d-flex justify-center align-center crest-column">
+            <img class="w-50" :src="hiowCrest" alt="HIoW Crest" />
+          </v-col>
+
+          <!-- Right Column: Text -->
+          <v-col cols="10" class="text-column">
+            <v-row class="spare-header text-h5 font-weight-bold mt-1 old-english justify-center">
+              Provincial Grand Lodge of Hampshire & Isle of Wight
+            </v-row>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-col>
   </v-row>
 </template>
 
@@ -39,7 +61,7 @@
 import type { GridOfficer } from '~/types/officers'
 import hiowCrest from '~/assets/images/hiowcrest.png'
 
-const props = defineProps<{ officers: GridOfficer[]; printMode: boolean }>()
+const props = defineProps<{ officers: GridOfficer[]; spares: number; printMode: boolean }>()
 
 const { ranks } = useRuntimeConfig().public
 
@@ -103,6 +125,10 @@ const grandRankPrefix = (officer: GridOfficer) => {
 .text-column {
   padding: 16px;
   box-sizing: border-box;
+}
+
+.spare-header {
+  margin-bottom: 130px;
 }
 
 @media print {
