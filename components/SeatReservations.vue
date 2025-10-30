@@ -42,7 +42,7 @@
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
-            <img class="w-50" :src="hiowCrest" alt="HIoW Crest" />
+            <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
           </v-col>
 
           <!-- Right Column: Text -->
