@@ -31,7 +31,7 @@
         v-if="activeDCsFront"
         v-model="includeGrandOfficers"
         class="ms-3 no-print"
-        label="Including Grand Officers?"
+        label="GO DCs at front also?"
         dense
         hide-details
       />

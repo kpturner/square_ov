@@ -1,6 +1,5 @@
 <template>
   <v-app>
-    {{ masonicYear }}
     <v-app-bar flat class="mb-4">
       <v-spacer />
       <v-btn
@@ -17,7 +16,16 @@
           </v-overlay>
         </client-only>
         <v-card variant="tonal" class="pa-6">
-          <v-card-title class="d-flex justify-space-between align-center">
+          <v-card-title class="d-flex flex-column align-start w-100">
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-home"
+              class="mb-2 w-100 w-sm-auto"
+              small
+              @click="$router.push('/home')"
+            >
+              Home
+            </v-btn>
             <div class="d-flex align-center">
               <span class="text-h5">Import Spreadsheet Data</span>
             </div>
@@ -50,7 +58,7 @@
             </v-row>
           </v-card>
           <v-card class="pa-6">
-            <span class="text-h6">Import Offical Visits</span>
+            <span class="text-h6">Import Official Visits</span>
             <v-row>
               <v-col>
                 <v-text-field v-model="ovSheetName" label="Sheet name" />
@@ -122,6 +130,7 @@ const importOfficialVisits = async () => {
   try {
     const data = (await readExcel(ovFile.value, ovSheetName.value)) as OVMaster[];
     await useOVMasterApi().import(data, year.value);
+    makeToast(`Sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
   } catch (err) {
     makeToast((err as Error).message, 'error');
     logger.error((err as Error).message);

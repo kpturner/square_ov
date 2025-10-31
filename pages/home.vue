@@ -177,6 +177,18 @@
           <v-card>
             <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
             <v-card-text>
+              Either select from the master list
+              <v-select
+                v-if="!editedOV.id"
+                v-model="selectedMasterOvId"
+                :items="ovSelectionList"
+                density="compact"
+                hide-details
+                :placeholder="`${masonicYear} Official Visit`"
+              />
+            </v-card-text>
+            <v-card-text v-if="!selectedMasterOvId">
+              OR enter the details yourself
               <v-text-field v-model="editedOV.name" label="Name" />
               <v-text-field v-model="editedOV.ovDate" label="Date" type="date" />
             </v-card-text>
@@ -202,10 +214,15 @@
 </template>
 
 <script setup lang="ts">
-import type { OV } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
+import type { GridOfficer } from '~/types/officers';
 
+const makeToast = useToast();
 const logger = useLogger('home');
+
+const _positionsRes = await $fetch('/api/ov/positions');
+type Position = (typeof _positionsRes)[number];
 
 const showDeleteConfirm = ref(false);
 const ovToDelete = ref<Partial<OV | null>>(null);
@@ -228,7 +245,10 @@ const formattedOVs = computed(() => {
   }));
 });
 
+const { masonicYear } = useMasonicYear();
+const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
+const ovMasters = ref<OVMaster[]>([]);
 const dialog = ref(false);
 const editedOV = ref<Partial<OV>>({});
 const headers = [
@@ -239,8 +259,18 @@ const headers = [
 
 async function fetchOVs() {
   ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
+  ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
   loading.value = false;
 }
+
+const ovSelectionList = computed(() => {
+  return ovMasters.value.map((ov) => {
+    return {
+      value: ov.id,
+      title: `${ov.number}: ${ov.lodgeName} on ${formatDate(ov.date)}`,
+    };
+  });
+});
 
 function logOff() {
   authStore.user = null;
@@ -256,8 +286,7 @@ function editOV(item: OV) {
   editedOV.value = {
     ...item,
     ovDate: new Date(
-      item.ovDate?.toISOString?.()?.substr(0, 10) ||
-        (item.ovDate.toString().split('T')[0] as string)
+      item.ovDate?.toISOString?.()?.slice(0, 10) || (item.ovDate.toString().split('T')[0] as string)
     ),
   };
   dialog.value = true;
@@ -278,6 +307,37 @@ async function copyOV(item: OV) {
   }
 }
 
+const selectedMasterOV = computed(() =>
+  ovMasters.value.find((ov) => ov.id === selectedMasterOvId.value)
+);
+
+const addOfficer = async (
+  ovId: number,
+  officers: GridOfficer[],
+  officerNo: number,
+  position: Position
+) => {
+  const activeOfficer = await $fetch<ActiveOfficer>(
+    `/api/active-officers/${masonicYear}/${officerNo}`
+  );
+
+  const firstName = activeOfficer.familiarName ?? activeOfficer.givenName.split(' ')[0];
+  officers.push({
+    id: 0,
+    name: `${firstName} ${activeOfficer.familyName}`,
+    rank: activeOfficer.provincialRank.replace('Prov', '').toUpperCase(),
+    provOfficerYear: null,
+    grandOfficer: false,
+    grandOfficerYear: null,
+    grandActive: false,
+    grandRank: null,
+    active: true,
+    position,
+    ovId,
+    isNew: true,
+  });
+};
+
 async function saveOV() {
   if (editedOV.value.id) {
     await $fetch(`/api/ov/${editedOV.value.id}`, {
@@ -285,12 +345,114 @@ async function saveOV() {
       body: { ...editedOV.value, userId: authStore.user?.id },
     });
   } else {
-    await $fetch('/api/ov', {
-      method: 'POST',
-      body: { ...editedOV.value, userId: authStore.user?.id },
-    });
+    // Depends on whether they selected a master OV or entered stuff manually
+    if (selectedMasterOvId.value) {
+      if (selectedMasterOV.value) {
+        const existing = ovs.value.find((ov) => ov.name === selectedMasterOV.value.lodgeName);
+        if (existing) {
+          makeToast(
+            `An official visit for ${selectedMasterOV.value.lodgeName} already exists`,
+            'error'
+          );
+          return;
+        }
+        editedOV.value = {
+          name: selectedMasterOV.value.lodgeName,
+          ovDate: new Date(
+            selectedMasterOV.value.date?.toISOString?.()?.slice(0, 10) ||
+              (selectedMasterOV.value.date.toString().split('T')[0] as string)
+          ),
+        };
+      }
+    }
+
+    try {
+      const updatedOV = await $fetch('/api/ov', {
+        method: 'POST',
+        body: { ...editedOV.value, userId: authStore.user?.id },
+      });
+
+      // Populate the officers if selected from the master list
+      if (selectedMasterOV.value) {
+        const officers: GridOfficer[] = [];
+        officers.push({
+          id: 0,
+          name: selectedMasterOV.value.vip,
+          rank: null,
+          provOfficerYear: null,
+          grandOfficer: false,
+          grandOfficerYear: null,
+          grandActive: false,
+          grandRank: null,
+          active: true,
+          position: 'vip',
+          ovId: updatedOV.id,
+          isNew: true,
+        });
+        officers.push({
+          id: 0,
+          name: selectedMasterOV.value.dc,
+          rank: null,
+          provOfficerYear: null,
+          grandOfficer: false,
+          grandOfficerYear: null,
+          grandActive: false,
+          grandRank: null,
+          active: true,
+          position: 'automatic',
+          ovId: updatedOV.id,
+          isNew: true,
+        });
+        if (selectedMasterOV.value.sword) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.sword, 'sword_bearer');
+        }
+        if (selectedMasterOV.value.standard) {
+          await addOfficer(
+            updatedOV.id,
+            officers,
+            selectedMasterOV.value.standard,
+            'standard_bearer'
+          );
+        }
+        if (selectedMasterOV.value.steward) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.steward, 'automatic');
+        }
+        if (selectedMasterOV.value.officer1) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer1, 'automatic');
+        }
+        if (selectedMasterOV.value.officer2) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer2, 'automatic');
+        }
+        if (selectedMasterOV.value.officer3) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer3, 'automatic');
+        }
+        if (selectedMasterOV.value.officer4) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer4, 'automatic');
+        }
+        if (selectedMasterOV.value.officer5) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer5, 'automatic');
+        }
+        if (selectedMasterOV.value.officer6) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer6, 'automatic');
+        }
+        if (selectedMasterOV.value.officer7) {
+          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer7, 'automatic');
+        }
+        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
+          method: 'PUT',
+          body: officers.map((o) => ({
+            ...o,
+            provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
+            grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
+          })),
+        });
+      }
+    } catch (err) {
+      makeToast((err as Error).message, 'error');
+    }
   }
   dialog.value = false;
+  selectedMasterOvId.value = null;
   await fetchOVs();
 }
 
