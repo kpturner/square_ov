@@ -67,7 +67,7 @@
                       size="small"
                       color="secondary"
                       variant="elevated"
-                      title="Procession"
+                      title="Reservations"
                       @click="$router.push(`/ov/${item.id}.reservations`)"
                     />
                     <v-btn
@@ -142,7 +142,7 @@
                           size="small"
                           color="secondary"
                           variant="elevated"
-                          title="Procession"
+                          title="Reservations"
                           @click="$router.push(`/ov/${item.id}.reservations`)"
                         />
 
