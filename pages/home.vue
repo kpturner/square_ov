@@ -398,11 +398,7 @@ async function saveOV() {
               ovId: updatedOV.id,
               isNew: true,
             },
-          ].map((o) => ({
-            ...o,
-            provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
-            grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
-          })),
+          ],
         });
         // Now the rest
         officers.push({
@@ -456,11 +452,7 @@ async function saveOV() {
         }
         await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
-          body: officers.map((o) => ({
-            ...o,
-            provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
-            grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
-          })),
+          body: officers,
         });
       }
     } catch (err) {
