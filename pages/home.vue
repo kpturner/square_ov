@@ -378,27 +378,22 @@ async function saveOV() {
       // Populate the officers if selected from the master list
       if (selectedMasterOV.value) {
         const officers: GridOfficer[] = [];
-        // Always do the VIP first so we can guarantee he is at the top
-        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
-          method: 'PUT',
-          body: [
-            {
-              id: 0,
-              name: selectedMasterOV.value.vip,
-              rank: ['PGM', 'DPGM'].includes(selectedMasterOV.value.vip)
-                ? selectedMasterOV.value.vip
-                : null,
-              provOfficerYear: null,
-              grandOfficer: false,
-              grandOfficerYear: null,
-              grandActive: false,
-              grandRank: null,
-              active: true,
-              position: 'vip',
-              ovId: updatedOV.id,
-              isNew: true,
-            },
-          ],
+
+        officers.push({
+          id: 0,
+          name: selectedMasterOV.value.vip,
+          rank: ['PGM', 'DPGM'].includes(selectedMasterOV.value.vip)
+            ? selectedMasterOV.value.vip
+            : null,
+          provOfficerYear: null,
+          grandOfficer: false,
+          grandOfficerYear: null,
+          grandActive: false,
+          grandRank: null,
+          active: true,
+          position: 'vip',
+          ovId: updatedOV.id,
+          isNew: true,
         });
         // Now the rest
         officers.push({
