@@ -267,7 +267,7 @@ const ovSelectionList = computed(() => {
   return ovMasters.value.map((ov) => {
     return {
       value: ov.id,
-      title: `${ov.number}: ${ov.lodgeName} no. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
+      title: `${ov.number}: ${ov.lodgeName} Lodge No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
     };
   });
 });
@@ -313,7 +313,7 @@ const selectedMasterOV = computed(() =>
 
 const selectedOVName = computed(
   () =>
-    `${selectedMasterOV.value?.lodgeName} no. ${selectedMasterOV.value?.lodgeNumber.replace('L', '')}`
+    `${selectedMasterOV.value?.lodgeName} Lodge No. ${selectedMasterOV.value?.lodgeNumber.replace('L', '')}`
 );
 
 const addOfficer = async (
