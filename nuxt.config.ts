@@ -26,10 +26,11 @@ export default defineNuxtConfig({
     transpile: ['vuetify'],
   },
   modules: [
+    '@nuxt/eslint',
     '@pinia/nuxt',
     (_options, nuxt) => {
       nuxt.hooks.hook('vite:extendConfig', (config) => {
-        // @ts-expect-error
+        // @ts-expect-error for some reason I do not care about
         config.plugins.push(vuetify({ autoImport: true }));
       });
     },

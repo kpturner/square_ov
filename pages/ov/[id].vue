@@ -5,8 +5,8 @@
       <v-spacer />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        @click="toggleTheme"
         variant="text"
+        @click="toggleTheme"
       />
     </v-app-bar>
     <v-main class="no-print">
@@ -22,22 +22,22 @@
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"
-                @click="$router.push('/home')"
                 class="mb-2 w-100 w-sm-auto"
                 small
+                @click="$router.push('/home')"
               >
                 Home
               </v-btn>
-              <span v-if="OV" class="text-subtitle-1 text-lg-h6"
-                >Officers for OV to {{ OV?.name || '...' }}</span
+              <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
+                >Officers for OV to {{ officialVisit?.name || '...' }}</span
               >
               <v-btn
-                v-if="OV"
+                v-if="officialVisit"
                 color="secondary"
                 prepend-icon="mdi-seat"
-                @click="$router.push(`/ov/${OV.id}.reservations`)"
                 class="mb-2 w-100 w-sm-auto"
                 small
+                @click="$router.push(`/ov/${officialVisit.id}.reservations`)"
               >
                 Seat reservations
               </v-btn>
@@ -59,8 +59,8 @@
               <v-btn
                 color="primary"
                 prepend-icon="mdi-content-save"
-                @click="saveAll"
                 class="w-100 w-sm-auto"
+                @click="saveAll"
               >
                 Save Changes
               </v-btn>
@@ -87,36 +87,36 @@
               <v-btn
                 color="primary"
                 prepend-icon="mdi-content-save"
-                @click="saveAll"
                 class="w-100 w-sm-auto"
+                @click="saveAll"
               >
                 Save Changes
               </v-btn>
             </div>
           </v-container>
         </v-card>
-        <hr />
-        <Procession v-if="!loading && OV" :officers :OV />
+        <hr >
+        <Procession v-if="!loading && officialVisit" :officers :official-visit />
 
         <v-card v-if="!loading">
           <v-card-title class="d-flex justify-space-between align-center">
             <div class="w-100 d-flex flex-column" style="align-items: flex-start">
               <v-btn
-                v-if="OV"
+                v-if="officialVisit"
                 color="secondary"
                 prepend-icon="mdi-seat"
-                @click="$router.push(`/ov/${OV.id}.reservations`)"
                 class="mb-2 w-100 w-sm-auto"
                 small
+                @click="$router.push(`/ov/${officialVisit.id}.reservations`)"
               >
                 Seat reservations
               </v-btn>
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"
-                @click="$router.push('/home')"
                 class="mb-2 w-100 w-sm-auto"
                 small
+                @click="$router.push('/home')"
               >
                 Home
               </v-btn>
@@ -133,52 +133,52 @@
       color="red"
       @confirm="confirmedDeletion"
     />
-    <Procession class="only-print" :officers :OV />
+    <Procession class="only-print" :officers :official-visit />
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import type { OV } from '@prisma/client'
-import type { GridOfficer } from '~/types/officers'
-import { useAuthStore } from '~/stores/auth'
+import { useRoute } from 'vue-router';
+import type { OV } from '@prisma/client';
+import type { GridOfficer } from '~/types/officers';
+import { useAuthStore } from '~/stores/auth';
 
-const authStore = useAuthStore()
-const { theme, toggleTheme } = useSetTheme()
+const authStore = useAuthStore();
+const { theme, toggleTheme } = useSetTheme();
 
-const showDeleteConfirm = ref(false)
-const officerToDelete = ref<GridOfficer>(null)
-const route = useRoute()
-const officers = ref<GridOfficer[]>([])
-const OV = ref<OV | null>(null)
+const showDeleteConfirm = ref(false);
+const officerToDelete = ref<GridOfficer>(null);
+const route = useRoute();
+const officers = ref<GridOfficer[]>([]);
+const officialVisit = ref<OV | null>(null);
 
-const loading = ref(true)
+const loading = ref(true);
 
 onMounted(async () => {
-  await loadOfficers()
-})
+  await loadOfficers();
+});
 
 function logOff() {
-  authStore.user = null
-  navigateTo('/')
+  authStore.user = null;
+  navigateTo('/');
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id)
-  const res = await $fetch(`/api/officers?ovId=${ovId}`)
-  officers.value = res.officers
-  OV.value = res.ov
+  const ovId = Number(route.params.id);
+  const res = await $fetch(`/api/officers?ovId=${ovId}`);
+  officers.value = res.officers;
+  officialVisit.value = res.ov
     ? {
         ...res.ov,
         createdAt: new Date(res.ov.createdAt),
         ovDate: new Date(res.ov.ovDate),
       }
-    : null
-  loading.value = false
+    : null;
+  loading.value = false;
 }
 
 async function addOfficer() {
-  await saveAll()
+  await saveAll();
   officers.value.push({
     id: 0,
     name: '',
@@ -192,26 +192,26 @@ async function addOfficer() {
     position: 'automatic',
     ovId: Number(route.params.id),
     isNew: true,
-  })
+  });
 }
 
 async function deleteOfficer(officer: GridOfficer) {
   if (!officer.id) {
-    officers.value = officers.value.filter((o) => o !== officer)
-    return
+    officers.value = officers.value.filter((o) => o !== officer);
+    return;
   }
 
-  officerToDelete.value = officer
-  showDeleteConfirm.value = true
+  officerToDelete.value = officer;
+  showDeleteConfirm.value = true;
 }
 
 async function confirmedDeletion() {
-  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' })
-  await loadOfficers()
+  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
+  await loadOfficers();
 }
 
 async function saveAll() {
-  const ovId = Number(route.params.id)
+  const ovId = Number(route.params.id);
   await $fetch(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
     body: officers.value.map((o) => ({
@@ -219,8 +219,8 @@ async function saveAll() {
       provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
     })),
-  })
-  await loadOfficers()
+  });
+  await loadOfficers();
 }
 </script>
 

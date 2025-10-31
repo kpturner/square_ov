@@ -9,7 +9,7 @@
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
-            <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
+            <img class="crest" :src="hiowCrest" alt="HIoW Crest" >
           </v-col>
 
           <!-- Right Column: Text -->
@@ -33,78 +33,80 @@
       </v-card>
     </v-col>
 
-    <v-col v-if="Number(spares)" v-for="i in Number(spares)" :key="i" cols="12">
-      <v-card
-        class="reservation-card mb-1"
-        :elevation="printMode ? '0' : '3'"
-        :variant="printMode ? 'elevated' : 'tonal'"
-      >
-        <v-row dense class="align-center text-center no-gutters">
-          <!-- Left Column: Crest with right border -->
-          <v-col cols="2" class="d-flex justify-center align-center crest-column">
-            <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
-          </v-col>
+    <template v-if="Number(spares)">
+      <v-col v-for="i in Number(spares)" :key="i" cols="12">
+        <v-card
+          class="reservation-card mb-1"
+          :elevation="printMode ? '0' : '3'"
+          :variant="printMode ? 'elevated' : 'tonal'"
+        >
+          <v-row dense class="align-center text-center no-gutters">
+            <!-- Left Column: Crest with right border -->
+            <v-col cols="2" class="d-flex justify-center align-center crest-column">
+              <img class="crest" :src="hiowCrest" alt="HIoW Crest" >
+            </v-col>
 
-          <!-- Right Column: Text -->
-          <v-col cols="10" class="text-column">
-            <v-row class="spare-header text-h5 font-weight-bold mt-1 old-english justify-center">
-              Provincial Grand Lodge of Hampshire & Isle of Wight
-            </v-row>
-          </v-col>
-        </v-row>
-      </v-card>
-    </v-col>
+            <!-- Right Column: Text -->
+            <v-col cols="10" class="text-column">
+              <v-row class="spare-header text-h5 font-weight-bold mt-1 old-english justify-center">
+                Provincial Grand Lodge of Hampshire & Isle of Wight
+              </v-row>
+            </v-col>
+          </v-row>
+        </v-card>
+      </v-col>
+    </template>
   </v-row>
 </template>
 
 <script setup lang="ts">
-import type { GridOfficer } from '~/types/officers'
-import hiowCrest from '~/assets/images/hiowcrest.png'
+import type { GridOfficer } from '~/types/officers';
+import hiowCrest from '~/assets/images/hiowcrest.png';
 
-const props = defineProps<{ officers: GridOfficer[]; spares: number; printMode?: boolean }>()
+defineProps<{ officers: GridOfficer[]; spares: number; printMode?: boolean }>();
 
-const { ranks } = useRuntimeConfig().public
+const { ranks } = useRuntimeConfig().public;
 
 const salutation = (officer: GridOfficer) => {
   if (officer.rank === 'PGM') {
-    return 'R. W. BRO.'
+    return 'R. W. BRO.';
   }
   if (officer.rank === 'DPGM') {
-    return 'V. W. BRO.'
+    return 'V. W. BRO.';
   }
-  return 'W. BRO.'
-}
+  return 'W. BRO.';
+};
 
 const provincialRank = (officer: GridOfficer) => {
   if (!officer.rank) {
-    return ''
+    return '';
   }
-  return ranks.find((r) => r.value === officer.rank)?.text
-}
+  return ranks.find((r) => r.value === officer.rank)?.text;
+};
 
 const provincialRankPrefix = (officer: GridOfficer) => {
   if (!officer.rank) {
-    return ''
+    return '';
   }
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
-    return ''
+    return '';
   }
-  return officer.active ? 'Provincial' : 'Past Provincial'
-}
+  return officer.active ? 'Provincial' : 'Past Provincial';
+};
 
 const grandRank = (officer: GridOfficer) => {
   if (!officer.grandOfficer) {
-    return
+    return;
   }
-  return ranks.find((r) => r.value === officer.grandRank)?.text
-}
+  return ranks.find((r) => r.value === officer.grandRank)?.text;
+};
 
 const grandRankPrefix = (officer: GridOfficer) => {
   if (!officer.grandOfficer) {
-    return
+    return;
   }
-  return officer.grandActive ? '' : 'Past'
-}
+  return officer.grandActive ? '' : 'Past';
+};
 </script>
 
 <style lang="scss" scoped>

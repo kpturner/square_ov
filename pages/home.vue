@@ -15,8 +15,8 @@
       <v-spacer />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        @click="toggleTheme"
         variant="text"
+        @click="toggleTheme"
       />
     </v-app-bar>
     <v-main>

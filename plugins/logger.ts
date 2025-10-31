@@ -1,6 +1,6 @@
 import pino from 'pino';
 
-export default defineNuxtPlugin((app) => {
+export default defineNuxtPlugin(() => {
   const { logLevel } = useRuntimeConfig().public;
 
   const logger = pino({

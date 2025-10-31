@@ -5,8 +5,8 @@
       <v-spacer />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        @click="toggleTheme"
         variant="text"
+        @click="toggleTheme"
       />
     </v-app-bar>
     <v-main>
@@ -21,9 +21,9 @@
             <v-btn
               color="primary"
               prepend-icon="mdi-home"
-              @click="$router.back()"
               class="mb-2 w-100 w-sm-auto"
               small
+              @click="$router.back()"
             >
               Back
             </v-btn>
@@ -31,8 +31,8 @@
             <div
               class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
             >
-              <div v-if="OV" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0">
-                Seat reservations for OV to {{ OV?.name || '...' }}
+              <div v-if="officialVisit" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0">
+                Seat reservations for OV to {{ officialVisit?.name || '...' }}
               </div>
 
               <v-btn
@@ -54,13 +54,7 @@
             style="max-width: 100px"
           />
 
-          <SeatReservations
-            :officers
-            :spares
-            @load-officers="loadOfficers"
-            @delete-officer="deleteOfficer"
-            @save-changes="saveAll"
-          />
+          <SeatReservations :officers :spares />
         </v-card>
 
         <v-card v-if="!loading" class="no-print">
@@ -70,9 +64,9 @@
             <v-btn
               color="primary"
               prepend-icon="mdi-home"
-              @click="$router.back()"
               class="mb-2 w-100 w-sm-auto no-print"
               small
+              @click="$router.back()"
             >
               Back
             </v-btn>
@@ -88,107 +82,51 @@
         </v-card>
       </v-container>
     </v-main>
-    <SeatReservations
-      class="only-print"
-      :officers
-      printMode
-      :spares
-      @load-officers="loadOfficers"
-      @delete-officer="deleteOfficer"
-      @save-changes="saveAll"
-    />
+    <SeatReservations class="only-print" :officers print-mode :spares />
   </v-app>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import type { OV } from '@prisma/client'
-import type { GridOfficer } from '~/types/officers'
-import { useAuthStore } from '~/stores/auth'
+import { useRoute } from 'vue-router';
+import type { OV } from '@prisma/client';
+import type { GridOfficer } from '~/types/officers';
+import { useAuthStore } from '~/stores/auth';
 
-const authStore = useAuthStore()
-const { theme, toggleTheme } = useSetTheme()
+const authStore = useAuthStore();
+const { theme, toggleTheme } = useSetTheme();
 
-const showDeleteConfirm = ref(false)
-const officerToDelete = ref<GridOfficer>(null)
-const route = useRoute()
-const officers = ref<GridOfficer[]>([])
-const OV = ref<OV | null>(null)
-const spares = ref(2)
+const route = useRoute();
+const officers = ref<GridOfficer[]>([]);
+const officialVisit = ref<OV | null>(null);
+const spares = ref(2);
 
-const loading = ref(true)
+const loading = ref(true);
 
 onMounted(async () => {
-  await loadOfficers()
-})
+  await loadOfficers();
+});
 
 function logOff() {
-  authStore.user = null
-  navigateTo('/')
+  authStore.user = null;
+  navigateTo('/');
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id)
-  const res = await $fetch(`/api/officers?ovId=${ovId}`)
-  officers.value = res.officers
-  OV.value = res.ov
+  const ovId = Number(route.params.id);
+  const res = await $fetch(`/api/officers?ovId=${ovId}`);
+  officers.value = res.officers;
+  officialVisit.value = res.ov
     ? {
         ...res.ov,
         createdAt: new Date(res.ov.createdAt),
         ovDate: new Date(res.ov.ovDate),
       }
-    : null
-  loading.value = false
-}
-
-async function addOfficer() {
-  await saveAll()
-  officers.value.push({
-    id: 0,
-    name: '',
-    rank: null,
-    provOfficerYear: null,
-    grandOfficer: false,
-    grandOfficerYear: null,
-    grandActive: false,
-    grandRank: null,
-    active: true,
-    position: 'automatic',
-    ovId: Number(route.params.id),
-    isNew: true,
-  })
-}
-
-async function deleteOfficer(officer: GridOfficer) {
-  if (!officer.id) {
-    officers.value = officers.value.filter((o) => o !== officer)
-    return
-  }
-
-  officerToDelete.value = officer
-  showDeleteConfirm.value = true
-}
-
-async function confirmedDeletion() {
-  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' })
-  await loadOfficers()
-}
-
-async function saveAll() {
-  const ovId = Number(route.params.id)
-  await $fetch(`/api/officers?ovId=${ovId}`, {
-    method: 'PUT',
-    body: officers.value.map((o) => ({
-      ...o,
-      provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
-      grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
-    })),
-  })
-  await loadOfficers()
+    : null;
+  loading.value = false;
 }
 
 function printReservations() {
-  window.print()
+  window.print();
 }
 </script>
 

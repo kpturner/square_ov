@@ -1,25 +1,12 @@
 <template>
-  <v-dialog
-    :model-value="localValue"
-    @update:model-value="updateValue"
-    max-width="400"
-  >
+  <v-dialog :model-value="localValue" max-width="400" @update:model-value="updateValue">
     <v-card>
       <v-card-title class="text-h6">{{ title }}</v-card-title>
       <v-card-text>{{ message }}</v-card-text>
       <v-card-actions>
         <v-spacer />
-        <v-btn
-          text
-          @click="cancel"
-          >Cancel</v-btn
-        >
-        <v-btn
-          :color="color"
-          text
-          @click="confirm"
-          >OK</v-btn
-        >
+        <v-btn text @click="cancel">Cancel</v-btn>
+        <v-btn :color="color" text @click="confirm">OK</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

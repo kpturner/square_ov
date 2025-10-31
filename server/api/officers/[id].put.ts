@@ -1,7 +1,6 @@
 import prisma from '~/server/utils/dbClient';
 
 export default defineEventHandler(async (event) => {
-  const ovId = Number(getQuery(event).ovId);
   const body = await readBody(event);
 
   const updates = body.map((o) =>

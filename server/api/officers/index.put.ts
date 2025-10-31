@@ -1,5 +1,5 @@
 import prisma from '~/server/utils/dbClient';
-import { Officer } from '@prisma/client';
+import type { Officer } from '@prisma/client';
 
 export default defineEventHandler(async (event) => {
   const ovId = Number(getQuery(event).ovId);

@@ -8,12 +8,7 @@
       class="mt-2"
     >
       <template #item.name="{ item }">
-        <v-text-field
-          v-model="item.name"
-          density="compact"
-          hide-details
-          placeholder="Name"
-        />
+        <v-text-field v-model="item.name" density="compact" hide-details placeholder="Name" />
       </template>
 
       <template #item.rank="{ item }">
@@ -29,31 +24,18 @@
       </template>
 
       <template #item.provOfficerYear="{ item }">
-        <v-text-field
-          v-model="item.provOfficerYear"
-          type="number"
-          density="compact"
-          hide-details
-        />
+        <v-text-field v-model="item.provOfficerYear" type="number" density="compact" hide-details />
       </template>
 
       <template #item.active="{ item }">
         <div class="checkbox-cell">
-          <v-checkbox
-            v-model="item.active"
-            hide-details
-            density="compact"
-          />
+          <v-checkbox v-model="item.active" hide-details density="compact" />
         </div>
       </template>
 
       <template #item.grandOfficer="{ item }">
         <div class="checkbox-cell">
-          <v-checkbox
-            v-model="item.grandOfficer"
-            hide-details
-            density="compact"
-          />
+          <v-checkbox v-model="item.grandOfficer" hide-details density="compact" />
         </div>
       </template>
 
@@ -70,7 +52,9 @@
       <template #item.grandRank="{ item }">
         <v-select
           v-model="item.grandRank"
-          :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
+          :items="
+            [{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))
+          "
           item-title="value"
           item-value="value"
           density="compact"
@@ -101,12 +85,7 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn
-          icon="mdi-delete"
-          size="small"
-          color="red"
-          @click="emits('delete-officer', item)"
-        />
+        <v-btn icon="mdi-delete" size="small" color="red" @click="emits('delete-officer', item)" />
       </template>
     </v-data-table>
   </v-responsive>
@@ -114,23 +93,11 @@
   <!-- MOBILE / TABLET CARDS -->
   <v-responsive class="hidden-lg-and-up">
     <v-row dense>
-      <v-col
-        v-for="(item, i) in officers"
-        :key="item.id ?? i"
-        cols="12"
-      >
-        <v-card
-          class="officer-card pa-3 mb-2"
-          elevation="3"
-          variant="tonal"
-        >
+      <v-col v-for="(item, i) in officers" :key="item.id ?? i" cols="12">
+        <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
           <v-row dense>
             <v-col cols="12">
-              <v-text-field
-                v-model="item.name"
-                label="Name"
-                density="compact"
-              />
+              <v-text-field v-model="item.name" label="Name" density="compact" />
             </v-col>
 
             <v-col cols="12">
@@ -146,12 +113,7 @@
             </v-col>
 
             <v-col cols="6">
-              <v-checkbox
-                v-model="item.active"
-                label="Active"
-                hide-details
-                density="compact"
-              />
+              <v-checkbox v-model="item.active" label="Active" hide-details density="compact" />
             </v-col>
 
             <v-col cols="12">
@@ -163,10 +125,7 @@
               />
             </v-col>
 
-            <v-col
-              cols="12"
-              sm="6"
-            >
+            <v-col cols="12" sm="6">
               <v-select
                 v-model="item.position"
                 :items="availablePositions"
@@ -184,10 +143,7 @@
               />
             </v-col>
 
-            <v-col
-              cols="6"
-              v-if="item.grandOfficer"
-            >
+            <v-col v-if="item.grandOfficer" cols="6">
               <v-checkbox
                 v-model="item.grandActive"
                 label="Active"
@@ -196,13 +152,14 @@
               />
             </v-col>
 
-            <v-col
-              cols="12"
-              v-if="item.grandOfficer"
-            >
+            <v-col v-if="item.grandOfficer" cols="12">
               <v-select
                 v-model="item.grandRank"
-                :items="[{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))"
+                :items="
+                  [{ value: '' }, ...ranks].filter(
+                    (r) => !['PGM', 'DPGM', 'APGM'].includes(r.value)
+                  )
+                "
                 item-title="value"
                 item-value="value"
                 label="Grand rank"
@@ -211,10 +168,7 @@
               />
             </v-col>
 
-            <v-col
-              cols="12"
-              v-if="item.grandOfficer"
-            >
+            <v-col v-if="item.grandOfficer" cols="12">
               <v-text-field
                 v-model="item.grandOfficerYear"
                 type="number"
@@ -223,12 +177,7 @@
               />
             </v-col>
           </v-row>
-          <v-row
-            dense
-            align="center"
-            justify="end"
-            class="mt-2"
-          >
+          <v-row dense align="center" justify="end" class="mt-2">
             <v-btn
               class="me-2"
               icon="mdi-content-save"
