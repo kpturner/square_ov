@@ -267,7 +267,7 @@ const ovSelectionList = computed(() => {
   return ovMasters.value.map((ov) => {
     return {
       value: ov.id,
-      title: `${ov.number}: ${ov.lodgeName} on ${formatDate(ov.date)}`,
+      title: `${ov.number}: ${ov.lodgeName} no. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
     };
   });
 });
@@ -311,6 +311,11 @@ const selectedMasterOV = computed(() =>
   ovMasters.value.find((ov) => ov.id === selectedMasterOvId.value)
 );
 
+const selectedOVName = computed(
+  () =>
+    `${selectedMasterOV.value?.lodgeName} no. ${selectedMasterOV.value?.lodgeNumber.replace('L', '')}`
+);
+
 const addOfficer = async (
   ovId: number,
   officers: GridOfficer[],
@@ -348,16 +353,14 @@ async function saveOV() {
     // Depends on whether they selected a master OV or entered stuff manually
     if (selectedMasterOvId.value) {
       if (selectedMasterOV.value) {
-        const existing = ovs.value.find((ov) => ov.name === selectedMasterOV.value.lodgeName);
+        const name = selectedOVName.value;
+        const existing = ovs.value.find((ov) => ov.name === name);
         if (existing) {
-          makeToast(
-            `An official visit for ${selectedMasterOV.value.lodgeName} already exists`,
-            'error'
-          );
+          makeToast(`An official visit for "${selectedOVName.value}" already exists`, 'error');
           return;
         }
         editedOV.value = {
-          name: selectedMasterOV.value.lodgeName,
+          name,
           ovDate: new Date(
             selectedMasterOV.value.date?.toISOString?.()?.slice(0, 10) ||
               (selectedMasterOV.value.date.toString().split('T')[0] as string)
