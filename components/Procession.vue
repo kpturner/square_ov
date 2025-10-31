@@ -170,9 +170,9 @@
 
 <script setup lang="ts">
 import type { Officer, OV } from '@prisma/client';
-import type { Rank } from '~/types';
 
 const { ranks } = useRuntimeConfig().public;
+const logger = useLogger('procession');
 
 const props = defineProps<{ officers: Officer[]; officialVisit: OV | null }>();
 
@@ -279,8 +279,8 @@ const automatic = computed(() =>
       }
 
       // Rank seniority
-      const aRankIndex = ranks.findIndex((r: Rank) => r.value === rankToConsider(a));
-      const bRankIndex = ranks.findIndex((r: Rank) => r.value === rankToConsider(b));
+      const aRankIndex = ranks.findIndex((r) => r.value === rankToConsider(a));
+      const bRankIndex = ranks.findIndex((r) => r.value === rankToConsider(b));
       if (aRankIndex !== bRankIndex)
         return (
           (aRankIndex !== -1 ? aRankIndex : ranks.length) -
@@ -451,7 +451,7 @@ const saveBooleans = () => {
         body,
       });
     } catch (err) {
-      console.error('Failed to update booleans:', err);
+      logger.error('Failed to update booleans:', err);
     }
   }, 400);
 };

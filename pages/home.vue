@@ -1,17 +1,7 @@
 <template>
   <v-app>
-    <v-app-bar
-      flat
-      class="mb-4"
-    >
-      <v-btn
-        color="grey"
-        variant="text"
-        small
-        @click="logOff"
-      >
-        Log Off
-      </v-btn>
+    <v-app-bar flat class="mb-4">
+      <v-btn color="grey" variant="text" small @click="logOff"> Log Off </v-btn>
       <v-spacer />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
@@ -22,16 +12,8 @@
     <v-main>
       <v-container>
         <client-only>
-          <v-overlay
-            v-model="loading"
-            absolute
-            class="d-flex align-center justify-center"
-          >
-            <v-progress-circular
-              indeterminate
-              size="64"
-              color="primary"
-            />
+          <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
+            <v-progress-circular indeterminate size="64" color="primary" />
           </v-overlay>
         </client-only>
         <v-row>
@@ -43,10 +25,7 @@
                 </div>
               </v-card-title>
               <!-- Top Actions -->
-              <div
-                v-if="!loading"
-                class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
-              >
+              <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
                 <v-btn
                   color="green"
                   class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -58,21 +37,12 @@
               </div>
               <!-- DESKTOP -->
               <v-responsive class="hidden-md-and-down">
-                <v-data-table
-                  :headers="headers"
-                  :items="formattedOVs"
-                  class="mt-4"
-                >
+                <v-data-table :headers="headers" :items="formattedOVs" class="mt-4">
                   <template #item.ovDate="{ item }">
                     {{ item.displayDate }}
                   </template>
                   <template #item.actions="{ item }">
-                    <v-btn
-                      class="me-2"
-                      icon="mdi-pencil"
-                      size="small"
-                      @click="editOV(item)"
-                    />
+                    <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />
                     <v-btn
                       class="me-2"
                       icon="mdi-content-copy"
@@ -115,16 +85,8 @@
               <!-- MOBILE -->
               <v-responsive class="hidden-lg-and-up"
                 ><v-row dense>
-                  <v-col
-                    v-for="(item, i) in formattedOVs"
-                    :key="item.id ?? i"
-                    cols="12"
-                  >
-                    <v-card
-                      class="officer-card pa-3 mb-2"
-                      elevation="3"
-                      variant="tonal"
-                    >
+                  <v-col v-for="(item, i) in formattedOVs" :key="item.id ?? i" cols="12">
+                    <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
                       <v-row dense>
                         <v-col cols="12">
                           <v-text-field
@@ -144,12 +106,7 @@
                           />
                         </v-col>
                       </v-row>
-                      <v-row
-                        dense
-                        align="center"
-                        justify="end"
-                        class="mt-2"
-                      >
+                      <v-row dense align="center" justify="end" class="mt-2">
                         <v-btn
                           icon="mdi-pencil"
                           size="small"
@@ -202,10 +159,7 @@
                   </v-col> </v-row
               ></v-responsive>
               <!-- Bottom Actions -->
-              <div
-                v-if="!loading"
-                class="d-flex flex-column flex-sm-row justify-end mb-2 no-print"
-              >
+              <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
                 <v-btn
                   color="green"
                   class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -219,35 +173,17 @@
           </v-col>
         </v-row>
 
-        <v-dialog
-          v-model="dialog"
-          max-width="400"
-        >
+        <v-dialog v-model="dialog" max-width="400">
           <v-card>
             <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
             <v-card-text>
-              <v-text-field
-                v-model="editedOV.name"
-                label="Name"
-              />
-              <v-text-field
-                v-model="editedOV.ovDate"
-                label="Date"
-                type="date"
-              />
+              <v-text-field v-model="editedOV.name" label="Name" />
+              <v-text-field v-model="editedOV.ovDate" label="Date" type="date" />
             </v-card-text>
             <v-card-actions>
               <v-spacer />
-              <v-btn
-                variant="text"
-                @click="dialog = false"
-                >Cancel</v-btn
-              >
-              <v-btn
-                color="primary"
-                @click="saveOV"
-                >Save</v-btn
-              >
+              <v-btn variant="text" @click="dialog = false">Cancel</v-btn>
+              <v-btn color="primary" @click="saveOV">Save</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -269,8 +205,10 @@
 import type { OV } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
 
+const logger = useLogger('home');
+
 const showDeleteConfirm = ref(false);
-const ovToDelete = ref<Partial<OV>>(null);
+const ovToDelete = ref<Partial<OV | null>>(null);
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
@@ -315,7 +253,10 @@ function openDialog() {
 }
 
 function editOV(item: OV) {
-  editedOV.value = { ...item, ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0] };
+  editedOV.value = {
+    ...item,
+    ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0],
+  };
   dialog.value = true;
 }
 
@@ -327,7 +268,7 @@ async function copyOV(item: OV) {
     await $fetch(`/api/ov/${item.id}/copy`, { method: 'POST' });
     await fetchOVs();
   } catch (err) {
-    console.error('Failed to copy OV:', err);
+    logger.error('Failed to copy OV:', err);
     alert('An error occurred while copying this OV.');
   } finally {
     loading.value = false;
@@ -341,7 +282,10 @@ async function saveOV() {
       body: { ...editedOV.value, userId: authStore.user?.id },
     });
   } else {
-    await $fetch('/api/ov', { method: 'POST', body: { ...editedOV.value, userId: authStore.user?.id } });
+    await $fetch('/api/ov', {
+      method: 'POST',
+      body: { ...editedOV.value, userId: authStore.user?.id },
+    });
   }
   dialog.value = false;
   await fetchOVs();

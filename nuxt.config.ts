@@ -1,4 +1,5 @@
 import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import type { Rank } from '~/types/officers';
 import config from 'config';
 
 export default defineNuxtConfig({
@@ -19,7 +20,7 @@ export default defineNuxtConfig({
     public: {
       logLevel: config.get('log_level'),
       logToFile: config.get<boolean>('log_to_file'),
-      ranks: config.get<{ value: string; text: string }[]>('ranks'),
+      ranks: config.get<Rank[]>('ranks'),
     },
   },
   build: {

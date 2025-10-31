@@ -35,12 +35,14 @@ export default function useLogger(namespace = 'default') {
 
   const defaultLevel = logLevel ?? (process.env.NODE_ENV === 'production' ? 'warn' : 'debug');
 
-  const localStorageKey = `loglevel:${namespace}`;
-  const localOverride = localStorage.getItem(localStorageKey);
-  const hasLocalOverride = localOverride && localOverride.toLowerCase() !== defaultLevel;
+  if (import.meta.client) {
+    const localStorageKey = `loglevel:${namespace}`;
+    const localOverride = localStorage.getItem(localStorageKey);
+    const hasLocalOverride = localOverride && localOverride.toLowerCase() !== defaultLevel;
 
-  if (!hasLocalOverride) {
-    logger.setLevel(defaultLevel);
+    if (!hasLocalOverride) {
+      logger.setLevel(defaultLevel);
+    }
   }
 
   const prefix = namespace === 'default' ? '' : `[${namespace}]`;
