@@ -8,6 +8,7 @@ export default withNuxt([
       'no-console': 'warn',
       'vue/multi-word-component-names': 'off',
       'vue/valid-v-slot': 'off',
+      'vue/html-self-closing': 'off',
     },
   },
 ]);

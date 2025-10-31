@@ -255,7 +255,10 @@ function openDialog() {
 function editOV(item: OV) {
   editedOV.value = {
     ...item,
-    ovDate: item.ovDate?.toISOString?.()?.substr(0, 10) || item.ovDate.split('T')[0],
+    ovDate: new Date(
+      item.ovDate?.toISOString?.()?.substr(0, 10) ||
+        (item.ovDate.toString().split('T')[0] as string)
+    ),
   };
   dialog.value = true;
 }
@@ -297,7 +300,7 @@ function confirmOVDeletion(item: Partial<OV>) {
 }
 
 async function deleteOV() {
-  await $fetch(`/api/ov/${ovToDelete.value.id}`, { method: 'DELETE' });
+  await $fetch(`/api/ov/${ovToDelete.value?.id}`, { method: 'DELETE' });
   await fetchOVs();
 }
 

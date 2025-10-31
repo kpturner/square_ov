@@ -56,3 +56,63 @@ enum Position {
   standard_bearer
   vip
 }
+
+model ActiveOfficer {
+  id             Int     @id @default(autoincrement())
+  year           String
+  number         Int
+  provincialRank String
+  givenName      String
+  familyName     String
+  familiarName   String?
+
+  // Reverse relations (optional, but handy if you want to query back)
+  oVMastersAsSword    OVMaster[] @relation("SwordRelation")
+  oVMastersAsStandard OVMaster[] @relation("StandardRelation")
+  oVMastersAsSteward  OVMaster[] @relation("StewardRelation")
+  oVMastersAsOfficer1 OVMaster[] @relation("Officer1Relation")
+  oVMastersAsOfficer2 OVMaster[] @relation("Officer2Relation")
+  oVMastersAsOfficer3 OVMaster[] @relation("Officer3Relation")
+  oVMastersAsOfficer4 OVMaster[] @relation("Officer4Relation")
+  oVMastersAsOfficer5 OVMaster[] @relation("Officer5Relation")
+  oVMastersAsOfficer6 OVMaster[] @relation("Officer6Relation")
+  oVMastersAsOfficer7 OVMaster[] @relation("Officer7Relation")
+
+  @@unique([year, number], name: "year_number")
+}
+
+model OVMaster {
+  id          Int      @id @default(autoincrement())
+  year        String
+  number      Int
+  date        DateTime
+  lodgeName   String
+  lodgeNumber String
+  location    String
+  vip         String
+  dc          String
+  sword       Int?
+  standard    Int?
+  steward     Int?
+  officer1    Int?
+  officer2    Int?
+  officer3    Int?
+  officer4    Int?
+  officer5    Int?
+  officer6    Int?
+  officer7    Int?
+
+  // Composite foreign key relations to (year, number) in ActiveOfficer
+  swordOfficer    ActiveOfficer? @relation("SwordRelation", fields: [year, sword], references: [year, number])
+  standardOfficer ActiveOfficer? @relation("StandardRelation", fields: [year, standard], references: [year, number])
+  stewardOfficer  ActiveOfficer? @relation("StewardRelation", fields: [year, steward], references: [year, number])
+  officer1Officer ActiveOfficer? @relation("Officer1Relation", fields: [year, officer1], references: [year, number])
+  officer2Officer ActiveOfficer? @relation("Officer2Relation", fields: [year, officer2], references: [year, number])
+  officer3Officer ActiveOfficer? @relation("Officer3Relation", fields: [year, officer3], references: [year, number])
+  officer4Officer ActiveOfficer? @relation("Officer4Relation", fields: [year, officer4], references: [year, number])
+  officer5Officer ActiveOfficer? @relation("Officer5Relation", fields: [year, officer5], references: [year, number])
+  officer6Officer ActiveOfficer? @relation("Officer6Relation", fields: [year, officer6], references: [year, number])
+  officer7Officer ActiveOfficer? @relation("Officer7Relation", fields: [year, officer7], references: [year, number])
+
+  @@unique([year, number], name: "year_number")
+}
