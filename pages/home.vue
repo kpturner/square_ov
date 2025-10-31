@@ -385,7 +385,9 @@ async function saveOV() {
             {
               id: 0,
               name: selectedMasterOV.value.vip,
-              rank: null,
+              rank: ['PGM', 'DPGM'].includes(selectedMasterOV.value.vip)
+                ? selectedMasterOV.value.vip
+                : null,
               provOfficerYear: null,
               grandOfficer: false,
               grandOfficerYear: null,
