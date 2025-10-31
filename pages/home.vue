@@ -267,7 +267,7 @@ const ovSelectionList = computed(() => {
   return ovMasters.value.map((ov) => {
     return {
       value: ov.id,
-      title: `${ov.number}: ${ov.lodgeName} Lodge No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
+      title: `${ov.number}: ${ov.lodgeName} ${ov.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
     };
   });
 });
@@ -311,10 +311,12 @@ const selectedMasterOV = computed(() =>
   ovMasters.value.find((ov) => ov.id === selectedMasterOvId.value)
 );
 
-const selectedOVName = computed(
-  () =>
-    `${selectedMasterOV.value?.lodgeName} Lodge No. ${selectedMasterOV.value?.lodgeNumber.replace('L', '')}`
-);
+const selectedOVName = computed(() => {
+  if (!selectedMasterOV.value) {
+    return '';
+  }
+  return `${selectedMasterOV.value.lodgeName} ${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
+});
 
 const addOfficer = async (
   ovId: number,
