@@ -222,7 +222,7 @@ async function addOfficer() {
   addOfficerDialog.value = false;
   if (selectedActiveOfficerId.value) {
     const ao = activeOfficers.value.find(
-      (ao) => (ao.id = selectedActiveOfficerId.value)
+      (ao) => ao.id === selectedActiveOfficerId.value
     ) as ActiveOfficer;
     selectedActiveOfficerId.value = null;
     const firstName = ao.familiarName ?? ao.givenName.split(' ')[0];

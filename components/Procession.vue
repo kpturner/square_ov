@@ -285,6 +285,7 @@ const automatic = computed(() =>
       // Rank seniority
       const aRankIndex = ranks.findIndex((r) => r.value === rankToConsider(a));
       const bRankIndex = ranks.findIndex((r) => r.value === rankToConsider(b));
+
       if (aRankIndex !== bRankIndex)
         return (
           (aRankIndex !== -1 ? aRankIndex : ranks.length) -
