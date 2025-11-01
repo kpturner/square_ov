@@ -7,12 +7,10 @@
         :variant="printMode ? 'elevated' : 'tonal'"
       >
         <v-row dense class="align-center text-center no-gutters">
-          <!-- Left Column: Crest with right border -->
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
             <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
           </v-col>
 
-          <!-- Right Column: Text -->
           <v-col cols="10" class="text-column">
             <v-row class="text-h5 font-weight-bold mb-1 mt-1 old-english justify-center">
               Provincial Grand Lodge of Hampshire & Isle of Wight
@@ -102,7 +100,7 @@ const grandRank = (officer: GridOfficer) => {
 };
 
 const grandRankPrefix = (officer: GridOfficer) => {
-  if (!officer.grandOfficer) {
+  if (!officer.grandOfficer || !officer.grandRank) {
     return;
   }
   return officer.grandActive ? '' : 'Past';

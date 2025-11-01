@@ -170,8 +170,9 @@
 
 <script setup lang="ts">
 import type { Officer, OV } from '@prisma/client';
+import type { Rank } from '~/types/officers';
 
-const { ranks } = useRuntimeConfig().public;
+const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
 const logger = useLogger('procession');
 
 const props = defineProps<{ officers: Officer[]; officialVisit: OV | null }>();
@@ -218,6 +219,9 @@ const rankPrefix = (officer: Officer) => {
 };
 
 const grandRankPrefix = (officer: Officer) => {
+  if (!officer.grandRank) {
+    return '';
+  }
   if (officer.grandActive) {
     return '';
   } else {
@@ -230,7 +234,7 @@ const rankCaption = (officer: Officer) => {
   if (officer.rank) {
     caption += `${rankPrefix(officer)}${officer.rank}`;
   }
-  if (officer.grandOfficer) {
+  if (officer.grandOfficer && officer.grandRank) {
     if (caption.length) {
       caption += ' - ';
     }
@@ -303,16 +307,9 @@ const automatic = computed(() =>
     })
 );
 
-// Build marching rows (top = rear, bottom = front)
+// Build rows (top = rear, bottom = front)
 const rows = computed(() => {
   const result: { south?: Officer; north?: Officer; centre?: Officer[] }[] = [];
-
-  // VIP + sword/standard first (rear)
-  const centreRow: Officer[] = [];
-  if (swordBearer.value) centreRow.push(swordBearer.value);
-  if (vip.value) centreRow.push(vip.value);
-  if (standardBearer.value) centreRow.push(standardBearer.value);
-  if (centreRow.length > 0) result.push({ centre: centreRow });
 
   let nextRow: { south?: Officer; north?: Officer } = {};
 
