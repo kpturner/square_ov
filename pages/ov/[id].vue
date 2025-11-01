@@ -51,7 +51,7 @@
                 color="green"
                 class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
                 prepend-icon="mdi-plus"
-                @click="addOfficer"
+                @click="addOfficerDialog = true"
               >
                 Add Officer
               </v-btn>
@@ -79,7 +79,7 @@
                 color="green"
                 class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
                 prepend-icon="mdi-plus"
-                @click="addOfficer"
+                @click="addOfficerDialog = true"
               >
                 Add Officer
               </v-btn>
@@ -125,6 +125,27 @@
         </v-card>
       </v-container>
     </v-main>
+    <v-dialog v-model="addOfficerDialog" max-width="400">
+      <v-card>
+        <v-card-title>Add Officer</v-card-title>
+        <v-card-text>
+          Either select an officer from the master list or leave unselected to add the officer
+          details yourself
+          <v-select
+            v-model="selectedActiveOfficerId"
+            :items="activeOfficerSelectionList"
+            density="compact"
+            hide-details
+            :placeholder="`${masonicYear} Active Officers`"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="addOfficerDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="addOfficer">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <ConfirmDialog
       v-model="showDeleteConfirm"
       title="Delete Officer"
@@ -139,12 +160,13 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import type { OV } from '@prisma/client';
+import type { OV, ActiveOfficer } from '@prisma/client';
 import type { GridOfficer } from '~/types/officers';
 import { useAuthStore } from '~/stores/auth';
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
+const makeToast = useToast();
 
 const showDeleteConfirm = ref(false);
 const officerToDelete = ref<GridOfficer | null>(null);
@@ -152,16 +174,34 @@ const route = useRoute();
 const router = useRouter();
 const officers = ref<GridOfficer[]>([]);
 const officialVisit = ref<OV | null>(null);
+const addOfficerDialog = ref(false);
+const { masonicYear } = useMasonicYear();
+const activeOfficers = ref<ActiveOfficer[]>([]);
+const selectedActiveOfficerId = ref(null);
 
 const loading = ref(true);
 
 onMounted(async () => {
+  await loadActiveOfficers();
   await loadOfficers();
 });
 
 function logOff() {
   authStore.user = null;
   navigateTo('/');
+}
+
+const activeOfficerSelectionList = computed(() => {
+  return activeOfficers.value.map((ao) => {
+    return {
+      value: ao.id,
+      title: `${ao.number}: ${ao.givenName} ${ao.familyName}`,
+    };
+  });
+});
+
+async function loadActiveOfficers() {
+  activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
 }
 
 async function loadOfficers() {
@@ -179,7 +219,38 @@ async function loadOfficers() {
 }
 
 async function addOfficer() {
+  addOfficerDialog.value = false;
+  if (selectedActiveOfficerId.value) {
+    const ao = activeOfficers.value.find(
+      (ao) => (ao.id = selectedActiveOfficerId.value)
+    ) as ActiveOfficer;
+    selectedActiveOfficerId.value = null;
+    const firstName = ao.familiarName ?? ao.givenName.split(' ')[0];
+    const name = `${firstName} ${ao.familyName}`;
+    officers.value.push({
+      id: 0,
+      name,
+      rank: ao.provincialRank.replace('Prov', '').toUpperCase(),
+      provOfficerYear: null,
+      grandOfficer: false,
+      grandOfficerYear: null,
+      grandActive: false,
+      grandRank: null,
+      active: true,
+      position: 'automatic',
+      ovId: Number(route.params.id),
+      isNew: true,
+    });
+    makeToast(`${name} ${ao.provincialRank} added to list.`);
+    await saveAll();
+    return;
+  }
   await saveAll();
+  makeToast('Blank officer added to list. Please add and save their details.');
+  addEmptyOfficer();
+}
+
+function addEmptyOfficer() {
   officers.value.push({
     id: 0,
     name: '',
