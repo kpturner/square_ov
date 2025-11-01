@@ -37,7 +37,7 @@
                 prepend-icon="mdi-seat"
                 class="mb-2 w-100 w-sm-auto"
                 small
-                @click="$router.push(`/ov/${officialVisit.id}.reservations`)"
+                @click="reservations"
               >
                 Seat reservations
               </v-btn>
@@ -95,7 +95,7 @@
             </div>
           </v-container>
         </v-card>
-        <hr >
+        <hr />
         <Procession v-if="!loading && officialVisit" :officers :official-visit />
 
         <v-card v-if="!loading">
@@ -107,7 +107,7 @@
                 prepend-icon="mdi-seat"
                 class="mb-2 w-100 w-sm-auto"
                 small
-                @click="$router.push(`/ov/${officialVisit.id}.reservations`)"
+                @click="reservations"
               >
                 Seat reservations
               </v-btn>
@@ -138,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import type { OV } from '@prisma/client';
 import type { GridOfficer } from '~/types/officers';
 import { useAuthStore } from '~/stores/auth';
@@ -147,8 +147,9 @@ const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
 
 const showDeleteConfirm = ref(false);
-const officerToDelete = ref<GridOfficer>(null);
+const officerToDelete = ref<GridOfficer | null>(null);
 const route = useRoute();
+const router = useRouter();
 const officers = ref<GridOfficer[]>([]);
 const officialVisit = ref<OV | null>(null);
 
@@ -206,8 +207,15 @@ async function deleteOfficer(officer: GridOfficer) {
 }
 
 async function confirmedDeletion() {
-  await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
-  await loadOfficers();
+  if (officerToDelete.value) {
+    await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
+    await loadOfficers();
+  }
+}
+
+async function reservations() {
+  await saveAll();
+  router.push(`/ov/${officialVisit.value?.id}.reservations`);
 }
 
 async function saveAll() {

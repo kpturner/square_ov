@@ -9,7 +9,7 @@
         <v-row dense class="align-center text-center no-gutters">
           <!-- Left Column: Crest with right border -->
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
-            <img class="crest" :src="hiowCrest" alt="HIoW Crest" >
+            <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
           </v-col>
 
           <!-- Right Column: Text -->
@@ -43,7 +43,7 @@
           <v-row dense class="align-center text-center no-gutters">
             <!-- Left Column: Crest with right border -->
             <v-col cols="2" class="d-flex justify-center align-center crest-column">
-              <img class="crest" :src="hiowCrest" alt="HIoW Crest" >
+              <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
             </v-col>
 
             <!-- Right Column: Text -->
@@ -60,12 +60,12 @@
 </template>
 
 <script setup lang="ts">
-import type { GridOfficer } from '~/types/officers';
+import type { GridOfficer, Rank } from '~/types/officers';
 import hiowCrest from '~/assets/images/hiowcrest.png';
 
 defineProps<{ officers: GridOfficer[]; spares: number; printMode?: boolean }>();
 
-const { ranks } = useRuntimeConfig().public;
+const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
 
 const salutation = (officer: GridOfficer) => {
   if (officer.rank === 'PGM') {
@@ -89,7 +89,7 @@ const provincialRankPrefix = (officer: GridOfficer) => {
     return '';
   }
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
-    return '';
+    return officer.active ? '' : 'Past';
   }
   return officer.active ? 'Provincial' : 'Past Provincial';
 };
