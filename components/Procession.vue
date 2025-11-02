@@ -12,31 +12,6 @@
       </v-btn>
     </v-card-title>
 
-    <div class="d-flex align-center">
-      <v-checkbox
-        v-model="alignActiveWardens"
-        class="no-print"
-        label="Align active wardens?"
-        dense
-        hide-details
-      />
-      <v-checkbox
-        v-model="activeDCsFront"
-        class="ms-3 no-print"
-        label="Active DCs at front?"
-        dense
-        hide-details
-      />
-      <v-checkbox
-        v-if="activeDCsFront"
-        v-model="includeGrandOfficers"
-        class="ms-3 no-print"
-        label="GO DCs at front also?"
-        dense
-        hide-details
-      />
-    </div>
-
     <v-card-text>
       <div v-if="vip" class="d-flex justify-center mb-4">
         <v-card v-if="vip" class="pa-3 text-center officer-card" color="yellow">
@@ -173,7 +148,6 @@ import type { Officer, OV } from '@prisma/client';
 import type { Rank } from '~/types/officers';
 
 const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
-const logger = useLogger('procession');
 
 const props = defineProps<{ officers: Officer[]; officialVisit: OV | null }>();
 
@@ -190,18 +164,6 @@ const seniorWarden = computed(() =>
 const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
-
-const activeDCsFront = ref(false);
-const includeGrandOfficers = ref(false);
-const alignActiveWardens = ref(false);
-
-onMounted(() => {
-  if (props.officialVisit) {
-    activeDCsFront.value = props.officialVisit.activeDCsFront;
-    includeGrandOfficers.value = props.officialVisit.includeGrandOfficers;
-    alignActiveWardens.value = props.officialVisit.alignWardens;
-  }
-});
 
 const rankPrefix = (officer: Officer) => {
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
@@ -317,9 +279,9 @@ const rows = computed(() => {
   // Traverse the automatic officers and add rows
   const activeDCs = automatic.value
     .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
-    .filter((o) => (includeGrandOfficers.value ? true : !o.grandOfficer))
+    .filter((o) => (props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer))
     .reverse();
-  const automaticOfficers = activeDCsFront.value
+  const automaticOfficers = props.officialVisit?.activeDCsFront
     ? automatic.value.filter((ao) => !activeDCs.includes(ao))
     : automatic.value;
 
@@ -333,7 +295,7 @@ const rows = computed(() => {
     }
   }
 
-  if (activeDCsFront.value) {
+  if (props.officialVisit?.activeDCsFront) {
     for (const officer of activeDCs) {
       if (!nextRow.south) {
         nextRow.south = officer;
@@ -389,7 +351,7 @@ const rows = computed(() => {
   }
 
   // Now if we have both the ProvSGW and the ProvJGW, ensure they are in the same row
-  if (seniorWarden.value && juniorWarden.value && alignActiveWardens.value) {
+  if (seniorWarden.value && juniorWarden.value && props.officialVisit?.alignWardens) {
     let sgwRowIndex = -1;
     let jgwRowIndex = -1;
     result.forEach((row, idx) => {
@@ -429,32 +391,9 @@ const rows = computed(() => {
   return result;
 });
 
-function printProcession() {
+async function printProcession() {
   window.print();
 }
-
-let timeout: ReturnType<typeof setTimeout>;
-const saveBooleans = () => {
-  clearTimeout(timeout);
-  timeout = setTimeout(async () => {
-    try {
-      const body = {
-        ...props.officialVisit,
-        alignWardens: alignActiveWardens.value,
-        activeDCsFront: activeDCsFront.value,
-        includeGrandOfficers: includeGrandOfficers.value,
-      };
-      await $fetch(`/api/ov/${props.officialVisit?.id}.put`, {
-        method: 'PUT',
-        body,
-      });
-    } catch (err) {
-      logger.error('Failed to update booleans:', err);
-    }
-  }, 400);
-};
-
-watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
 </script>
 
 <style lang="scss" scoped>

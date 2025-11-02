@@ -222,7 +222,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer, VIP } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
 import type { GridOfficer } from '~/types/officers';
 
@@ -326,6 +326,25 @@ const selectedOVName = computed(() => {
   return `${selectedMasterOV.value.lodgeName} ${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
 });
 
+const addVIP = async (ovId: number, vipName: string) => {
+  const vip = await $fetch<VIP>(`/api/vip/${masonicYear}/${vipName}`);
+
+  return {
+    id: 0,
+    name: vipName,
+    rank: vip.provincialRank,
+    provOfficerYear: null,
+    grandOfficer: ['SGW', 'JGW'].includes(vip.provincialRank) ? false : true,
+    grandOfficerYear: null,
+    grandActive: false,
+    grandRank: null,
+    active: true,
+    position: 'vip',
+    ovId,
+    isNew: true,
+  };
+};
+
 const addOfficer = async (
   ovId: number,
   officers: GridOfficer[],
@@ -389,26 +408,10 @@ async function saveOV() {
       if (selectedMasterOV.value) {
         const officers: GridOfficer[] = [];
         // Always do the VIP first so we can guarantee he is at the top
+        const vip = await addVIP(updatedOV.id, selectedMasterOV.value.vip);
         await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
-          body: [
-            {
-              id: 0,
-              name: selectedMasterOV.value.vip,
-              rank: ['PGM', 'DPGM'].includes(selectedMasterOV.value.vip)
-                ? selectedMasterOV.value.vip
-                : null,
-              provOfficerYear: null,
-              grandOfficer: false,
-              grandOfficerYear: null,
-              grandActive: false,
-              grandRank: null,
-              active: true,
-              position: 'vip',
-              ovId: updatedOV.id,
-              isNew: true,
-            },
-          ],
+          body: [vip],
         });
         // Now the rest
         officers.push({

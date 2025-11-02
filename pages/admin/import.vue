@@ -29,6 +29,12 @@
             <div class="d-flex align-center">
               <span class="text-h5">Import Spreadsheet Data</span>
             </div>
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-flag" color="red-darken-3" size="32" class="mr-2" />
+              <span class="text-subtitle-1 font-weight-bold" style="color: #b71c1c">
+                <em>STOP!! Unless you know what you are doing!</em>
+              </span>
+            </div>
           </v-card-title>
           <v-card class="pa-6 mb-4">
             <v-row>

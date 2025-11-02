@@ -96,6 +96,34 @@
           </v-container>
         </v-card>
         <hr />
+
+        <v-card>
+          <div class="d-flex align-center">
+            <v-checkbox
+              v-model="alignActiveWardens"
+              label="Align active wardens?"
+              class="no-print"
+              dense
+              hide-details
+            />
+            <v-checkbox
+              v-model="activeDCsFront"
+              class="no-print ms-3"
+              label="Active DCs at front?"
+              dense
+              hide-details
+            />
+            <v-checkbox
+              v-if="activeDCsFront"
+              v-model="includeGrandOfficers"
+              class="no-print ms-3"
+              label="GO DCs at front also?"
+              dense
+              hide-details
+            />
+          </div>
+        </v-card>
+
         <Procession v-if="!loading && officialVisit" :officers :official-visit />
 
         <v-card v-if="!loading">
@@ -154,7 +182,7 @@
       color="red"
       @confirm="confirmedDeletion"
     />
-    <Procession class="only-print" :officers :official-visit />
+    <Procession v-if="!loading && officialVisit" class="only-print" :officers :official-visit />
   </v-app>
 </template>
 
@@ -163,6 +191,8 @@ import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer } from '@prisma/client';
 import type { GridOfficer } from '~/types/officers';
 import { useAuthStore } from '~/stores/auth';
+
+const logger = useLogger('officers');
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
@@ -178,6 +208,10 @@ const addOfficerDialog = ref(false);
 const { masonicYear } = useMasonicYear();
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const selectedActiveOfficerId = ref(null);
+
+const activeDCsFront = ref(false);
+const includeGrandOfficers = ref(false);
+const alignActiveWardens = ref(true);
 
 const loading = ref(true);
 
@@ -215,6 +249,9 @@ async function loadOfficers() {
         ovDate: new Date(res.ov.ovDate),
       }
     : null;
+  alignActiveWardens.value = officialVisit.value?.alignWardens ?? false;
+  activeDCsFront.value = officialVisit.value?.activeDCsFront ?? false;
+  includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   loading.value = false;
 }
 
@@ -301,6 +338,29 @@ async function saveAll() {
   });
   await loadOfficers();
 }
+
+let timeout: ReturnType<typeof setTimeout>;
+const saveBooleans = () => {
+  clearTimeout(timeout);
+  timeout = setTimeout(async () => {
+    try {
+      const body = {
+        ...officialVisit.value,
+        alignWardens: alignActiveWardens.value,
+        activeDCsFront: activeDCsFront.value,
+        includeGrandOfficers: includeGrandOfficers.value,
+      };
+      officialVisit.value = await $fetch<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
+        method: 'PUT',
+        body,
+      });
+    } catch (err) {
+      logger.error('Failed to update booleans:', err);
+    }
+  }, 400);
+};
+
+watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
 </script>
 
 <style lang="scss" scoped></style>
