@@ -33,6 +33,37 @@ export default defineEventHandler(async (event) => {
     .object({ year: z.string(), ovs: z.array(z.record(z.string(), z.any())) })
     .parse(body);
 
+  const activeDCs = await prisma.activeOfficer.findMany({
+    where: {
+      year,
+      OR: [
+        { provincialRank: { equals: 'ProvGDC' } },
+        { provincialRank: { equals: 'ProvDepGDC' } },
+        { provincialRank: { equals: 'ProvAGDC' } },
+      ],
+    },
+  });
+
+  const VIPs = await prisma.vIP.findMany({
+    where: {
+      year,
+    },
+  });
+
+  const PGM = await prisma.vIP.findMany({
+    where: {
+      year,
+      provincialRank: 'PGM',
+    },
+  });
+
+  const DPGM = await prisma.vIP.findMany({
+    where: {
+      year,
+      provincialRank: 'DPGM',
+    },
+  });
+
   const columnMap: Record<string, keyof typeof officialVisitSchema.shape> = {
     'Visit No': 'number',
     Date: 'date',
@@ -67,6 +98,31 @@ export default defineEventHandler(async (event) => {
       // Handle Excel serial date
       if (field === 'date' && typeof value === 'number') {
         value = excelSerialToDate(value);
+      }
+
+      // Try to get the DC full name rather than just the surname we see on the spreadsheet
+      if (column === 'DC' && value) {
+        const dc = activeDCs.filter((dc) => dc.familyName.toLowerCase() === value.toLowerCase());
+        if (dc.length === 1) {
+          const firstName = dc[0].familiarName ?? dc[0].givenName.split(' ')[0];
+          value = `${firstName} ${dc[0].familyName}`;
+        }
+      }
+
+      // Try to get the VIP full name rather than just the surname we see on the spreadsheet
+      if (column === 'VIP' && value) {
+        if (value === 'PGM') {
+          value = PGM[0].name;
+        } else if (value === 'DPGM') {
+          value = DPGM[0].name;
+        } else {
+          const vip = VIPs.filter(
+            (vip) => vip.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
+          );
+          if (vip.length === 1) {
+            value = vip[0].name;
+          }
+        }
       }
 
       mapped[field] = value;

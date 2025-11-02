@@ -79,7 +79,7 @@ const provincialRank = (officer: GridOfficer) => {
   if (!officer.rank) {
     return '';
   }
-  return ranks.find((r) => r.value === officer.rank)?.text;
+  return ranks.find((r) => r.value === officer.rank)?.title;
 };
 
 const provincialRankPrefix = (officer: GridOfficer) => {
@@ -96,7 +96,7 @@ const grandRank = (officer: GridOfficer) => {
   if (!officer.grandOfficer) {
     return;
   }
-  return ranks.find((r) => r.value === officer.grandRank)?.text;
+  return ranks.find((r) => r.value === officer.grandRank)?.title;
 };
 
 const grandRankPrefix = (officer: GridOfficer) => {
@@ -126,7 +126,7 @@ const grandRankPrefix = (officer: GridOfficer) => {
   min-height: 180px;
 }
 
-.text-column {
+.title-column {
   padding: 16px;
   box-sizing: border-box;
 }

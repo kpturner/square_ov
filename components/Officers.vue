@@ -16,7 +16,6 @@
           v-model="item.rank"
           :items="[{ value: '' }, ...ranks]"
           item-title="value"
-          item-value="value"
           density="compact"
           hide-details
           placeholder="Prov rank"
@@ -104,8 +103,6 @@
               <v-select
                 v-model="item.rank"
                 :items="[{ value: '' }, ...ranks]"
-                item-title="value"
-                item-value="value"
                 label="Provincial Rank"
                 density="compact"
                 placeholder="Prov rank"

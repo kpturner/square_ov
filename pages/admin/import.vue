@@ -66,6 +66,21 @@
             </v-row>
           </v-card>
           <v-card class="pa-6">
+            <span class="text-h6">Import VIPs</span>
+            <v-row>
+              <v-col>
+                <v-text-field v-model="vipSheetName" label="Sheet name" />
+              </v-col>
+            </v-row>
+            <v-row> </v-row>
+            <v-row>
+              <v-col>
+                <v-btn color="primary" @click="importVIPs">Import</v-btn>
+              </v-col>
+            </v-row>
+          </v-card>
+
+          <v-card class="pa-6">
             <span class="text-h6">Import Official Visits</span>
             <v-row>
               <v-col>
@@ -97,7 +112,7 @@
 
 <script setup lang="ts">
 import * as XLSX from 'xlsx';
-import type { ActiveOfficer, OVMaster } from '@prisma/client';
+import type { ActiveOfficer, OVMaster, VIP } from '@prisma/client';
 
 const logger = useLogger('import');
 
@@ -106,6 +121,7 @@ const { theme, toggleTheme } = useSetTheme();
 const loading = ref(false);
 const { masonicYear } = useMasonicYear();
 const year = ref(masonicYear);
+const vipSheetName = ref('VIP Contact Details');
 const aoSheetName = ref('Active Officers');
 const ovSheetName = ref(`${masonicYear} Visits`);
 const file = ref<File | null>(null);
@@ -123,12 +139,15 @@ const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
-    const data = (await readExcel(file.value, aoSheetName.value)) as ActiveOfficer[];
+    const data = (await readExcel(file.value, aoSheetName.value)) as Record<string, unknown>[];
     const { importErrors } = await useActiveOfficerApi().import(data, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(`Errors occurred importing sheet ${aoSheetName.value} for year ${year.value}`);
+      makeToast(
+        `Errors occurred importing sheet ${aoSheetName.value} for year ${year.value}`,
+        'error'
+      );
     } else {
       makeToast(`Sheet ${aoSheetName.value} imported successfully for year ${year.value}`);
     }
@@ -143,14 +162,59 @@ const importOfficialVisits = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
-    const data = (await readExcel(file.value, ovSheetName.value)) as OVMaster[];
+    const data = (await readExcel(file.value, ovSheetName.value)) as Record<string, unknown>[];
     const { importErrors } = await useOVMasterApi().import(data, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(`Errors occurred importing sheet ${ovSheetName.value} for year ${year.value}`);
+      makeToast(
+        `Errors occurred importing sheet ${ovSheetName.value} for year ${year.value}`,
+        'error'
+      );
     } else {
       makeToast(`Sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
+    }
+  } catch (err) {
+    makeToast((err as Error).message, 'error');
+    logger.error((err as Error).message);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const importVIPs = async () => {
+  if (!file.value) return alert('Select a file first.');
+  loading.value = true;
+  try {
+    const data = (await readExcel(file.value, vipSheetName.value)) as Record<string, unknown>[];
+    // Tidy up this data first
+    const tidy = data
+      .map((r) => {
+        const columns = Object.keys(r);
+        const officeKey = columns.find(
+          (c) => c.indexOf('Province of Hampshire and Isle of Wight') >= 0
+        ) as string;
+        const clean = {
+          Office: (r[officeKey] as string).toUpperCase(),
+          Name: r['__EMPTY'],
+          Address: r['__EMPTY__1'],
+          Email: r['__EMPTY__2'],
+          Phone: r['__EMPTY__3'],
+          Mobile: r['__EMPTY__3'],
+        };
+        return clean;
+      })
+      .filter((r) => r.Office !== 'Name');
+    const { importErrors } = await useVIPApi().import(tidy, year.value);
+    if (importErrors.length) {
+      importErrorsFound.value = importErrors;
+      importErrorsExist.value = true;
+      makeToast(
+        `Errors occurred importing sheet ${vipSheetName.value} for year ${year.value}`,
+        'error'
+      );
+    } else {
+      makeToast(`Sheet ${vipSheetName.value} imported successfully for year ${year.value}`);
     }
   } catch (err) {
     makeToast((err as Error).message, 'error');

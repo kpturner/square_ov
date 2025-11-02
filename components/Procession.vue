@@ -104,7 +104,7 @@
                 class="ms-2"
               />
               <v-icon
-                v-if="['GDC', 'DGDC'].includes(row.south.rank ?? '') && row.south.active"
+                v-if="['GDC', 'DEPGDC'].includes(row.south.rank ?? '') && row.south.active"
                 color="white"
                 icon="mdi-magic-staff"
                 size="small"
@@ -143,7 +143,7 @@
                 class="ms-2"
               />
               <v-icon
-                v-if="['GDC', 'DGDC'].includes(row.north.rank ?? '') && row.north.active"
+                v-if="['GDC', 'DEPGDC'].includes(row.north.rank ?? '') && row.north.active"
                 color="white"
                 icon="mdi-magic-staff"
                 size="small"
@@ -316,7 +316,7 @@ const rows = computed(() => {
 
   // Traverse the automatic officers and add rows
   const activeDCs = automatic.value
-    .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DGDC' || o.rank === 'AGDC'))
+    .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
     .filter((o) => (includeGrandOfficers.value ? true : !o.grandOfficer))
     .reverse();
   const automaticOfficers = activeDCsFront.value

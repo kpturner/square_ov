@@ -116,3 +116,12 @@ model OVMaster {
 
   @@unique([year, number], name: "year_number")
 }
+
+model VIP {
+  id             Int    @id @default(autoincrement())
+  year           String
+  provincialRank String
+  name           String
+
+  @@unique([year, name], name: "year_name")
+}
