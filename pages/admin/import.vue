@@ -112,7 +112,6 @@
 
 <script setup lang="ts">
 import * as XLSX from 'xlsx';
-import type { ActiveOfficer, OVMaster, VIP } from '@prisma/client';
 
 const logger = useLogger('import');
 
