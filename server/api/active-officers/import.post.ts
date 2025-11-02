@@ -1,5 +1,8 @@
 import prisma from '~/server/utils/dbClient';
 import { z } from 'zod';
+import type { Rank } from '~/types/officers';
+
+const ranks = useRuntimeConfig().public.ranks as Rank[];
 
 const officerSchema = z.object({
   number: z.number(),
@@ -10,6 +13,7 @@ const officerSchema = z.object({
 });
 
 export default defineEventHandler(async (event) => {
+  const importErrors: string[] = [];
   const body = await readBody(event);
   const { year, officers } = z
     .object({ year: z.string(), officers: z.array(z.record(z.string(), z.any())) })
@@ -23,16 +27,24 @@ export default defineEventHandler(async (event) => {
     'Familiar Name': 'familiarName',
   };
 
-  const validatedOfficers = officers.map((row) =>
-    officerSchema.parse(
-      Object.fromEntries(
-        Object.entries(columnMap).map(([key, field]) => [
-          field,
-          row[key] === undefined || row[key] === '' ? null : row[key],
-        ])
-      )
-    )
-  );
+  const validatedOfficers = officers.map((row) => {
+    const mapped: Record<string, unknown> = {};
+    for (const [column, field] of Object.entries(columnMap)) {
+      let value = row[column];
+      if (value === undefined || value === '') value = null;
+      // Validate the rank
+      if (field === 'provincialRank' && value) {
+        const bareRank = value.replace('Prov', '').toUpperCase();
+        if (!ranks.find((r) => r.value === bareRank)) {
+          importErrors.push(`${bareRank} rank found in spreadsheet but not in config`);
+        }
+      }
+
+      mapped[field] = value;
+    }
+
+    return officerSchema.parse(mapped);
+  });
 
   const promises = validatedOfficers.map((officer) =>
     prisma.activeOfficer.upsert({
@@ -44,5 +56,5 @@ export default defineEventHandler(async (event) => {
 
   await Promise.all(promises);
 
-  return { success: true, imported: validatedOfficers.length };
+  return { success: true, imported: validatedOfficers.length, importErrors };
 });

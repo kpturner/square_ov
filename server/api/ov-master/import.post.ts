@@ -27,6 +27,7 @@ function excelSerialToDate(serial: number): Date {
 }
 
 export default defineEventHandler(async (event) => {
+  const importErrors: string[] = [];
   const body = await readBody(event);
   const { year, ovs } = z
     .object({ year: z.string(), ovs: z.array(z.record(z.string(), z.any())) })
@@ -84,5 +85,5 @@ export default defineEventHandler(async (event) => {
 
   await Promise.all(promises);
 
-  return { success: true, imported: validatedOfficialVisits.length };
+  return { success: true, imported: validatedOfficialVisits.length, importErrors };
 });

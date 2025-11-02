@@ -18,7 +18,7 @@
         </client-only>
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex flex-column" style="align-items: flex-start">
+            <div class="w-100 d-flex flex-column align-start">
               <v-btn
                 color="primary"
                 prepend-icon="mdi-home"

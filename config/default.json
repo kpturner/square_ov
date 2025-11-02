@@ -59,11 +59,11 @@
       "text": "Grand Superintendent of Works"
     },
     {
-      "value": "DGCHAP",
+      "value": "DEPGCHAP",
       "text": "Deputy Grand Chaplain"
     },
     {
-      "value": "DGREG",
+      "value": "DEPGREG",
       "text": "Deputy Grand Registrar"
     },
     {
@@ -71,7 +71,7 @@
       "text": "Deputy Grand Secretary"
     },
     {
-      "value": "DGDC",
+      "value": "DEPGDC",
       "text": "Deputy Grand Director of Ceremonies"
     },
     {
@@ -99,7 +99,7 @@
       "text": "Grand Communications Officer"
     },
     {
-      "value": "GMENT",
+      "value": "GMEN",
       "text": "Grand Mentor"
     },
     {

@@ -30,25 +30,33 @@
               <span class="text-h5">Import Spreadsheet Data</span>
             </div>
           </v-card-title>
-          <v-row>
-            <v-col>
-              <v-text-field
-                v-model="year"
-                label="Masonic year"
-                :placeholder="String(new Date().getFullYear())"
-              />
-            </v-col>
-          </v-row>
+          <v-card class="pa-6 mb-4">
+            <v-row>
+              <v-col>
+                <v-text-field
+                  v-model="year"
+                  label="Masonic year"
+                  :placeholder="String(new Date().getFullYear())"
+                />
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col>
+                <v-file-input
+                  label="Official Visit spreadsheet"
+                  accept=".xlsx,.xls"
+                  prepend-icon="mdi-file-excel"
+                  variant="outlined"
+                  @change="handleFile"
+                />
+              </v-col>
+            </v-row>
+          </v-card>
           <v-card class="pa-6 mb-4">
             <span class="text-h6">Import Active Officers</span>
             <v-row>
               <v-col>
                 <v-text-field v-model="aoSheetName" label="Sheet name" />
-              </v-col>
-            </v-row>
-            <v-row>
-              <v-col>
-                <input type="file" accept=".xlsx,.xls" @change="handleFile" />
               </v-col>
             </v-row>
             <v-row>
@@ -64,11 +72,7 @@
                 <v-text-field v-model="ovSheetName" label="Sheet name" />
               </v-col>
             </v-row>
-            <v-row>
-              <v-col>
-                <input type="file" accept=".xlsx,.xls" @change="handleOVFile" />
-              </v-col>
-            </v-row>
+            <v-row> </v-row>
             <v-row>
               <v-col>
                 <v-btn color="primary" @click="importOfficialVisits">Import</v-btn>
@@ -78,6 +82,16 @@
         </v-card>
       </v-container>
     </v-main>
+    <v-dialog v-model="importErrorsExist" max-width="400">
+      <v-card>
+        <v-card-title>Import errors</v-card-title>
+        <v-card-text v-for="(e, i) of importErrorsFound" :key="i"> * {{ e }} </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn color="primary" @click="importErrorsExist = false">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-app>
 </template>
 
@@ -95,7 +109,8 @@ const year = ref(masonicYear);
 const aoSheetName = ref('Active Officers');
 const ovSheetName = ref(`${masonicYear} Visits`);
 const file = ref<File | null>(null);
-const ovFile = ref<File | null>(null);
+const importErrorsExist = ref(false);
+const importErrorsFound = ref<string[]>([]);
 
 const handleFile = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -104,38 +119,45 @@ const handleFile = (event: Event) => {
   }
 };
 
-const handleOVFile = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  if (target.files?.[0]) {
-    ovFile.value = target.files[0];
-  }
-};
-
 const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
     const data = (await readExcel(file.value, aoSheetName.value)) as ActiveOfficer[];
-    await useActiveOfficerApi().import(data, year.value);
-    makeToast(`Sheet ${aoSheetName.value} imported successfully for year ${year.value}`);
+    const { importErrors } = await useActiveOfficerApi().import(data, year.value);
+    if (importErrors.length) {
+      importErrorsFound.value = importErrors;
+      importErrorsExist.value = true;
+      makeToast(`Errors occurred importing sheet ${aoSheetName.value} for year ${year.value}`);
+    } else {
+      makeToast(`Sheet ${aoSheetName.value} imported successfully for year ${year.value}`);
+    }
   } catch (err) {
     makeToast((err as Error).message, 'error');
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
 };
 
 const importOfficialVisits = async () => {
-  if (!ovFile.value) return alert('Select a file first.');
+  if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
-    const data = (await readExcel(ovFile.value, ovSheetName.value)) as OVMaster[];
-    await useOVMasterApi().import(data, year.value);
-    makeToast(`Sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
+    const data = (await readExcel(file.value, ovSheetName.value)) as OVMaster[];
+    const { importErrors } = await useOVMasterApi().import(data, year.value);
+    if (importErrors.length) {
+      importErrorsFound.value = importErrors;
+      importErrorsExist.value = true;
+      makeToast(`Errors occurred importing sheet ${ovSheetName.value} for year ${year.value}`);
+    } else {
+      makeToast(`Sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
+    }
   } catch (err) {
     makeToast((err as Error).message, 'error');
     logger.error((err as Error).message);
+  } finally {
+    loading.value = false;
   }
-  loading.value = false;
 };
 
 async function readExcel(file: File, sheetName: string) {

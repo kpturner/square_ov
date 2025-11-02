@@ -20,7 +20,17 @@
           <v-col>
             <v-card>
               <v-card-title class="d-flex justify-space-between align-center">
-                <div class="d-flex align-center">
+                <div class="w-100 d-flex flex-column align-start">
+                  <v-btn
+                    color="red-darken-3"
+                    prepend-icon="mdi-import"
+                    class="mb-2 w-100 w-sm-auto"
+                    small
+                    title="Here be dragons!!"
+                    @click="$router.push('/admin/import')"
+                  >
+                    Imports
+                  </v-btn>
                   <span class="text-h5">Official Visits</span>
                 </div>
               </v-card-title>
