@@ -20,9 +20,11 @@ RUN yarn install --frozen-lockfile --production
 COPY . .
 
 # Copy secret (using BuildKit secrets)
-RUN mkdir -p ./config/secrets \
-    && --mount=type=secret,id=DB_PASSWORD_SECRET \
-       cp /run/secrets/DB_PASSWORD_SECRET ./config/secrets/db_password_secret.txt
+RUN mkdir -p ./config/secrets
+
+RUN --mount=type=secret,id=DB_PASSWORD_SECRET \
+    cp /run/secrets/DB_PASSWORD_SECRET ./config/secrets/db_password_secret.txt
+
 
 # Build app
 RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
