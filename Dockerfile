@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.2
 
-FROM node:22
+FROM node:22-alpine
 
 ARG OPTS=
 
@@ -30,6 +30,7 @@ RUN apt-get update
 RUN apt-get install default-mysql-client -y
 
 RUN rm -rf ./.tmp
+RUN rm -rf node_modules
 
 EXPOSE 4000
 
