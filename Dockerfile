@@ -44,10 +44,6 @@ WORKDIR /usr/src/app
 ENV OPTS=${OPTS}
 ENV NITRO_PORT=4000
 
-# Copy production dependencies only
-COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile --production
-
 # Copy built app from builder
 COPY --from=builder /usr/src/app/.output ./
 COPY --from=builder /usr/src/app/config/secrets ./config/secrets
