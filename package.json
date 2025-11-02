@@ -16,12 +16,10 @@
     "@fontsource/unifrakturmaguntia": "^5.2.8",
     "@getbrevo/brevo": "^2.2.0",
     "@mdi/font": "^7.4.47",
-    "@nuxt/eslint": "1.10.0",
     "@pinia/nuxt": "^0.11.2",
     "@prisma/client": "^6.18.0",
     "bcrypt": "^5.1.1",
     "config": "^3.3.12",
-    "eslint": "^9.0.0",
     "handlebars": "^4.7.8",
     "loglevel": "^1.9.2",
     "moment": "^2.30.1",
@@ -33,7 +31,6 @@
     "pino-pretty": "^13.0.0",
     "prisma": "^6.3.1",
     "sass": "^1.93.2",
-    "stripe": "^17.6.0",
     "vue": "latest",
     "vue-router": "latest",
     "vue3-toastify": "^0.2.8",
@@ -43,9 +40,11 @@
     "vuetify": "^3.7.11"
   },
   "devDependencies": {
+    "@nuxt/eslint": "1.10.0",
     "@types/bcrypt": "^5.0.2",
     "@types/config": "^3.3.5",
     "@types/node-cron": "^3.0.11",
+    "eslint": "^9.0.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
   }

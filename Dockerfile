@@ -1,32 +1,31 @@
-# syntax = docker/dockerfile:1.2
+# syntax=docker/dockerfile:1.2
 
-# Use a smaller base image
-FROM node:22-alpine AS base
+# --------------------
+# Stage 1: build
+# --------------------
+FROM node:22-alpine AS builder
 
-# Arguments and environment
 ARG OPTS=
 ENV OPTS=${OPTS}
 ENV NITRO_PORT=4000
 
 WORKDIR /usr/src/app
 
-# Copy only package files first to leverage caching
+# Copy only package files first
 COPY package.json yarn.lock ./
 
-# Install dependencies
-RUN yarn install --frozen-lockfile --production
+# Install all dependencies for build (including devDeps)
+RUN yarn install --frozen-lockfile
 
-# Copy the rest of the source code
+# Copy app source
 COPY . .
 
-# Copy secret (using BuildKit secrets)
+# Copy secret (BuildKit secret)
 RUN mkdir -p ./config/secrets
-
 RUN --mount=type=secret,id=DB_PASSWORD_SECRET \
     cp /run/secrets/DB_PASSWORD_SECRET ./config/secrets/db_password_secret.txt
 
-
-# Build app
+# Build Nuxt app
 RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     DB_HOST=host.docker.internal \
     DB_PORT=3306 \
@@ -35,13 +34,28 @@ RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     LOG_LEVEL=debug \
     yarn build
 
-# Optional: Install MySQL client (alpine version is smaller)
-RUN apk add --no-cache mysql-client
+# --------------------
+# Stage 2: runtime
+# --------------------
+FROM node:22-alpine AS runtime
 
-# Clean up build artifacts (optional)
-RUN rm -rf ./.tmp
+WORKDIR /usr/src/app
+
+ENV OPTS=${OPTS}
+ENV NITRO_PORT=4000
+
+# Copy production dependencies only
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+
+# Copy built app from builder
+COPY --from=builder /usr/src/app/.output ./
+COPY --from=builder /usr/src/app/config/secrets ./config/secrets
+COPY start.sh ./
+
+# Optional: install MySQL client (alpine version)
+RUN apk add --no-cache mysql-client
 
 EXPOSE 4000
 
-# Start command
 CMD ["./start.sh"]
