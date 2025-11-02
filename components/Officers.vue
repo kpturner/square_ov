@@ -55,7 +55,6 @@
             [{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))
           "
           item-title="value"
-          item-value="value"
           density="compact"
           hide-details
           placeholder="Grand rank"
@@ -157,8 +156,6 @@
                     (r) => !['PGM', 'DPGM', 'APGM'].includes(r.value)
                   )
                 "
-                item-title="value"
-                item-value="value"
                 label="Grand rank"
                 density="compact"
                 placeholder="Grand rank"
@@ -198,13 +195,13 @@
 </template>
 
 <script setup lang="ts">
-import type { GridOfficer } from '~/types/officers';
+import type { GridOfficer, Rank } from '~/types/officers';
 
 const props = defineProps<{ officers: GridOfficer[] }>();
 
 const emits = defineEmits(['load-officers', 'delete-officer', 'save-changes']);
 
-const { ranks } = useRuntimeConfig().public;
+const ranks = useRuntimeConfig().public.ranks as Rank[];
 
 const positionsRes = await $fetch('/api/ov/positions');
 const positions = positionsRes ?? [];
