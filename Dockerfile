@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.2
 
-FROM node:22-alpine
+FROM node:22
 
 ARG OPTS=
 
