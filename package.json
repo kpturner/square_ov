@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "prepare:nuxt": "nuxi prepare",
-    "build": "yarn lint:fix && nuxt build",
+    "build": "nuxt build",
     "dev": "nuxt dev | pino-pretty",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
