@@ -388,7 +388,7 @@ const addDC = async (ovId: number, name: string) => {
     name,
     rank: dc.provincialRank.replace('Prov', '').toUpperCase(),
     provOfficerYear: null,
-    grandOfficer: false,
+    grandOfficer: dc.provincialRank.toUpperCase() === 'PROVGDC',
     grandOfficerYear: null,
     grandActive: false,
     grandRank: null,
