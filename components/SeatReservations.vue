@@ -114,7 +114,7 @@ const grandRankPrefix = (officer: GridOfficer) => {
 }
 
 .crest {
-  width: 80%;
+  width: 100%;
 }
 
 .crest-column {
