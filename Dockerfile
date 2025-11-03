@@ -23,6 +23,7 @@ RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     DB_NAME=square-ov \
     DB_USER=square-ov \
     LOG_LEVEL=debug \
+    yarn typecheck \
     yarn build
 
 # --------------------

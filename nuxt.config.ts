@@ -4,6 +4,12 @@ import config from 'config';
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
+  app: {
+    head: {
+      title: 'Square OV',
+      meta: [{ name: 'description', content: 'DC tool for managing OV details.' }],
+    },
+  },
   css: ['@/assets/css/global.scss', '@fontsource/unifrakturmaguntia/index.css'],
   devtools: { enabled: true },
   devServer: {
@@ -14,7 +20,7 @@ export default defineNuxtConfig({
       user: config.get<string>('database.user'),
       pass: config.get<string>('database.password'),
       host: config.get<string>('database.host'),
-      port: config.get<string>('database.port'),
+      port: String(config.get('database.port')),
       name: config.get<string>('database.name'),
     },
     public: {
