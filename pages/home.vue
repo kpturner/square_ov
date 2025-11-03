@@ -193,6 +193,7 @@
             v-model="selectedMasterOvId"
             :items="ovSelectionList"
             density="compact"
+            hide-details
             :placeholder="`${masonicYear} Official Visit`"
           />
         </v-card-text>
