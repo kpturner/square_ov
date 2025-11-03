@@ -42,7 +42,7 @@
 
             <!-- Right Column: Text -->
             <v-col cols="10" class="text-column">
-              <v-row class="spare-header text-h5 font-weight-bold mt-1 old-english justify-center">
+              <v-row class="spare-header text-h5 mt-1 old-english justify-center">
                 Provincial Grand Lodge of Hampshire & Isle of Wight
               </v-row>
             </v-col>
