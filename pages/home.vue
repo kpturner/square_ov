@@ -187,10 +187,9 @@
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
         <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
-        <v-card-text>
+        <v-card-text v-if="!editedOV.id">
           Either select from the master list
           <v-select
-            v-if="!editedOV.id"
             v-model="selectedMasterOvId"
             :items="ovSelectionList"
             density="compact"
@@ -199,7 +198,7 @@
           />
         </v-card-text>
         <v-card-text v-if="!selectedMasterOvId">
-          OR enter the details yourself
+          <span v-if="!editedOV.id">OR enter the details yourself</span>
           <v-text-field v-model="editedOV.name" label="Name" />
           <v-text-field v-model="editedOV.ovDate" label="Date" type="date" />
         </v-card-text>
@@ -234,6 +233,7 @@ type Position = (typeof _positionsRes)[number];
 
 const showDeleteConfirm = ref(false);
 const ovToDelete = ref<Partial<OV | null>>(null);
+const activeOfficers = ref<ActiveOfficer[]>([]);
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
@@ -258,17 +258,22 @@ const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
 const ovMasters = ref<OVMaster[]>([]);
 const dialog = ref(false);
-const editedOV = ref<Partial<OV>>({});
+type EditedOV = { id?: number; name?: string; ovDate?: string };
+const editedOV = ref<EditedOV>({});
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Date', key: 'ovDate' },
   { title: 'Actions', key: 'actions', sortable: false },
 ];
 
-async function fetchOVs() {
+async function loadOVs() {
   ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
   ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
   loading.value = false;
+}
+
+async function loadActiveOfficers() {
+  activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
 }
 
 const ovSelectionList = computed(() => {
@@ -290,12 +295,25 @@ function openDialog() {
   dialog.value = true;
 }
 
+function formatForDateInput(date: Date | string | null | undefined): string {
+  if (!date) return '';
+
+  // Convert string to Date if necessary
+  const d = typeof date === 'string' ? new Date(date) : date;
+
+  // Ensure valid date
+  if (isNaN(d.getTime())) return '';
+
+  // Return YYYY-MM-DD
+  return d.toISOString().slice(0, 10);
+}
+
 function editOV(item: OV) {
+  selectedMasterOvId.value = null;
+  const ovDate = formatForDateInput(item.ovDate);
   editedOV.value = {
     ...item,
-    ovDate: new Date(
-      item.ovDate?.toISOString?.()?.slice(0, 10) || (item.ovDate.toString().split('T')[0] as string)
-    ),
+    ovDate,
   };
   dialog.value = true;
 }
@@ -306,7 +324,7 @@ async function copyOV(item: OV) {
   loading.value = true;
   try {
     await $fetch(`/api/ov/${item.id}/copy`, { method: 'POST' });
-    await fetchOVs();
+    await loadOVs();
   } catch (err) {
     logger.error('Failed to copy OV:', err);
     alert('An error occurred while copying this OV.');
@@ -323,12 +341,11 @@ const selectedOVName = computed(() => {
   if (!selectedMasterOV.value) {
     return '';
   }
-  return `${selectedMasterOV.value.lodgeName} ${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
+  return `${selectedMasterOV.value.lodgeName.trim()}${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? ' Lodge ' : ' '}No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
 });
 
 const addVIP = async (ovId: number, vipName: string) => {
   const vip = await $fetch<VIP>(`/api/vip/${masonicYear}/${vipName}`);
-
   return {
     id: 0,
     name: vipName,
@@ -345,16 +362,50 @@ const addVIP = async (ovId: number, vipName: string) => {
   };
 };
 
+const addDC = async (ovId: number, name: string) => {
+  const dc = activeOfficers.value.find((ao) => {
+    const compareName = `${ao.familiarName ? ao.familiarName : ao.givenName} ${ao.familyName}`;
+    return compareName.toUpperCase() === name.toUpperCase();
+  });
+  if (!dc) {
+    return {
+      id: 0,
+      name,
+      rank: null,
+      provOfficerYear: null,
+      grandOfficer: false,
+      grandOfficerYear: null,
+      grandActive: false,
+      grandRank: null,
+      active: true,
+      position: 'head_of_south',
+      ovId,
+      isNew: true,
+    };
+  }
+  return {
+    id: 0,
+    name,
+    rank: dc.provincialRank.replace('Prov', '').toUpperCase(),
+    provOfficerYear: null,
+    grandOfficer: false,
+    grandOfficerYear: null,
+    grandActive: false,
+    grandRank: null,
+    active: true,
+    position: 'head_of_south',
+    ovId,
+    isNew: true,
+  };
+};
+
 const addOfficer = async (
   ovId: number,
   officers: GridOfficer[],
   officerNo: number,
   position: Position
 ) => {
-  const activeOfficer = await $fetch<ActiveOfficer>(
-    `/api/active-officers/${masonicYear}/${officerNo}`
-  );
-
+  const activeOfficer = activeOfficers.value.find((ao) => ao.number === officerNo) as ActiveOfficer;
   const firstName = activeOfficer.familiarName ?? activeOfficer.givenName.split(' ')[0];
   officers.push({
     id: 0,
@@ -382,18 +433,15 @@ async function saveOV() {
     // Depends on whether they selected a master OV or entered stuff manually
     if (selectedMasterOvId.value) {
       if (selectedMasterOV.value) {
-        const name = selectedOVName.value;
-        const existing = ovs.value.find((ov) => ov.name === name);
+        const name = selectedOVName.value.trim();
+        const existing = ovs.value.find((ov) => ov.name.trim() === name);
         if (existing) {
           makeToast(`An official visit for "${selectedOVName.value}" already exists`, 'error');
           return;
         }
         editedOV.value = {
           name,
-          ovDate: new Date(
-            selectedMasterOV.value.date?.toISOString?.()?.slice(0, 10) ||
-              (selectedMasterOV.value.date.toString().split('T')[0] as string)
-          ),
+          ovDate: formatForDateInput(selectedMasterOV.value.date),
         };
       }
     }
@@ -413,21 +461,13 @@ async function saveOV() {
           method: 'PUT',
           body: [vip],
         });
-        // Now the rest
-        officers.push({
-          id: 0,
-          name: selectedMasterOV.value.dc,
-          rank: null,
-          provOfficerYear: null,
-          grandOfficer: false,
-          grandOfficerYear: null,
-          grandActive: false,
-          grandRank: null,
-          active: true,
-          position: 'automatic',
-          ovId: updatedOV.id,
-          isNew: true,
+        // DC second
+        const dc = await addDC(updatedOV.id, selectedMasterOV.value.dc);
+        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
+          method: 'PUT',
+          body: [dc],
         });
+        // Now the rest
         if (selectedMasterOV.value.sword) {
           await addOfficer(updatedOV.id, officers, selectedMasterOV.value.sword, 'sword_bearer');
         }
@@ -474,7 +514,7 @@ async function saveOV() {
   }
   dialog.value = false;
   selectedMasterOvId.value = null;
-  await fetchOVs();
+  await loadOVs();
 }
 
 function confirmOVDeletion(item: Partial<OV>) {
@@ -484,12 +524,15 @@ function confirmOVDeletion(item: Partial<OV>) {
 
 async function deleteOV() {
   await $fetch(`/api/ov/${ovToDelete.value?.id}`, { method: 'DELETE' });
-  await fetchOVs();
+  await loadOVs();
 }
 
 function goToOfficers(item: OV) {
   navigateTo(`/ov/${item.id}`);
 }
 
-onMounted(fetchOVs);
+onMounted(async () => {
+  await loadActiveOfficers();
+  await loadOVs();
+});
 </script>
