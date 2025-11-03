@@ -5,13 +5,14 @@
   "scripts": {
     "prepare": "husky",
     "prepare:nuxt": "nuxi prepare",
-    "build": "yarn lint:fix && nuxt build",
+    "build": "yarn lint:fix && yarn typecheck && nuxt build",
     "dev": "nuxt dev | pino-pretty",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@fontsource/unifrakturmaguntia": "^5.2.8",

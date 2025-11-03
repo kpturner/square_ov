@@ -104,23 +104,23 @@ export default defineEventHandler(async (event) => {
       if (column === 'DC' && value) {
         const dc = activeDCs.filter((dc) => dc.familyName.toLowerCase() === value.toLowerCase());
         if (dc.length === 1) {
-          const firstName = dc[0].familiarName ?? dc[0].givenName.split(' ')[0];
-          value = `${firstName} ${dc[0].familyName}`;
+          const firstName = dc[0]?.familiarName ?? dc[0]?.givenName.split(' ')[0];
+          value = `${firstName} ${dc[0]?.familyName}`;
         }
       }
 
       // Try to get the VIP full name rather than just the surname we see on the spreadsheet
       if (column === 'VIP' && value) {
         if (value === 'PGM') {
-          value = PGM[0].name;
+          value = PGM[0]?.name;
         } else if (value === 'DPGM') {
-          value = DPGM[0].name;
+          value = DPGM[0]?.name;
         } else {
           const vip = VIPs.filter(
             (vip) => vip.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
           );
           if (vip.length === 1) {
-            value = vip[0].name;
+            value = vip[0]?.name;
           }
         }
       }

@@ -1,9 +1,10 @@
+import type { Officer } from '@prisma/client';
 import prisma from '~/server/utils/dbClient';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
 
-  const updates = body.map((o) =>
+  const updates = body.map((o: Officer) =>
     prisma.officer.update({
       where: { id: o.id },
       data: {
