@@ -8,7 +8,7 @@
           </v-col>
 
           <v-col cols="10" class="text-column">
-            <v-row class="text-h5 mb-1 mt-1 old-english justify-center">
+            <v-row class="text-h5 ma-1 old-english justify-center">
               Provincial Grand Lodge of Hampshire & Isle of Wight
             </v-row>
             <v-row class="mb-1 justify-center">
