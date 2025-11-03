@@ -1,7 +1,7 @@
 {
   "database": {
     "host": "localhost",
-    "port": 52001,
+    "port": "52001",
     "database": "square-ov",
     "user": "square-ov",
     "password": "",
