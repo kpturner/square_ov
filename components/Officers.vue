@@ -83,7 +83,13 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn icon="mdi-delete" size="small" color="red" @click="emits('delete-officer', item)" />
+        <v-btn
+          icon="mdi-delete"
+          size="small"
+          color="red"
+          title="Delete officer"
+          @click="emits('delete-officer', item)"
+        />
       </template>
     </v-data-table>
   </v-responsive>
