@@ -17,13 +17,14 @@ RUN --mount=type=secret,id=DB_PASSWORD_SECRET \
 
 RUN yarn install --frozen-lockfile
 
+RUN yarn typecheck
+
 RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     DB_HOST=host.docker.internal \
     DB_PORT=3306 \
     DB_NAME=square-ov \
     DB_USER=square-ov \
     LOG_LEVEL=debug \
-    yarn typecheck \
     yarn build
 
 # --------------------
