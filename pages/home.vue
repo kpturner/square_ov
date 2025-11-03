@@ -191,6 +191,15 @@
           Either select from the master list
           <v-autocomplete
             v-model="selectedMasterOvId"
+            class="hidden-sm-and-down"
+            :items="ovSelectionList"
+            density="compact"
+            clearable
+            :placeholder="`${masonicYear} Official Visit`"
+          />
+          <v-select
+            v-model="selectedMasterOvId"
+            class="hidden-md-and-up"
             :items="ovSelectionList"
             density="compact"
             clearable
