@@ -163,7 +163,7 @@
             v-model="selectedActiveOfficerId"
             :items="activeOfficerSelectionList"
             density="compact"
-            hide-details
+            clearable
             :placeholder="`${masonicYear} Active Officers`"
           />
         </v-card-text>
