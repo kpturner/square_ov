@@ -187,7 +187,7 @@
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
         <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
-        <v-card-text v-if="!editedOV.id">
+        <v-card-text v-show="!editedOV.id">
           Either select from the master list
           <v-autocomplete
             v-model="selectedMasterOvId"
