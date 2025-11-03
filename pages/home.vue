@@ -189,11 +189,10 @@
         <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
         <v-card-text v-if="!editedOV.id">
           Either select from the master list
-          <v-select
+          <v-autocomplete
             v-model="selectedMasterOvId"
             :items="ovSelectionList"
             density="compact"
-            hide-details
             :placeholder="`${masonicYear} Official Visit`"
           />
         </v-card-text>

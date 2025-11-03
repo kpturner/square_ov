@@ -159,7 +159,7 @@
         <v-card-text>
           Either select an officer from the master list or leave unselected to add the officer
           details yourself
-          <v-select
+          <v-autocomplete
             v-model="selectedActiveOfficerId"
             :items="activeOfficerSelectionList"
             density="compact"
