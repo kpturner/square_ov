@@ -4,7 +4,7 @@ import config from 'config';
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
-  css: ['@/assets/css/global.scss'],
+  css: ['@/assets/css/global.scss', '@fontsource/unifrakturmaguntia/index.css'],
   devtools: { enabled: true },
   devServer: {
     port: 4000,

@@ -1,18 +1,14 @@
 <template>
   <v-row dense>
     <v-col v-for="(item, i) in officers" :key="item.id ?? i" cols="12">
-      <v-card
-        class="reservation-card mb-1"
-        :elevation="printMode ? '0' : '3'"
-        :variant="printMode ? 'elevated' : 'tonal'"
-      >
+      <v-card class="reservation-card mb-1" :elevation="printMode ? '0' : '3'" variant="tonal">
         <v-row dense class="align-center text-center no-gutters">
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
             <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
           </v-col>
 
           <v-col cols="10" class="text-column">
-            <v-row class="text-h5 font-weight-bold mb-1 mt-1 old-english justify-center">
+            <v-row class="text-h5 mb-1 mt-1 old-english justify-center">
               Provincial Grand Lodge of Hampshire & Isle of Wight
             </v-row>
             <v-row class="mb-1 justify-center">

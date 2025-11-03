@@ -1,5 +1,6 @@
 .old-english {
-  font-family: 'UnifrakturMaguntia', cursive !important;
+  font-family:
+    'UnifrakturMaguntia', 'Old English Text MT', 'Goudy Text MT', serif, cursive !important;
 }
 
 .only-print {
@@ -7,6 +8,24 @@
 }
 
 @media print {
+  /* Force Vuetify light theme colors */
+  html,
+  body {
+    /* Force white background and black text */
+    background: #fff !important;
+    color: #000 !important;
+
+    /* Tell iOS Safari not to use dark mode for print */
+    color-scheme: light !important;
+  }
+  [data-theme='dark'],
+  .v-theme--dark {
+    --v-theme-background: #ffffff !important;
+    --v-theme-surface: #ffffff !important;
+    --v-theme-on-background: #000000 !important;
+    --v-theme-on-surface: #000000 !important;
+    color-scheme: light !important;
+  }
   /* Hide all "no-print" buttons and controls */
   .no-print {
     display: none !important;

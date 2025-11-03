@@ -4,5 +4,5 @@ export type GridOfficer = Officer & { isNew?: boolean };
 
 export type Rank = {
   value: string;
-  text: string;
+  title: string;
 };
