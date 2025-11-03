@@ -81,8 +81,8 @@ async function submit() {
       authStore.setUser(res.authUser);
       router.push('/home');
     }
-  } catch (err: unknown) {
-    error.value = err?.data?.statusMessage || 'Error';
+  } catch (err) {
+    error.value = (err as { data: { statusMessage: string } })?.data.statusMessage || 'Error';
   }
 }
 </script>
