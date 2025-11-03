@@ -31,7 +31,7 @@
             <div
               class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
             >
-              <div v-if="officialVisit" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0">
+              <div v-if="officialVisit" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0 text-wrap">
                 Seat reservations for OV to {{ officialVisit?.name || '...' }}
               </div>
 
