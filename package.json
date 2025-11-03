@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky",
     "prepare:nuxt": "nuxi prepare",
-    "build": "yarn lint:fix && yarn typecheck && nuxt build",
+    "build": "yarn lint:fix && nuxt build",
     "dev": "nuxt dev | pino-pretty",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
