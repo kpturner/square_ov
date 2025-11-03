@@ -54,7 +54,7 @@ export default defineNuxtConfig({
   },
   nitro: {
     routeRules: {
-      '/api/webhook/stripe': { cache: false },
+      '/admin/import': { ssr: false },
     },
   },
 });
