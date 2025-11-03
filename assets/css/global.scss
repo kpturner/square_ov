@@ -8,12 +8,17 @@
 }
 
 @media print {
+  @page {
+    margin: 5mm 5mm 0 5mm; /* top, right, bottom, left */
+  }
   /* Force Vuetify light theme colors */
   html,
   body {
     /* Force white background and black text */
     background: #fff !important;
     color: #000 !important;
+    margin: 0; /* remove default body margin */
+    padding: 0;
 
     /* Tell iOS Safari not to use dark mode for print */
     color-scheme: light !important;

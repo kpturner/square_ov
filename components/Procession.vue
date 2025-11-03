@@ -14,10 +14,11 @@
 
     <v-card-text>
       <div v-if="vip" class="d-flex justify-center mb-4">
-        <v-card v-if="vip" class="pa-3 text-center officer-card" color="yellow">
+        <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
           <div class="d-flex justify-center align-center">
-            <strong>{{ vip.name }}</strong>
             <v-icon color="black" icon="mdi-star" size="large" class="ms-2" />
+            <strong>{{ vip.name }}</strong>
+            <v-icon color="black" icon="mdi-star" size="large" />
           </div>
           <div class="text-caption">{{ rankCaption(vip) }}</div>
         </v-card>
@@ -66,28 +67,35 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
-            :class="row.south.grandOfficer ? 'grand-officer' : 'prov-officer'"
+            :class="[row.south.grandOfficer ? 'grand-officer' : 'prov-officer', row.south.rank]"
             :color="row.south.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
           >
             <div class="d-flex justify-center align-center">
               {{ row.south.name }}
               <v-icon
                 v-if="row.south.rank === 'AGDC' && row.south.active"
-                color="white"
+                color="black"
                 icon="mdi-auto-fix"
                 size="small"
                 class="ms-2"
               />
               <v-icon
                 v-if="['GDC', 'DEPGDC'].includes(row.south.rank ?? '') && row.south.active"
-                color="white"
+                color="black"
                 icon="mdi-magic-staff"
                 size="small"
                 class="ms-2"
               />
               <v-icon
                 v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
-                color="white"
+                color="black"
+                icon="mdi-star"
+                size="small"
+                class="ms-2"
+              />
+              <v-icon
+                v-if="['APGM', 'DPGM'].includes(row.south.rank ?? '') && row.south.active"
+                color="black"
                 icon="mdi-star"
                 size="small"
                 class="ms-2"
@@ -105,28 +113,35 @@
         >
           <v-card
             class="pa-2 text-center officer-card"
-            :class="row.north.grandOfficer ? 'grand-officer' : 'prov-officer'"
+            :class="[row.north.grandOfficer ? 'grand-officer' : 'prov-officer', row.north.rank]"
             :color="row.north.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
           >
             <div class="d-flex justify-center align-center">
               {{ row.north.name }}
               <v-icon
                 v-if="row.north.rank === 'AGDC' && row.north.active"
-                color="white"
+                color="black"
                 icon="mdi-auto-fix"
                 size="small"
                 class="ms-2"
               />
               <v-icon
                 v-if="['GDC', 'DEPGDC'].includes(row.north.rank ?? '') && row.north.active"
-                color="white"
+                color="black"
                 icon="mdi-magic-staff"
                 size="small"
                 class="ms-2"
               />
               <v-icon
                 v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
-                color="white"
+                color="black"
+                icon="mdi-star"
+                size="small"
+                class="ms-2"
+              />
+              <v-icon
+                v-if="['APGM', 'DPGM'].includes(row.north.rank ?? '') && row.north.active"
+                color="black"
                 icon="mdi-star"
                 size="small"
                 class="ms-2"
@@ -402,12 +417,20 @@ async function printProcession() {
   flex-direction: column;
 }
 
+.sword-bearer,
+.standard-bearer,
 .grand-officer {
-  border: 8px solid yellow;
+  border: 6px solid #fbc02d;
 }
 
 .prov-officer {
-  border: 4px solid yellow;
+  border: 4px solid #fbc02d;
+}
+
+.vip,
+.APGM,
+.DPGM {
+  border: 8px solid #fbc02d;
 }
 
 @media print {
@@ -423,18 +446,14 @@ async function printProcession() {
     width: 100%;
   }
 
-  .sword-bearer {
-    color: black !important;
-  }
-
+  .vip,
+  .sword-bearer,
+  .standard-bearer,
+  .prov-officer,
   .grand-officer {
+    background-color: transparent !important;
     color: black !important;
-    border: none;
-  }
-
-  .prov-officer {
-    color: black !important;
-    border: none;
+    border-color: black;
   }
 
   .officer-card {
