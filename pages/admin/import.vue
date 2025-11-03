@@ -10,11 +10,9 @@
     </v-app-bar>
     <v-main>
       <v-container>
-        <client-only>
-          <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
-            <v-progress-circular indeterminate size="64" color="primary" />
-          </v-overlay>
-        </client-only>
+        <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
+          <v-progress-circular indeterminate size="64" color="primary" />
+        </v-overlay>
         <v-card variant="tonal" class="pa-6">
           <v-card-title class="d-flex flex-column align-start w-100">
             <v-btn
