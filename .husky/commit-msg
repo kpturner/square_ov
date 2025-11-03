@@ -1,0 +1,9 @@
+#!/bin/sh
+
+# Exit early for merge commits
+if grep -qE '^Merge ' "$1"; then
+  echo "Merge commit detected, skipping commit linting."
+  exit 0
+fi
+
+npx commitlint --edit "$1"

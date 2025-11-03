@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "prepare": "husky",
     "prepare:nuxt": "nuxi prepare",
     "build": "yarn lint:fix && nuxt build",
     "dev": "nuxt dev | pino-pretty",
@@ -41,12 +42,25 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@commitlint/config-conventional": "^20.0.0",
     "@types/bcrypt": "^5.0.2",
     "@types/config": "^3.3.5",
     "@types/node-cron": "^3.0.11",
+    "commitlint": "^20.1.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
     "vite-plugin-vuetify": "^2.1.0",
     "vuetify": "^3.7.11"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,vue,json,yml,html,css,graphql}": "prettier --write",
+    "*.{js,ts,tsx,vue}": "eslint --fix"
   }
 }

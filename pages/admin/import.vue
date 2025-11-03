@@ -201,11 +201,11 @@ const importVIPs = async () => {
         ) as string;
         const clean = {
           Office: (r[officeKey] as string).toUpperCase(),
-          Name: r['__EMPTY'],
-          Address: r['__EMPTY__1'],
-          Email: r['__EMPTY__2'],
-          Phone: r['__EMPTY__3'],
-          Mobile: r['__EMPTY__3'],
+          Name: r.__EMPTY,
+          Address: r.__EMPTY__1,
+          Email: r.__EMPTY__2,
+          Phone: r.__EMPTY__3,
+          Mobile: r.__EMPTY__4,
         };
         return clean;
       })
