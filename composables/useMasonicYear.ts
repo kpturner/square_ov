@@ -7,7 +7,7 @@ export const useMasonicYear = () => {
   const startYear = month >= 9 ? year % 100 : (year - 1) % 100;
   const endYear = (startYear + 1) % 100;
 
-  const masonicYear = `${String(startYear).padStart(2, '0')} - ${String(endYear).padStart(2, '0')}`;
+  const masonicYear = `${String(startYear).padStart(2, '0')}-${String(endYear).padStart(2, '0')}`;
 
   return { masonicYear };
 };
