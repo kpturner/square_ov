@@ -32,18 +32,19 @@ model OV {
 }
 
 model Officer {
-  id               Int      @id @default(autoincrement())
-  name             String
-  rank             String?
-  provOfficerYear  Int?
-  grandOfficer     Boolean
-  grandOfficerYear Int?
-  active           Boolean
-  ovId             Int
-  position         Position @default(automatic)
-  grandActive      Boolean?
-  grandRank        String?
-  ov               OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
+  id                    Int      @id @default(autoincrement())
+  name                  String
+  rank                  String?
+  provOfficerYear       Int?
+  grandOfficer          Boolean
+  grandOfficerYear      Int?
+  active                Boolean
+  ovId                  Int
+  position              Position @default(automatic)
+  grandActive           Boolean?
+  grandRank             String?
+  excludeFromProcession Boolean?
+  ov                    OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
 
   @@index([ovId], map: "Officer_ovId_fkey")
 }

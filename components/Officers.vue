@@ -82,6 +82,12 @@
         />
       </template>
 
+      <template #item.excludeFromProcession="{ item }">
+        <div class="checkbox-cell">
+          <v-checkbox v-model="item.excludeFromProcession" hide-details density="compact" />
+        </div>
+      </template>
+
       <template #item.actions="{ item }">
         <v-btn
           icon="mdi-delete"
@@ -176,6 +182,15 @@
                 density="compact"
               />
             </v-col>
+
+            <v-col cols="12">
+              <v-checkbox
+                v-model="item.excludeFromProcession"
+                label="Exclude from procession"
+                hide-details
+                density="compact"
+              />
+            </v-col>
           </v-row>
           <v-row dense align="center" justify="end" class="mt-2">
             <v-btn
@@ -201,9 +216,10 @@
 </template>
 
 <script setup lang="ts">
-import type { GridOfficer, Rank } from '~/types/officers';
+import type { Rank } from '~/types/officers';
+import type { Officer } from '@prisma/client';
 
-const props = defineProps<{ officers: GridOfficer[] }>();
+const props = defineProps<{ officers: Officer[] }>();
 
 const emits = defineEmits(['load-officers', 'delete-officer', 'save-changes']);
 
@@ -228,6 +244,7 @@ const headers = [
   { title: 'Grand Rank', key: 'grandRank', width: '200px' },
   { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
   { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
+  { title: 'Exclude', key: 'excludeFromProcession', align: 'center' as const, width: '80px' },
   { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
 ];
 </script>

@@ -54,14 +54,15 @@
 </template>
 
 <script setup lang="ts">
-import type { GridOfficer, Rank } from '~/types/officers';
+import type { Rank } from '~/types/officers';
+import type { Officer } from '@prisma/client';
 import hiowCrest from '~/assets/images/hiowcrest.png';
 
-defineProps<{ officers: GridOfficer[]; spares: number; printMode?: boolean }>();
+defineProps<{ officers: Officer[]; spares: number; printMode?: boolean }>();
 
 const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
 
-const salutation = (officer: GridOfficer) => {
+const salutation = (officer: Officer) => {
   if (officer.rank === 'PGM') {
     return 'R. W. BRO.';
   }
@@ -71,14 +72,14 @@ const salutation = (officer: GridOfficer) => {
   return 'W. BRO.';
 };
 
-const provincialRank = (officer: GridOfficer) => {
+const provincialRank = (officer: Officer) => {
   if (!officer.rank) {
     return '';
   }
   return ranks.find((r) => r.value === officer.rank)?.title;
 };
 
-const provincialRankPrefix = (officer: GridOfficer) => {
+const provincialRankPrefix = (officer: Officer) => {
   if (!officer.rank) {
     return '';
   }
@@ -88,14 +89,14 @@ const provincialRankPrefix = (officer: GridOfficer) => {
   return officer.active ? 'Provincial' : 'Past Provincial';
 };
 
-const grandRank = (officer: GridOfficer) => {
+const grandRank = (officer: Officer) => {
   if (!officer.grandOfficer) {
     return;
   }
   return ranks.find((r) => r.value === officer.grandRank)?.title;
 };
 
-const grandRankPrefix = (officer: GridOfficer) => {
+const grandRankPrefix = (officer: Officer) => {
   if (!officer.grandOfficer || !officer.grandRank) {
     return;
   }

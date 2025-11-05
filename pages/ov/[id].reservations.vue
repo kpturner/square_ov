@@ -88,15 +88,14 @@
 
 <script setup lang="ts">
 import { useRoute } from 'vue-router';
-import type { OV } from '@prisma/client';
-import type { GridOfficer } from '~/types/officers';
+import type { OV, Officer } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
 
 const authStore = useAuthStore();
 const { theme, toggleTheme } = useSetTheme();
 
 const route = useRoute();
-const officers = ref<GridOfficer[]>([]);
+const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const spares = ref(2);
 

@@ -11,15 +11,10 @@ export default defineEventHandler(async (event) => {
         await prisma.officer.update({
           where: { id: o.id },
           data: {
-            name: o.name,
+            ...o,
             rank: o.rank?.trim() ? o.rank : null,
-            provOfficerYear: o.provOfficerYear,
-            active: o.active,
-            grandOfficer: o.grandOfficer,
             grandRank: o.grandRank?.trim() ? o.grandRank : null,
-            grandOfficerYear: o.grandOfficerYear,
-            grandActive: o.grandActive,
-            position: o.position,
+            ovId: undefined,
           },
         });
       } else {
@@ -34,6 +29,7 @@ export default defineEventHandler(async (event) => {
             grandOfficerYear: o.grandOfficerYear,
             grandActive: o.grandActive,
             position: o.position,
+            excludeFromProcession: o.excludeFromProcession,
             ovId,
           },
         });

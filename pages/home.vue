@@ -230,9 +230,8 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer, VIP } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer, VIP, Officer } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
-import type { GridOfficer } from '~/types/officers';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -367,7 +366,6 @@ const addVIP = async (ovId: number, vipName: string) => {
     active: true,
     position: 'vip',
     ovId,
-    isNew: true,
   };
 };
 
@@ -389,7 +387,6 @@ const addDC = async (ovId: number, name: string) => {
       active: true,
       position: 'head_of_south',
       ovId,
-      isNew: true,
     };
   }
   return {
@@ -404,13 +401,12 @@ const addDC = async (ovId: number, name: string) => {
     active: true,
     position: 'head_of_south',
     ovId,
-    isNew: true,
   };
 };
 
 const addOfficer = async (
   ovId: number,
-  officers: GridOfficer[],
+  officers: Officer[],
   officerNo: number,
   position: Position
 ) => {
@@ -427,8 +423,8 @@ const addOfficer = async (
     grandRank: null,
     active: true,
     position,
+    excludeFromProcession: false,
     ovId,
-    isNew: true,
   });
 };
 
@@ -463,7 +459,7 @@ async function saveOV() {
 
       // Populate the officers if selected from the master list
       if (selectedMasterOV.value) {
-        const officers: GridOfficer[] = [];
+        const officers: Officer[] = [];
         // Always do the VIP first so we can guarantee he is at the top
         const vip = await addVIP(updatedOV.id, selectedMasterOV.value.vip);
         await $fetch(`/api/officers?ovId=${updatedOV.id}`, {

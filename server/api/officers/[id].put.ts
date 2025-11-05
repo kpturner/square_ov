@@ -15,6 +15,7 @@ export default defineEventHandler(async (event) => {
         grandOfficerYear: o.grandOfficerYear,
         grandRank: o.grandRank?.trim() ? o.grandRank : null,
         grandActive: o.grandActive,
+        excludeFromProcession: o.excludeFromProcession,
         position: o.position,
       },
     })

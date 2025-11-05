@@ -124,7 +124,11 @@
           </div>
         </v-card>
 
-        <Procession v-if="!loading && officialVisit" :officers :official-visit />
+        <Procession
+          v-if="!loading && officialVisit"
+          :officers="officers.filter((o) => !o.excludeFromProcession)"
+          :official-visit
+        />
 
         <v-card v-if="!loading">
           <v-card-title class="d-flex justify-space-between align-center">
@@ -182,14 +186,18 @@
       color="red"
       @confirm="confirmedDeletion"
     />
-    <Procession v-if="!loading && officialVisit" class="only-print" :officers :official-visit />
+    <Procession
+      v-if="!loading && officialVisit"
+      class="only-print"
+      :officers="officers.filter((o) => !o.excludeFromProcession)"
+      :official-visit
+    />
   </v-app>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import type { OV, ActiveOfficer } from '@prisma/client';
-import type { GridOfficer } from '~/types/officers';
+import type { OV, ActiveOfficer, Officer } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
 
 const logger = useLogger('officers');
@@ -199,10 +207,10 @@ const { theme, toggleTheme } = useSetTheme();
 const makeToast = useToast();
 
 const showDeleteConfirm = ref(false);
-const officerToDelete = ref<GridOfficer | null>(null);
+const officerToDelete = ref<Officer | null>(null);
 const route = useRoute();
 const router = useRouter();
-const officers = ref<GridOfficer[]>([]);
+const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
 const { masonicYear } = useMasonicYear();
@@ -275,8 +283,8 @@ async function addOfficer() {
       grandRank: null,
       active: true,
       position: 'automatic',
+      excludeFromProcession: false,
       ovId: Number(route.params.id),
-      isNew: true,
     });
     makeToast(`${name} ${ao.provincialRank} added to list.`);
     await saveAll();
@@ -299,12 +307,12 @@ function addEmptyOfficer() {
     grandRank: null,
     active: true,
     position: 'automatic',
+    excludeFromProcession: false,
     ovId: Number(route.params.id),
-    isNew: true,
   });
 }
 
-async function deleteOfficer(officer: GridOfficer) {
+async function deleteOfficer(officer: Officer) {
   if (!officer.id) {
     officers.value = officers.value.filter((o) => o !== officer);
     return;
