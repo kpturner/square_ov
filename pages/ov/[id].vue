@@ -351,12 +351,12 @@ async function addVIP() {
       excludeFromProcession: false,
       ovId: Number(route.params.id),
     });
-    makeToast(`${name} ${vip.provincialRank} added to list.`);
+    makeToast(`${vip.name} ${vip.provincialRank} added to list.`);
     await saveAll();
     return;
   }
   await saveAll();
-  makeToast('Blank officer added to list. Please add and save their details.');
+  makeToast('Blank VIP added to list. Please add and save their details.');
   addEmptyOfficer('vip');
 }
 
