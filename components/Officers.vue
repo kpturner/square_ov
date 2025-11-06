@@ -2,7 +2,7 @@
   <v-responsive class="hidden-md-and-down">
     <v-data-table
       :headers
-      :items="officers"
+      :items="sortedOfficers"
       :items-per-page="officers.length"
       item-value="id"
       class="mt-2"
@@ -108,7 +108,7 @@
   <!-- MOBILE / TABLET CARDS -->
   <v-responsive class="hidden-lg-and-up">
     <v-row dense>
-      <v-col v-for="(item, i) in officers" :key="item.id ?? i" cols="12">
+      <v-col v-for="(item, i) in sortedOfficers" :key="item.id ?? i" cols="12">
         <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
           <v-row dense>
             <v-col cols="12">
@@ -232,6 +232,22 @@ const ranks = useRuntimeConfig().public.ranks as Rank[];
 
 const positionsRes = await $fetch('/api/ov/positions');
 const positions = positionsRes ?? [];
+
+const sortedOfficers = computed(() => {
+  const priority = {
+    vip: 1,
+    sword_bearer: 2,
+    standard_bearer: 3,
+    head_of_south: 4,
+    head_of_north: 5,
+  };
+
+  return [...props.officers].sort((a, b) => {
+    const aPriority = priority[a.position as keyof typeof priority] || 999;
+    const bPriority = priority[b.position as keyof typeof priority] || 999;
+    return aPriority - bPriority;
+  });
+});
 
 const availablePositions = computed(() => {
   return positions.filter((pos: string) => {
