@@ -1,162 +1,150 @@
 <template>
-  <v-app>
-    <v-app-bar flat class="mb-4 no-print">
-      <v-btn color="grey" variant="text" small @click="logOff"> Log Off </v-btn>
-      <v-spacer />
-      <v-btn
-        :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        variant="text"
-        @click="toggleTheme"
-      />
-    </v-app-bar>
-    <v-main class="no-print">
+  <v-container fluid class="pa-4">
+    <client-only>
+      <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
+        <v-progress-circular indeterminate size="64" color="primary" />
+      </v-overlay>
+    </client-only>
+    <v-card class="no-print">
+      <v-card-title class="d-flex justify-space-between align-center">
+        <div class="w-100 d-flex flex-column align-start">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-home"
+            class="mb-2 w-100 w-sm-auto"
+            small
+            @click="$router.push('/home')"
+          >
+            Home
+          </v-btn>
+          <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
+            >Officers for OV to {{ officialVisit?.name || '...' }}</span
+          >
+          <v-btn
+            v-if="officialVisit"
+            color="secondary"
+            prepend-icon="mdi-seat"
+            class="mb-2 w-100 w-sm-auto"
+            small
+            @click="reservations"
+          >
+            Seat reservations
+          </v-btn>
+        </div>
+      </v-card-title>
+
       <v-container fluid class="pa-4">
-        <client-only>
-          <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
-            <v-progress-circular indeterminate size="64" color="primary" />
-          </v-overlay>
-        </client-only>
-        <v-card>
-          <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex flex-column align-start">
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-home"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                @click="$router.push('/home')"
-              >
-                Home
-              </v-btn>
-              <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
-                >Officers for OV to {{ officialVisit?.name || '...' }}</span
-              >
-              <v-btn
-                v-if="officialVisit"
-                color="secondary"
-                prepend-icon="mdi-seat"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                @click="reservations"
-              >
-                Seat reservations
-              </v-btn>
-            </div>
-          </v-card-title>
+        <!-- Top Actions -->
+        <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
+          <v-btn
+            color="green"
+            class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+            prepend-icon="mdi-plus"
+            @click="addOfficerDialog = true"
+          >
+            Add Officer
+          </v-btn>
 
-          <v-container fluid class="pa-4">
-            <!-- Top Actions -->
-            <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
-              <v-btn
-                color="green"
-                class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
-                prepend-icon="mdi-plus"
-                @click="addOfficerDialog = true"
-              >
-                Add Officer
-              </v-btn>
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-content-save"
+            class="w-100 w-sm-auto"
+            @click="saveAll"
+          >
+            Save Changes
+          </v-btn>
+        </div>
 
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-content-save"
-                class="w-100 w-sm-auto"
-                @click="saveAll"
-              >
-                Save Changes
-              </v-btn>
-            </div>
-
-            <Officers
-              :officers
-              @load-officers="loadOfficers"
-              @delete-officer="deleteOfficer"
-              @save-changes="saveAll"
-            />
-
-            <!-- Bottom Actions -->
-            <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
-              <v-btn
-                color="green"
-                class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
-                prepend-icon="mdi-plus"
-                @click="addOfficerDialog = true"
-              >
-                Add Officer
-              </v-btn>
-
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-content-save"
-                class="w-100 w-sm-auto"
-                @click="saveAll"
-              >
-                Save Changes
-              </v-btn>
-            </div>
-          </v-container>
-        </v-card>
-        <hr />
-
-        <v-card>
-          <div class="d-flex align-center">
-            <v-checkbox
-              v-model="alignActiveWardens"
-              label="Align active wardens?"
-              class="no-print"
-              dense
-              hide-details
-            />
-            <v-checkbox
-              v-model="activeDCsFront"
-              class="no-print ms-3"
-              label="Active DCs at front?"
-              dense
-              hide-details
-            />
-            <v-checkbox
-              v-if="activeDCsFront"
-              v-model="includeGrandOfficers"
-              class="no-print ms-3"
-              label="GO DCs at front also?"
-              dense
-              hide-details
-            />
-          </div>
-        </v-card>
-
-        <Procession
-          v-if="!loading && officialVisit"
-          :officers="officers.filter((o) => !o.excludeFromProcession)"
-          :official-visit
+        <Officers
+          :officers
+          @load-officers="loadOfficers"
+          @delete-officer="deleteOfficer"
+          @save-changes="saveAll"
         />
 
-        <v-card v-if="!loading">
-          <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex flex-column" style="align-items: flex-start">
-              <v-btn
-                v-if="officialVisit"
-                color="secondary"
-                prepend-icon="mdi-seat"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                @click="reservations"
-              >
-                Seat reservations
-              </v-btn>
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-home"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                @click="$router.push('/home')"
-              >
-                Home
-              </v-btn>
-            </div>
-          </v-card-title>
-        </v-card>
+        <!-- Bottom Actions -->
+        <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
+          <v-btn
+            color="green"
+            class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+            prepend-icon="mdi-plus"
+            @click="addOfficerDialog = true"
+          >
+            Add Officer
+          </v-btn>
+
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-content-save"
+            class="w-100 w-sm-auto"
+            @click="saveAll"
+          >
+            Save Changes
+          </v-btn>
+        </div>
       </v-container>
-    </v-main>
+    </v-card>
+    <hr />
+
+    <v-card>
+      <div class="no-print d-flex align-center">
+        <v-checkbox
+          v-model="alignActiveWardens"
+          label="Align active wardens?"
+          class="no-print"
+          dense
+          hide-details
+        />
+        <v-checkbox
+          v-model="activeDCsFront"
+          class="no-print ms-3"
+          label="Active DCs at front?"
+          dense
+          hide-details
+        />
+        <v-checkbox
+          v-if="activeDCsFront"
+          v-model="includeGrandOfficers"
+          class="no-print ms-3"
+          label="GO DCs at front also?"
+          dense
+          hide-details
+        />
+      </div>
+    </v-card>
+
+    <Procession
+      v-if="!loading && officialVisit"
+      :officers="officers.filter((o) => !o.excludeFromProcession)"
+      :official-visit
+    />
+
+    <v-card v-if="!loading" class="no-print">
+      <v-card-title class="d-flex justify-space-between align-center">
+        <div class="w-100 d-flex flex-column" style="align-items: flex-start">
+          <v-btn
+            v-if="officialVisit"
+            color="secondary"
+            prepend-icon="mdi-seat"
+            class="mb-2 w-100 w-sm-auto"
+            small
+            @click="reservations"
+          >
+            Seat reservations
+          </v-btn>
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-home"
+            class="mb-2 w-100 w-sm-auto"
+            small
+            @click="$router.push('/home')"
+          >
+            Home
+          </v-btn>
+        </div>
+      </v-card-title>
+    </v-card>
+
     <v-dialog v-model="addOfficerDialog" max-width="400">
       <v-card>
         <v-card-title>Add Officer</v-card-title>
@@ -186,24 +174,15 @@
       color="red"
       @confirm="confirmedDeletion"
     />
-    <Procession
-      v-if="!loading && officialVisit"
-      class="only-print"
-      :officers="officers.filter((o) => !o.excludeFromProcession)"
-      :official-visit
-    />
-  </v-app>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer, Officer } from '@prisma/client';
-import { useAuthStore } from '~/stores/auth';
 
 const logger = useLogger('officers');
 
-const authStore = useAuthStore();
-const { theme, toggleTheme } = useSetTheme();
 const makeToast = useToast();
 
 const showDeleteConfirm = ref(false);
@@ -227,11 +206,6 @@ onMounted(async () => {
   await loadActiveOfficers();
   await loadOfficers();
 });
-
-function logOff() {
-  authStore.user = null;
-  navigateTo('/');
-}
 
 const activeOfficerSelectionList = computed(() => {
   return activeOfficers.value.map((ao) => {

@@ -11,6 +11,12 @@
   @page {
     margin: 5mm 5mm 0 5mm; /* top, right, bottom, left */
   }
+  .v-application,
+  .v-application__wrap,
+  v-main {
+    height: auto !important;
+    min-height: auto !important;
+  }
   /* Force Vuetify light theme colors */
   html,
   body {

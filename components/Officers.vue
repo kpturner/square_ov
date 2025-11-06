@@ -84,7 +84,12 @@
 
       <template #item.excludeFromProcession="{ item }">
         <div class="checkbox-cell">
-          <v-checkbox v-model="item.excludeFromProcession" hide-details density="compact" />
+          <v-checkbox
+            v-model="item.excludeFromProcession"
+            hide-details
+            density="compact"
+            title="Exclude from procession"
+          />
         </div>
       </template>
 

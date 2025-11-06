@@ -1,76 +1,135 @@
 <template>
-  <v-app>
-    <v-app-bar flat class="mb-4">
-      <v-btn color="grey" variant="text" small @click="logOff"> Log Off </v-btn>
-      <v-spacer />
-      <v-btn
-        :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
-        variant="text"
-        @click="toggleTheme"
-      />
-    </v-app-bar>
-    <v-main>
-      <v-container>
-        <client-only>
-          <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
-            <v-progress-circular indeterminate size="64" color="primary" />
-          </v-overlay>
-        </client-only>
-        <v-row>
-          <v-col>
-            <v-card>
-              <v-card-title class="d-flex justify-space-between align-center">
-                <div class="w-100 d-flex flex-column align-start">
-                  <v-btn
-                    color="red-darken-3"
-                    prepend-icon="mdi-import"
-                    class="mb-2 w-100 w-sm-auto"
-                    small
-                    title="Here be dragons!!"
-                    @click="$router.push('/admin/import')"
-                  >
-                    Imports
-                  </v-btn>
-                  <span class="text-h5">Official Visits</span>
-                </div>
-              </v-card-title>
-              <!-- Top Actions -->
-              <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+  <v-container>
+    <client-only>
+      <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
+        <v-progress-circular indeterminate size="64" color="primary" />
+      </v-overlay>
+    </client-only>
+    <v-row>
+      <v-col>
+        <v-card>
+          <v-card-title class="d-flex justify-space-between align-center">
+            <div class="w-100 d-flex flex-column align-start">
+              <v-btn
+                color="red-darken-3"
+                prepend-icon="mdi-import"
+                class="mb-2 w-100 w-sm-auto"
+                small
+                title="Here be dragons!!"
+                @click="$router.push('/admin/import')"
+              >
+                Imports
+              </v-btn>
+              <span class="text-h5">Official Visits</span>
+            </div>
+          </v-card-title>
+          <!-- Top Actions -->
+          <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+            <v-btn
+              color="green"
+              class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+              prepend-icon="mdi-plus"
+              @click="openDialog()"
+            >
+              Add Official Visit
+            </v-btn>
+          </div>
+          <!-- DESKTOP -->
+          <v-responsive class="hidden-md-and-down">
+            <v-data-table :headers="headers" :items="formattedOVs" class="mt-4">
+              <template #item.ovDate="{ item }">
+                {{ item.displayDate }}
+              </template>
+              <template #item.actions="{ item }">
+                <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />
                 <v-btn
+                  class="me-2"
+                  icon="mdi-content-copy"
+                  size="small"
+                  color="blue"
+                  variant="elevated"
+                  title="Copy OV"
+                  @click="copyOV(item)"
+                />
+                <v-btn
+                  class="me-2"
+                  icon="mdi-account-group"
+                  size="small"
                   color="green"
-                  class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
-                  prepend-icon="mdi-plus"
-                  @click="openDialog()"
-                >
-                  Add Official Visit
-                </v-btn>
-              </div>
-              <!-- DESKTOP -->
-              <v-responsive class="hidden-md-and-down">
-                <v-data-table :headers="headers" :items="formattedOVs" class="mt-4">
-                  <template #item.ovDate="{ item }">
-                    {{ item.displayDate }}
-                  </template>
-                  <template #item.actions="{ item }">
-                    <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />
+                  variant="elevated"
+                  title="Procession"
+                  @click="goToOfficers(item)"
+                />
+                <v-btn
+                  class="me-2"
+                  icon="mdi-seat"
+                  size="small"
+                  color="secondary"
+                  variant="elevated"
+                  title="Reservations"
+                  @click="$router.push(`/ov/${item.id}.reservations`)"
+                />
+                <v-btn
+                  icon="mdi-delete"
+                  size="small"
+                  color="red"
+                  variant="elevated"
+                  title="Delete OV"
+                  @click="confirmOVDeletion(item)"
+                />
+              </template>
+            </v-data-table>
+          </v-responsive>
+
+          <!-- MOBILE -->
+          <v-responsive class="hidden-lg-and-up"
+            ><v-row dense>
+              <v-col v-for="(item, i) in formattedOVs" :key="item.id ?? i" cols="12">
+                <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
+                  <v-row dense>
+                    <v-col cols="12">
+                      <v-text-field v-model="item.name" label="Date" density="compact" readonly />
+                    </v-col>
+
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="item.displayDate"
+                        label="Date"
+                        density="compact"
+                        readonly
+                      />
+                    </v-col>
+                  </v-row>
+                  <v-row dense align="center" justify="end" class="mt-2">
                     <v-btn
+                      icon="mdi-pencil"
+                      size="small"
+                      variant="text"
+                      title="Edit OV"
                       class="me-2"
+                      @click="editOV(item)"
+                    />
+
+                    <v-btn
                       icon="mdi-content-copy"
                       size="small"
                       color="blue"
                       variant="elevated"
                       title="Copy OV"
+                      class="me-2"
                       @click="copyOV(item)"
                     />
+
                     <v-btn
-                      class="me-2"
                       icon="mdi-account-group"
                       size="small"
                       color="green"
                       variant="elevated"
                       title="Procession"
+                      class="me-2"
                       @click="goToOfficers(item)"
                     />
+
                     <v-btn
                       class="me-2"
                       icon="mdi-seat"
@@ -80,6 +139,7 @@
                       title="Reservations"
                       @click="$router.push(`/ov/${item.id}.reservations`)"
                     />
+
                     <v-btn
                       icon="mdi-delete"
                       size="small"
@@ -88,102 +148,25 @@
                       title="Delete OV"
                       @click="confirmOVDeletion(item)"
                     />
-                  </template>
-                </v-data-table>
-              </v-responsive>
+                  </v-row>
+                </v-card>
+              </v-col> </v-row
+          ></v-responsive>
+          <!-- Bottom Actions -->
+          <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+            <v-btn
+              color="green"
+              class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+              prepend-icon="mdi-plus"
+              @click="openDialog()"
+            >
+              Add Official Visit
+            </v-btn>
+          </div>
+        </v-card>
+      </v-col>
+    </v-row>
 
-              <!-- MOBILE -->
-              <v-responsive class="hidden-lg-and-up"
-                ><v-row dense>
-                  <v-col v-for="(item, i) in formattedOVs" :key="item.id ?? i" cols="12">
-                    <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
-                      <v-row dense>
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="item.name"
-                            label="Date"
-                            density="compact"
-                            readonly
-                          />
-                        </v-col>
-
-                        <v-col cols="12">
-                          <v-text-field
-                            v-model="item.displayDate"
-                            label="Date"
-                            density="compact"
-                            readonly
-                          />
-                        </v-col>
-                      </v-row>
-                      <v-row dense align="center" justify="end" class="mt-2">
-                        <v-btn
-                          icon="mdi-pencil"
-                          size="small"
-                          variant="text"
-                          title="Edit OV"
-                          class="me-2"
-                          @click="editOV(item)"
-                        />
-
-                        <v-btn
-                          icon="mdi-content-copy"
-                          size="small"
-                          color="blue"
-                          variant="elevated"
-                          title="Copy OV"
-                          class="me-2"
-                          @click="copyOV(item)"
-                        />
-
-                        <v-btn
-                          icon="mdi-account-group"
-                          size="small"
-                          color="green"
-                          variant="elevated"
-                          title="Procession"
-                          class="me-2"
-                          @click="goToOfficers(item)"
-                        />
-
-                        <v-btn
-                          class="me-2"
-                          icon="mdi-seat"
-                          size="small"
-                          color="secondary"
-                          variant="elevated"
-                          title="Reservations"
-                          @click="$router.push(`/ov/${item.id}.reservations`)"
-                        />
-
-                        <v-btn
-                          icon="mdi-delete"
-                          size="small"
-                          color="red"
-                          variant="elevated"
-                          title="Delete OV"
-                          @click="confirmOVDeletion(item)"
-                        />
-                      </v-row>
-                    </v-card>
-                  </v-col> </v-row
-              ></v-responsive>
-              <!-- Bottom Actions -->
-              <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
-                <v-btn
-                  color="green"
-                  class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
-                  prepend-icon="mdi-plus"
-                  @click="openDialog()"
-                >
-                  Add Official Visit
-                </v-btn>
-              </div>
-            </v-card>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-main>
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
         <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
@@ -226,12 +209,11 @@
       color="red"
       @confirm="deleteOV()"
     />
-  </v-app>
+  </v-container>
 </template>
 
 <script setup lang="ts">
 import type { OV, OVMaster, ActiveOfficer, VIP, Officer } from '@prisma/client';
-import { useAuthStore } from '~/stores/auth';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -244,7 +226,6 @@ const ovToDelete = ref<Partial<OV | null>>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 
 const authStore = useAuthStore();
-const { theme, toggleTheme } = useSetTheme();
 
 const loading = ref(true);
 
@@ -292,11 +273,6 @@ const ovSelectionList = computed(() => {
     };
   });
 });
-
-function logOff() {
-  authStore.user = null;
-  navigateTo('/');
-}
 
 function openDialog() {
   editedOV.value = {};
