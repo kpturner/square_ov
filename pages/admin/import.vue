@@ -194,7 +194,7 @@ const importVIPs = async () => {
         };
         return clean;
       })
-      .filter((r) => r.Office !== 'Name');
+      .filter((r) => r.Name !== 'Name');
     const { importErrors } = await useVIPApi().import(tidy, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
