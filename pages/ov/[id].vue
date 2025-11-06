@@ -37,6 +37,16 @@
         <!-- Top Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
           <v-btn
+            v-if="!hasVIP"
+            color="red"
+            class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+            prepend-icon="mdi-plus"
+            @click="addVIPDialog = true"
+          >
+            Add VIP
+          </v-btn>
+
+          <v-btn
             color="green"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
             prepend-icon="mdi-plus"
@@ -64,6 +74,16 @@
 
         <!-- Bottom Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
+          <v-btn
+            v-if="!hasVIP"
+            color="red"
+            class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+            prepend-icon="mdi-plus"
+            @click="addVIPDialog = true"
+          >
+            Add VIP
+          </v-btn>
+
           <v-btn
             color="green"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -145,6 +165,27 @@
       </v-card-title>
     </v-card>
 
+    <v-dialog v-model="addVIPDialog" max-width="400">
+      <v-card>
+        <v-card-title>Add VIP</v-card-title>
+        <v-card-text>
+          Either select a VIP from the master list or leave unselected to add the VIP details
+          yourself
+          <v-autocomplete
+            v-model="selectedVIPId"
+            :items="activeVIPSelectionList"
+            density="compact"
+            clearable
+            :placeholder="`${masonicYear} VIPs`"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="addVIPDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="addVIP">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="addOfficerDialog" max-width="400">
       <v-card>
         <v-card-title>Add Officer</v-card-title>
@@ -179,7 +220,7 @@
 
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
-import type { OV, ActiveOfficer, Officer } from '@prisma/client';
+import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
 
 const logger = useLogger('officers');
 
@@ -192,9 +233,12 @@ const router = useRouter();
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
+const addVIPDialog = ref(false);
 const { masonicYear } = useMasonicYear();
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const selectedActiveOfficerId = ref(null);
+const vips = ref<VIP[]>([]);
+const selectedVIPId = ref(null);
 
 const activeDCsFront = ref(false);
 const includeGrandOfficers = ref(false);
@@ -202,9 +246,22 @@ const alignActiveWardens = ref(true);
 
 const loading = ref(true);
 
+const _positionsRes = await $fetch('/api/ov/positions');
+type Position = (typeof _positionsRes)[number];
+
 onMounted(async () => {
+  await loadVIPs();
   await loadActiveOfficers();
   await loadOfficers();
+});
+
+const activeVIPSelectionList = computed(() => {
+  return vips.value.map((vip) => {
+    return {
+      value: vip.id,
+      title: `${vip.provincialRank} - ${vip.name}`,
+    };
+  });
 });
 
 const activeOfficerSelectionList = computed(() => {
@@ -216,8 +273,14 @@ const activeOfficerSelectionList = computed(() => {
   });
 });
 
+const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
+
 async function loadActiveOfficers() {
   activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
+}
+
+async function loadVIPs() {
+  vips.value = await $fetch<VIP[]>(`/api/vip?year=${masonicYear}`);
 }
 
 async function loadOfficers() {
@@ -269,7 +332,35 @@ async function addOfficer() {
   addEmptyOfficer();
 }
 
-function addEmptyOfficer() {
+async function addVIP() {
+  addVIPDialog.value = false;
+  if (selectedVIPId.value) {
+    const vip = vips.value.find((vip) => vip.id === selectedVIPId.value) as VIP;
+    selectedVIPId.value = null;
+    officers.value.push({
+      id: 0,
+      name: vip.name,
+      rank: vip.provincialRank,
+      provOfficerYear: null,
+      grandOfficer: false,
+      grandOfficerYear: null,
+      grandActive: false,
+      grandRank: null,
+      active: true,
+      position: 'vip',
+      excludeFromProcession: false,
+      ovId: Number(route.params.id),
+    });
+    makeToast(`${name} ${vip.provincialRank} added to list.`);
+    await saveAll();
+    return;
+  }
+  await saveAll();
+  makeToast('Blank officer added to list. Please add and save their details.');
+  addEmptyOfficer('vip');
+}
+
+function addEmptyOfficer(position?: Position) {
   officers.value.push({
     id: 0,
     name: '',
@@ -280,7 +371,7 @@ function addEmptyOfficer() {
     grandActive: false,
     grandRank: null,
     active: true,
-    position: 'automatic',
+    position: position ?? 'automatic',
     excludeFromProcession: false,
     ovId: Number(route.params.id),
   });
