@@ -118,7 +118,7 @@
             <v-col cols="12">
               <v-select
                 v-model="item.rank"
-                :items="[{ value: '' }, ...ranks]"
+                :items="[{ value: '', title: '' }, ...ranks]"
                 label="Provincial Rank"
                 density="compact"
                 placeholder="Prov rank"
@@ -169,7 +169,7 @@
               <v-select
                 v-model="item.grandRank"
                 :items="
-                  [{ value: '' }, ...ranks].filter(
+                  [{ value: '', title: '' }, ...ranks].filter(
                     (r) => !['PGM', 'DPGM', 'APGM'].includes(r.value)
                   )
                 "
