@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-app-bar flat class="mb-4">
+    <v-app-bar flat class="no-print mb-4">
       <v-app-bar-title>
         Square OV
         <client-only>
@@ -8,27 +8,18 @@
         >
       </v-app-bar-title>
       <v-spacer />
-      <v-btn
-        v-if="$route.path !== '/'"
-        color="grey"
-        variant="text"
-        small
-        class="no-print"
-        @click="logOff"
-      >
+      <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOff">
         Log Off
       </v-btn>
       <v-btn
         v-if="$route.path !== '/'"
         icon="mdi-account"
         variant="text"
-        class="no-print"
         @click="profileDialog = true"
       />
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
         variant="text"
-        class="no-print"
         @click="toggleTheme"
       />
     </v-app-bar>
