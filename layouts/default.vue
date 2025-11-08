@@ -4,8 +4,11 @@
       <v-app-bar-title>
         Square OV
         <client-only>
-          <span v-if="user?.name"> - {{ user.name }}</span></client-only
-        >
+          <template v-if="user?.name">
+            <span class="hidden-sm-and-down"> - {{ user.name }}</span>
+            <div class="hidden-md-and-up text-body-2">{{ user.name }}</div>
+          </template>
+        </client-only>
       </v-app-bar-title>
       <v-spacer />
       <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOff">
