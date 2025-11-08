@@ -367,7 +367,7 @@ const addDC = async (ovId: number, name: string) => {
   }
   return {
     id: 0,
-    name,
+    name: `${name} (${dc.number})`,
     rank: dc.provincialRank.replace('Prov', '').toUpperCase(),
     provOfficerYear: null,
     grandOfficer: dc.provincialRank.toUpperCase() === 'PROVGDC',
@@ -390,7 +390,7 @@ const addOfficer = async (
   const firstName = activeOfficer.familiarName ?? activeOfficer.givenName.split(' ')[0];
   officers.push({
     id: 0,
-    name: `${firstName} ${activeOfficer.familyName}`,
+    name: `${firstName} ${activeOfficer.familyName} (${activeOfficer.number})`,
     rank: activeOfficer.provincialRank.replace('Prov', '').toUpperCase(),
     provOfficerYear: null,
     grandOfficer: false,

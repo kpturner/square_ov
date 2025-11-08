@@ -308,7 +308,7 @@ async function addOfficer() {
     ) as ActiveOfficer;
     selectedActiveOfficerId.value = null;
     const firstName = ao.familiarName ?? ao.givenName.split(' ')[0];
-    const name = `${firstName} ${ao.familyName}`;
+    const name = `${firstName} ${ao.familyName} (${ao.number})`;
     officers.value.push({
       id: 0,
       name,
