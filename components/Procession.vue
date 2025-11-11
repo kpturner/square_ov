@@ -164,7 +164,10 @@ import type { Rank } from '~/types/officers';
 
 const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
 
-const props = defineProps<{ officers: Officer[]; officialVisit: OV | null }>();
+const props = defineProps<{
+  officers: Officer[];
+  officialVisit: OV | null;
+}>();
 
 // Special roles
 const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
@@ -233,6 +236,48 @@ const rankToConsider = (officer: Officer) => {
   return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
 };
 
+const activeNumberToConsider = (officer: Officer): number | null => {
+  const match = officer.name.match(/\((\d{1,4})\)/);
+  if (!match) return null;
+
+  const num = parseInt(match[1]!, 10);
+  if (num >= 1 && num <= 9999) {
+    return num;
+  }
+
+  return null;
+};
+
+const provYearCompare = (a: Officer, b: Officer): number | null => {
+  if (
+    a.active === b.active &&
+    a.provOfficerYear &&
+    b.provOfficerYear &&
+    rankToConsider(a) === rankToConsider(b)
+  ) {
+    if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
+  }
+  return null;
+};
+
+const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
+  if (
+    !['JGW', 'SGW'].includes(rankToConsider(a) ?? '') &&
+    rankToConsider(a) === rankToConsider(b) &&
+    a.active === b.active
+  ) {
+    const anum = activeNumberToConsider(a);
+    const bnum = activeNumberToConsider(b);
+    if (anum !== null && bnum !== null) {
+      if (anum > bnum) {
+        return 1;
+      }
+      return -1;
+    }
+  }
+  return null;
+};
+
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
   props.officers
@@ -256,13 +301,9 @@ const automatic = computed(() =>
       }
 
       // Prov year for equal rank and active status
-      if (
-        a.active === b.active &&
-        a.provOfficerYear &&
-        b.provOfficerYear &&
-        rankToConsider(a) === rankToConsider(b)
-      ) {
-        if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
+      const pyRes = provYearCompare(a, b);
+      if (pyRes !== null) {
+        return pyRes;
       }
 
       // Rank seniority
@@ -291,9 +332,36 @@ const automatic = computed(() =>
         if (!a.active && b.active) return 1;
       }
 
+      // Finally active office number
+      const aonRes = activeOfficerNumberCompare(a, b);
+      if (aonRes !== null) {
+        return aonRes;
+      }
+
       return 0;
     })
 );
+
+const activeDCs = computed(() => {
+  return automatic.value
+    .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
+    .filter((o) => (props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer))
+    .sort((a, b) => {
+      // Provincial year compare
+      const pyRes = provYearCompare(a, b);
+      if (pyRes !== null) {
+        return pyRes;
+      }
+      // Active officer number
+      const aonRes = activeOfficerNumberCompare(a, b);
+      if (aonRes !== null) {
+        return aonRes;
+      }
+
+      return 0;
+    })
+    .reverse();
+});
 
 // Build rows (top = rear, bottom = front)
 const rows = computed(() => {
@@ -302,12 +370,8 @@ const rows = computed(() => {
   let nextRow: { south?: Officer; north?: Officer } = {};
 
   // Traverse the automatic officers and add rows
-  const activeDCs = automatic.value
-    .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
-    .filter((o) => (props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer))
-    .reverse();
   const automaticOfficers = props.officialVisit?.activeDCsFront
-    ? automatic.value.filter((ao) => !activeDCs.includes(ao))
+    ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
     : automatic.value;
 
   for (const officer of automaticOfficers) {
@@ -321,7 +385,7 @@ const rows = computed(() => {
   }
 
   if (props.officialVisit?.activeDCsFront) {
-    for (const officer of activeDCs) {
+    for (const officer of activeDCs.value) {
       if (!nextRow.south) {
         nextRow.south = officer;
       } else if (!nextRow.north) {
