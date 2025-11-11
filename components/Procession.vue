@@ -180,6 +180,12 @@ const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
 
+const ranksInProcessionOrder = computed(() => {
+  // In the procession we want Grand Steward to be at the front (barring other overrides)
+  const gStwd = ranks.find((r) => r.value === 'GSTWD')!;
+  return [...ranks.filter((r) => r.value !== 'GSTWD'), gStwd];
+});
+
 const rankPrefix = (officer: Officer) => {
   if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
     if (officer.active) {
@@ -260,8 +266,12 @@ const automatic = computed(() =>
       }
 
       // Rank seniority
-      const aRankIndex = ranks.findIndex((r) => r.value === rankToConsider(a));
-      const bRankIndex = ranks.findIndex((r) => r.value === rankToConsider(b));
+      const aRankIndex = ranksInProcessionOrder.value.findIndex(
+        (r) => r.value === rankToConsider(a)
+      );
+      const bRankIndex = ranksInProcessionOrder.value.findIndex(
+        (r) => r.value === rankToConsider(b)
+      );
 
       if (aRankIndex !== bRankIndex)
         return (
