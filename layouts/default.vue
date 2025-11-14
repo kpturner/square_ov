@@ -2,7 +2,7 @@
   <v-app>
     <v-app-bar flat class="no-print mb-4">
       <v-app-bar-title>
-        Square OV
+        <span class="text-subtitle-1 text-md-h6">Square OV</span>
         <client-only>
           <template v-if="user?.name">
             <span class="hidden-sm-and-down"> - {{ user.name }}</span>
