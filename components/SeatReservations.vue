@@ -17,10 +17,10 @@
               </div>
             </v-row>
             <v-row class="justify-center">
-              <div class="text-h5">{{ provincialRankPrefix(item) }} {{ provincialRank(item) }}</div>
+              <div class="text-h5">{{ grandRankPrefix(item) }} {{ grandRank(item) }}</div>
             </v-row>
             <v-row class="justify-center">
-              <div class="text-h5">{{ grandRankPrefix(item) }} {{ grandRank(item) }}</div>
+              <div class="text-h5">{{ provincialRankPrefix(item) }} {{ provincialRank(item) }}</div>
             </v-row>
           </v-col>
         </v-row>

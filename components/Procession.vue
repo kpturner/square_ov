@@ -217,17 +217,19 @@ const grandRankPrefix = (officer: Officer) => {
 
 const rankCaption = (officer: Officer) => {
   let caption = '';
-  if (officer.rank) {
-    caption += `${rankPrefix(officer)}${officer.rank}`;
-  }
+
   if (officer.grandOfficer && officer.grandRank) {
-    if (caption.length) {
-      caption += ' - ';
-    }
     caption += `${grandRankPrefix(officer)}${officer.grandRank}`;
     if (officer.grandOfficerYear) {
       caption += ` (${officer.grandOfficerYear})`;
     }
+  }
+
+  if (officer.rank) {
+    if (caption.length) {
+      caption += ' - ';
+    }
+    caption += `${rankPrefix(officer)}${officer.rank}`;
   }
   return caption;
 };
