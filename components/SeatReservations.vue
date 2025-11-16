@@ -13,7 +13,7 @@
             </v-row>
             <v-row class="mb-1 justify-center">
               <div class="text-h4 font-weight-bold">
-                {{ salutation(item) }} {{ item.name.toUpperCase() }}
+                {{ salutation(item) }} {{ cleanName(item.name.toUpperCase()) }}
               </div>
             </v-row>
             <v-row class="justify-center">
@@ -70,6 +70,10 @@ const salutation = (officer: Officer) => {
     return 'V. W. BRO.';
   }
   return 'W. BRO.';
+};
+
+const cleanName = (officerName: string) => {
+  return officerName.replace(/\(\d+\)/g, '').trim();
 };
 
 const provincialRank = (officer: Officer) => {
