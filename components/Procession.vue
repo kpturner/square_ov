@@ -51,7 +51,7 @@
       </div>
 
       <div class="d-flex justify-center flex-wrap mb-2">
-        <div class="row-number"></div>
+        <div class="row-number no-print"></div>
         <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
           <strong>SOUTH</strong>
         </div>
@@ -64,7 +64,7 @@
         :key="idx"
         class="d-flex align-center justify-center flex-wrap mb-2"
       >
-        <div class="row-number">{{ idx + 1 }}</div>
+        <div class="row-number no-print">{{ idx + 1 }}</div>
         <!-- South column -->
         <div
           v-if="row.south"
@@ -448,6 +448,14 @@ const rows = computed(() => {
   if (props.officialVisit?.activeDCsFront) {
     for (const officer of activeDCs.value) {
       addOfficer(officer);
+    }
+  }
+
+  // Look through the fixed positions and if we do not yet have it in the results, add it now
+  for (const fp in fixedPositionMap.value) {
+    const fpi = parseInt(fp);
+    if (fpi >= result.length) {
+      result.push(fixedPositionMap.value[fp]!);
     }
   }
 

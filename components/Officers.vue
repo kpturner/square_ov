@@ -249,26 +249,37 @@ const sortedOfficers = computed(() => {
   });
 });
 
+const availableOfficers = computed(() => {
+  return props.officers.filter(
+    (o) =>
+      !['vip', 'sword_bearer', 'standard_bearer'].includes(o.position ?? '') &&
+      !o.excludeFromProcession
+  );
+});
+
 const processionRows = computed(() => {
-  return (
-    Math.ceil(
-      props.officers.filter(
-        (o) =>
-          !['vip', 'sword_bearer', 'standard_bearer'].includes(o.position ?? '') &&
-          !o.excludeFromProcession
-      ).length / 2
-    ) - 1
-  ); // Reduce by 1 as the last row is handled by "head_of...."
+  return Math.ceil(availableOfficers.value.length / 2);
 });
 
 const dynamicRowPositions = computed(() => {
   const rows = [];
 
   for (let n = 1; n <= processionRows.value; n++) {
-    rows.push(`row_${n}_south`);
-    rows.push(`row_${n}_north`);
+    if (n === processionRows.value) {
+      // Last row
+      if (availableOfficers.value.length % 2 === 0) {
+        // Even number
+        rows.push(`row_${n}_south`);
+        rows.push(`row_${n}_north`);
+      } else {
+        // Odd number
+        rows.push(`row_${n}_south`);
+      }
+    } else {
+      rows.push(`row_${n}_south`);
+      rows.push(`row_${n}_north`);
+    }
   }
-
   return rows;
 });
 
@@ -276,10 +287,41 @@ const allPositions = computed(() => {
   return [...positions, ...dynamicRowPositions.value];
 });
 
+const lastRowSouth = computed(() => `row_${processionRows.value}_south`);
+const lastRowNorth = computed(() => `row_${processionRows.value}_north`);
+
 const availablePositions = computed(() => {
   return allPositions.value.filter((pos: string) => {
     // 'automatic' always allowed
     if (pos === 'automatic') return true;
+
+    // head_of_xxxx being selected means that the row_n_xxxx cannot be an option
+    if (
+      pos === lastRowSouth.value &&
+      props.officers.some((officer) => officer.position === 'head_of_south')
+    ) {
+      return false;
+    }
+    if (
+      pos === lastRowNorth.value &&
+      props.officers.some((officer) => officer.position === 'head_of_north')
+    ) {
+      return false;
+    }
+
+    // ...and of course, vice versa
+    if (
+      pos === 'head_of_south' &&
+      props.officers.some((officer) => officer.position === lastRowSouth.value)
+    ) {
+      return false;
+    }
+    if (
+      pos === 'head_of_north' &&
+      props.officers.some((officer) => officer.position === lastRowNorth.value)
+    ) {
+      return false;
+    }
 
     // Check if any officer is using that position
     return !props.officers.some((officer) => officer.position === pos);
