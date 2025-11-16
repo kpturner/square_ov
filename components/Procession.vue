@@ -51,6 +51,7 @@
       </div>
 
       <div class="d-flex justify-center flex-wrap mb-2">
+        <div class="row-number"></div>
         <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
           <strong>SOUTH</strong>
         </div>
@@ -58,7 +59,12 @@
           <strong>NORTH</strong>
         </div>
       </div>
-      <div v-for="(row, idx) in rows" :key="idx" class="d-flex justify-center flex-wrap mb-2">
+      <div
+        v-for="(row, idx) in rows"
+        :key="idx"
+        class="d-flex align-center justify-center flex-wrap mb-2"
+      >
+        <div class="row-number">{{ idx + 1 }}</div>
         <!-- South column -->
         <div
           v-if="row.south"
@@ -163,6 +169,8 @@ import type { Officer, OV } from '@prisma/client';
 import type { Rank } from '~/types/officers';
 
 const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
+
+type ProcessionRow = { south?: Officer; north?: Officer };
 
 const props = defineProps<{
   officers: Officer[];
@@ -365,36 +373,81 @@ const activeDCs = computed(() => {
     .reverse();
 });
 
+function parseFixedPosition(position?: string) {
+  if (!position) return null;
+
+  const match = position.match(/^row_(\d+)_(south|north)$/);
+  if (!match) return null;
+
+  const [, rowNumStr, side] = match;
+  return { rowIndex: Number(rowNumStr) - 1, side: side as 'south' | 'north' };
+}
+
+const fixedPositionMap = computed(() => {
+  const fixedPositionMap: Record<number, ProcessionRow> = {};
+  for (const officer of props.officers) {
+    const parsed = parseFixedPosition(officer.position);
+
+    if (parsed) {
+      if (!fixedPositionMap[parsed.rowIndex]) {
+        fixedPositionMap[parsed.rowIndex] = {};
+      }
+      const row = fixedPositionMap[parsed.rowIndex]!;
+      row[parsed.side] = officer;
+    }
+  }
+  return fixedPositionMap;
+});
+
 // Build rows (top = rear, bottom = front)
 const rows = computed(() => {
-  const result: { south?: Officer; north?: Officer; centre?: Officer[] }[] = [];
+  const result: ProcessionRow[] = [];
 
-  let nextRow: { south?: Officer; north?: Officer } = {};
+  let nextRow: ProcessionRow = {};
+
+  const addRow = (row: ProcessionRow) => {
+    result.push(row);
+    nextRow = {};
+  };
 
   // Traverse the automatic officers and add rows
-  const automaticOfficers = props.officialVisit?.activeDCsFront
-    ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
-    : automatic.value;
+  const automaticOfficers = (
+    props.officialVisit?.activeDCsFront
+      ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
+      : automatic.value
+  ).filter((o) => !parseFixedPosition(o.position));
+
+  const addOfficer = (officer: Officer) => {
+    // If the next row is empty, see if it has a pre-populated value in thr fixedPositionMap
+    if (!nextRow.south && !nextRow.north) {
+      const prefilled = fixedPositionMap.value[result.length];
+      if (prefilled?.north || prefilled?.south) {
+        nextRow = { ...prefilled };
+      }
+    }
+    if (nextRow.south && nextRow.north) {
+      addRow(nextRow);
+    } else {
+      if (!nextRow.south) {
+        nextRow.south = officer;
+        // North might be prepopulated
+        if (nextRow.north) {
+          addRow(nextRow);
+        }
+      } else if (!nextRow.north) {
+        nextRow.north = officer;
+        addRow(nextRow);
+      }
+    }
+  };
 
   for (const officer of automaticOfficers) {
-    if (!nextRow.south) {
-      nextRow.south = officer;
-    } else if (!nextRow.north) {
-      nextRow.north = officer;
-      result.push(nextRow);
-      nextRow = {};
-    }
+    addOfficer(officer);
   }
 
   if (props.officialVisit?.activeDCsFront) {
     for (const officer of activeDCs.value) {
-      if (!nextRow.south) {
-        nextRow.south = officer;
-      } else if (!nextRow.north) {
-        nextRow.north = officer;
-        result.push(nextRow);
-        nextRow = {};
-      }
+      addOfficer(officer);
     }
   }
 
@@ -407,36 +460,31 @@ const rows = computed(() => {
       if (headNorth.value) {
         nextRow.north = headNorth.value;
       }
-      result.push(nextRow);
-      nextRow = {};
+      addRow(nextRow);
     } else {
       const hs = headSouth.value;
       let hn = headNorth.value;
       if (hs && hn) {
         nextRow.north = hn;
         hn = undefined;
-        result.push(nextRow);
-        nextRow = {};
+        addRow(nextRow);
       }
       if (hs) {
         if (nextRow.south) {
           // Swap
           nextRow.north = nextRow.south;
           nextRow.south = hs;
-          result.push(nextRow);
-          nextRow = {};
+          addRow(nextRow);
         } else {
           nextRow.south = hs;
         }
       }
       if (hn) {
         nextRow.north = hn;
-        result.push(nextRow);
-        nextRow = {};
+        addRow(nextRow);
       }
       if (Object.keys(nextRow).length > 0) {
-        result.push(nextRow);
-        nextRow = {};
+        addRow(nextRow);
       }
     }
   }
@@ -470,7 +518,9 @@ const rows = computed(() => {
           const officerInNorthOfJWRow = { ...jwRow.north };
           const officerInSouthOfJWRow = { ...jwRow.south };
           const officerToMove =
-            officerInNorthOfJWRow.rank === 'JGW' ? officerInSouthOfJWRow : officerInNorthOfJWRow;
+            officerInNorthOfJWRow.id === juniorWarden.value.id
+              ? officerInSouthOfJWRow
+              : officerInNorthOfJWRow;
           jwRow.south = seniorWarden.value;
           jwRow.north = juniorWarden.value;
           swRow.north = officerToMove as Officer;
@@ -488,6 +538,10 @@ async function printProcession() {
 </script>
 
 <style lang="scss" scoped>
+.row-number {
+  min-width: 20px;
+}
+
 .v-card-text {
   display: flex;
   flex-direction: column;

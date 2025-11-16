@@ -230,8 +230,8 @@ const emits = defineEmits(['load-officers', 'delete-officer', 'save-changes']);
 
 const ranks = useRuntimeConfig().public.ranks as Rank[];
 
-const positionsRes = await $fetch('/api/ov/positions');
-const positions = positionsRes ?? [];
+const _positionsRes = await $fetch('/api/ov/positions');
+const positions = _positionsRes ?? [];
 
 const sortedOfficers = computed(() => {
   const priority = {
@@ -249,9 +249,40 @@ const sortedOfficers = computed(() => {
   });
 });
 
+const processionRows = computed(() => {
+  return (
+    Math.ceil(
+      props.officers.filter(
+        (o) =>
+          !['vip', 'sword_bearer', 'standard_bearer'].includes(o.position ?? '') &&
+          !o.excludeFromProcession
+      ).length / 2
+    ) - 1
+  ); // Reduce by 1 as the last row is handled by "head_of...."
+});
+
+const dynamicRowPositions = computed(() => {
+  const rows = [];
+
+  for (let n = 1; n <= processionRows.value; n++) {
+    rows.push(`row_${n}_south`);
+    rows.push(`row_${n}_north`);
+  }
+
+  return rows;
+});
+
+const allPositions = computed(() => {
+  return [...positions, ...dynamicRowPositions.value];
+});
+
 const availablePositions = computed(() => {
-  return positions.filter((pos: string) => {
-    return pos === 'automatic' || !props.officers.some((officer) => officer.position === pos);
+  return allPositions.value.filter((pos: string) => {
+    // 'automatic' always allowed
+    if (pos === 'automatic') return true;
+
+    // Check if any officer is using that position
+    return !props.officers.some((officer) => officer.position === pos);
   });
 });
 
