@@ -14,6 +14,13 @@ export default defineEventHandler(async (event) => {
 
   const ov = await prisma.oV.findUnique({ where: { id: ovId } });
 
+  if (!ov) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid OV id',
+    });
+  }
+
   // Fetch officers for this ovId
   const officers = await prisma.officer.findMany({
     where: { ovId },
