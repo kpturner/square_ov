@@ -38,7 +38,7 @@
             <v-checkbox v-model="item.attending" label="Attended" hide-details density="compact"
           /></v-col>
           <v-col cols="2">
-            <v-checkbox v-model="item.original" label="Original" hide-details density="compact"
+            <v-checkbox v-model="item.original" label="Allocated" hide-details density="compact"
           /></v-col>
         </v-row> </v-card
     ></template>
@@ -92,7 +92,7 @@ const sortedOfficers = computed(() => {
 const headers = [
   { title: 'Name', key: 'fullName', sortable: false },
   { title: 'Attended', key: 'attending', align: 'center' as const, width: '80px' },
-  { title: 'Original Party', key: 'original', align: 'center' as const, width: '80px' },
+  { title: 'Allocated officer', key: 'original', align: 'center' as const, width: '80px' },
 ];
 </script>
 

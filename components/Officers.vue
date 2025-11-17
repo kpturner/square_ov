@@ -143,7 +143,7 @@
             <v-col cols="6">
               <v-checkbox
                 v-model="item.original"
-                label="In original party"
+                label="Allocated officer"
                 hide-details
                 density="compact"
               />
