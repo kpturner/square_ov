@@ -33,7 +33,9 @@
     <template v-else
       ><v-card v-for="item in sortedOfficers" :key="item.id" class="officer-card ma-1">
         <v-row dense class="align-center">
-          <v-col cols="8"> {{ fullName(item) }}</v-col>
+          <v-col cols="8">
+            <span class="ms-2">{{ fullName(item) }}</span></v-col
+          >
           <v-col cols="2">
             <v-checkbox v-model="item.attending" label="Attended" hide-details density="compact"
           /></v-col>

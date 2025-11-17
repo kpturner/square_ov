@@ -39,6 +39,14 @@
             Print
           </v-btn>
           <v-btn
+            color="secondary"
+            prepend-icon="mdi-download"
+            class="w-100 w-sm-auto me-2 mb-2"
+            @click="download"
+          >
+            Download
+          </v-btn>
+          <v-btn
             color="success"
             prepend-icon="mdi-content-save"
             class="w-100 w-sm-auto"
@@ -59,6 +67,14 @@
             @click="printReport"
           >
             Print
+          </v-btn>
+          <v-btn
+            color="secondary"
+            prepend-icon="mdi-download"
+            class="w-100 w-sm-auto me-2 mb-2"
+            @click="download"
+          >
+            Download
           </v-btn>
           <v-btn
             color="success"
@@ -99,12 +115,18 @@ import type { OV, Officer } from '@prisma/client';
 const route = useRoute();
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
+const ovId = Number(route.params.id);
 
 const loading = ref(true);
 
 onMounted(async () => {
   await loadOfficers();
 });
+
+const download = () => {
+  const url = `/api/officers/export?ovId=${ovId}`;
+  window.location.href = url;
+};
 
 function formatDate(dateStr: string | Date) {
   if (!dateStr) return '';
@@ -113,7 +135,6 @@ function formatDate(dateStr: string | Date) {
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id);
   const res = await $fetch(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
