@@ -20,16 +20,31 @@
           <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
             >Officers for OV to {{ officialVisit?.name || '...' }}</span
           >
-          <v-btn
-            v-if="officialVisit"
-            color="secondary"
-            prepend-icon="mdi-seat"
-            class="mb-2 w-100 w-sm-auto"
-            small
-            @click="reservations"
-          >
-            Seat reservations
-          </v-btn>
+          <v-row v-if="officialVisit" class="mb-2" dense>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                color="secondary"
+                prepend-icon="mdi-seat"
+                class="w-100"
+                small
+                @click="reservations"
+              >
+                Seat reservations
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                v-if="officialVisit"
+                color="info"
+                prepend-icon="mdi-file"
+                class="w-100"
+                small
+                @click="attendance"
+              >
+                Attendance report
+              </v-btn>
+            </v-col>
+          </v-row>
         </div>
       </v-card-title>
 
@@ -47,7 +62,7 @@
           </v-btn>
 
           <v-btn
-            color="green"
+            color="success"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
             prepend-icon="mdi-plus"
             @click="addOfficerDialog = true"
@@ -65,12 +80,7 @@
           </v-btn>
         </div>
 
-        <Officers
-          :officers
-          @load-officers="loadOfficers"
-          @delete-officer="deleteOfficer"
-          @save-changes="saveAll"
-        />
+        <Officers :officers @delete-officer="deleteOfficer" @save-changes="saveAll" />
 
         <!-- Bottom Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
@@ -85,7 +95,7 @@
           </v-btn>
 
           <v-btn
-            color="green"
+            color="success"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
             prepend-icon="mdi-plus"
             @click="addOfficerDialog = true"
@@ -135,23 +145,38 @@
 
     <Procession
       v-if="!loading && officialVisit"
-      :officers="officers.filter((o) => !o.excludeFromProcession)"
+      :officers="officers.filter((o) => !o.excludeFromProcession && o.attending)"
       :official-visit
     />
 
     <v-card v-if="!loading" class="no-print">
       <v-card-title class="d-flex justify-space-between align-center">
         <div class="w-100 d-flex flex-column" style="align-items: flex-start">
-          <v-btn
-            v-if="officialVisit"
-            color="secondary"
-            prepend-icon="mdi-seat"
-            class="mb-2 w-100 w-sm-auto"
-            small
-            @click="reservations"
-          >
-            Seat reservations
-          </v-btn>
+          <v-row v-if="officialVisit" class="mb-2" dense>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                color="secondary"
+                prepend-icon="mdi-seat"
+                class="w-100"
+                small
+                @click="reservations"
+              >
+                Seat reservations
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                v-if="officialVisit"
+                color="info"
+                prepend-icon="mdi-file"
+                class="w-100"
+                small
+                @click="attendance"
+              >
+                Attendance report
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-btn
             color="primary"
             prepend-icon="mdi-home"
@@ -321,6 +346,8 @@ async function addOfficer() {
       active: true,
       position: 'automatic',
       excludeFromProcession: false,
+      original: false,
+      attending: true,
       ovId: Number(route.params.id),
     });
     makeToast(`${name} ${ao.provincialRank} added to list.`);
@@ -349,6 +376,8 @@ async function addVIP() {
       active: true,
       position: 'vip',
       excludeFromProcession: false,
+      original: true,
+      attending: true,
       ovId: Number(route.params.id),
     });
     makeToast(`${vip.name} ${vip.provincialRank} added to list.`);
@@ -373,6 +402,8 @@ function addEmptyOfficer(position?: Position) {
     active: true,
     position: position ?? 'automatic',
     excludeFromProcession: false,
+    original: false,
+    attending: true,
     ovId: Number(route.params.id),
   });
 }
@@ -397,6 +428,11 @@ async function confirmedDeletion() {
 async function reservations() {
   await saveAll();
   router.push(`/ov/${officialVisit.value?.id}.reservations`);
+}
+
+async function attendance() {
+  await saveAll();
+  router.push(`/ov/${officialVisit.value?.id}.attendance`);
 }
 
 async function saveAll() {

@@ -43,6 +43,8 @@ model Officer {
   position              String
   grandActive           Boolean?
   grandRank             String?
+  original              Boolean?
+  attending             Boolean?
   excludeFromProcession Boolean?
   ov                    OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
 

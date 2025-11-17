@@ -21,29 +21,55 @@
           class="d-flex flex-column flex-sm-row align-start align-sm-center justify-space-between w-100"
         >
           <div v-if="officialVisit" class="text-subtitle-1 text-lg-h6 mb-2 mb-sm-0 text-wrap">
-            Seat reservations for OV to {{ officialVisit?.name || '...' }}
+            Attendance report for OV to {{ officialVisit?.name || '...' }} on
+            {{ formatDate(officialVisit?.ovDate) }}
           </div>
-
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-printer"
-            class="w-100 w-sm-auto"
-            @click="printReservations"
-          >
-            Print
-          </v-btn>
         </div>
       </v-card-title>
 
-      <v-text-field
-        v-model="spares"
-        type="number"
-        label="Spares"
-        class="w-auto"
-        style="max-width: 100px"
-      />
+      <v-container fluid class="pa-4">
+        <!-- Top Actions -->
+        <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-printer"
+            class="w-100 w-sm-auto me-2 mb-2"
+            @click="printReport"
+          >
+            Print
+          </v-btn>
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-content-save"
+            class="w-100 w-sm-auto"
+            @click="saveAll"
+          >
+            Save Changes
+          </v-btn>
+        </div>
 
-      <SeatReservations :officers="attendingOfficers" :spares />
+        <Attendance :official-visit :officers />
+
+        <!-- Bottom Actions -->
+        <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
+          <v-btn
+            color="primary"
+            prepend-icon="mdi-printer"
+            class="w-100 w-sm-auto no-print me-2"
+            @click="printReport"
+          >
+            Print
+          </v-btn>
+          <v-btn
+            color="success"
+            prepend-icon="mdi-content-save"
+            class="w-100 w-sm-auto"
+            @click="saveAll"
+          >
+            Save Changes
+          </v-btn>
+        </div>
+      </v-container>
     </v-card>
 
     <v-card v-if="!loading" class="no-print">
@@ -59,18 +85,10 @@
         >
           Back
         </v-btn>
-        <v-btn
-          color="primary"
-          prepend-icon="mdi-printer"
-          class="w-100 w-sm-auto no-print"
-          @click="printReservations"
-        >
-          Print
-        </v-btn>
       </v-card-title>
     </v-card>
 
-    <SeatReservations class="only-print" :officers print-mode :spares />
+    <Attendance class="only-print" :official-visit :officers print-mode />
   </v-container>
 </template>
 
@@ -81,7 +99,6 @@ import type { OV, Officer } from '@prisma/client';
 const route = useRoute();
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
-const spares = ref(2);
 
 const loading = ref(true);
 
@@ -89,9 +106,11 @@ onMounted(async () => {
   await loadOfficers();
 });
 
-const attendingOfficers = computed(() => {
-  return officers.value.filter((o) => o.attending);
-});
+function formatDate(dateStr: string | Date) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
+}
 
 async function loadOfficers() {
   const ovId = Number(route.params.id);
@@ -107,7 +126,21 @@ async function loadOfficers() {
   loading.value = false;
 }
 
-function printReservations() {
+async function saveAll() {
+  const ovId = Number(route.params.id);
+  await $fetch(`/api/officers?ovId=${ovId}`, {
+    method: 'PUT',
+    body: officers.value.map((o) => ({
+      ...o,
+      provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
+      grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
+    })),
+  });
+  await loadOfficers();
+}
+
+async function printReport() {
+  await saveAll();
   window.print();
 }
 </script>

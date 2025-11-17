@@ -30,6 +30,8 @@ export default defineEventHandler(async (event) => {
             grandActive: o.grandActive,
             position: o.position,
             excludeFromProcession: o.excludeFromProcession,
+            attending: o.attending,
+            original: o.original,
             ovId,
           },
         });

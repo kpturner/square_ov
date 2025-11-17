@@ -6,6 +6,7 @@
       :items-per-page="officers.length"
       item-value="id"
       class="mt-2"
+      density="compact"
     >
       <template #item.name="{ item }">
         <v-text-field v-model="item.name" density="compact" hide-details placeholder="Name" />
@@ -20,6 +21,21 @@
           hide-details
           placeholder="Prov rank"
         />
+      </template>
+
+      <template #item.attending="{ item }">
+        <div class="checkbox-cell">
+          <v-tooltip text="Attending">
+            <template #activator="{ props: tooltipProps }">
+              <v-checkbox
+                v-bind="tooltipProps"
+                v-model="item.attending"
+                hide-details
+                density="compact"
+              />
+            </template>
+          </v-tooltip>
+        </div>
       </template>
 
       <template #item.provOfficerYear="{ item }">
@@ -84,12 +100,16 @@
 
       <template #item.excludeFromProcession="{ item }">
         <div class="checkbox-cell">
-          <v-checkbox
-            v-model="item.excludeFromProcession"
-            hide-details
-            density="compact"
-            title="Exclude from procession"
-          />
+          <v-tooltip text="Exclude from procession">
+            <template #activator="{ props: tooltipProps }">
+              <v-checkbox
+                v-bind="tooltipProps"
+                v-model="item.excludeFromProcession"
+                hide-details
+                density="compact"
+              />
+            </template>
+          </v-tooltip>
         </div>
       </template>
 
@@ -111,6 +131,24 @@
       <v-col v-for="(item, i) in sortedOfficers" :key="item.id ?? i" cols="12">
         <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
           <v-row dense>
+            <v-col cols="6">
+              <v-checkbox
+                v-model="item.attending"
+                label="Attending"
+                hide-details
+                density="compact"
+              />
+            </v-col>
+
+            <v-col cols="6">
+              <v-checkbox
+                v-model="item.original"
+                label="In original party"
+                hide-details
+                density="compact"
+              />
+            </v-col>
+
             <v-col cols="12">
               <v-text-field v-model="item.name" label="Name" density="compact" />
             </v-col>
@@ -226,7 +264,7 @@ import type { Officer } from '@prisma/client';
 
 const props = defineProps<{ officers: Officer[] }>();
 
-const emits = defineEmits(['load-officers', 'delete-officer', 'save-changes']);
+const emits = defineEmits(['delete-officer', 'save-changes']);
 
 const ranks = useRuntimeConfig().public.ranks as Rank[];
 
@@ -329,21 +367,30 @@ const availablePositions = computed(() => {
 });
 
 const headers = [
+  { title: '', key: 'attending', align: 'center' as const },
   { title: 'Name', key: 'name', minWidth: '230px' },
   { title: 'Provincial Rank', key: 'rank', width: '200px' },
-  { title: 'Active', key: 'active', align: 'center' as const, width: '80px' },
+  { title: 'Active', key: 'active', align: 'center' as const },
   { title: 'Prov year', key: 'provOfficerYear', width: '115px' },
   { title: 'Position in procession', key: 'position', width: '210px' },
-  { title: 'Grand Officer', key: 'grandOfficer', align: 'center' as const, width: '80px' },
+  { title: 'GO', key: 'grandOfficer', align: 'center' as const },
   { title: 'Grand Rank', key: 'grandRank', width: '200px' },
-  { title: 'Active', key: 'grandActive', align: 'center' as const, width: '80px' },
+  { title: 'Active', key: 'grandActive', align: 'center' as const },
   { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
-  { title: 'Exclude', key: 'excludeFromProcession', align: 'center' as const, width: '80px' },
-  { title: 'Actions', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
+  { title: 'Excl', key: 'excludeFromProcession', align: 'center' as const },
+  { title: '', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
 ];
 </script>
 
 <style lang="scss" scoped>
+.checkbox-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.checkbox-cell .v-checkbox {
+  margin: 0 !important; /* remove Vuetify checkbox margin */
+}
 ::v-deep(.v-data-table th),
 ::v-deep(.v-data-table td) {
   padding-left: 4px !important;

@@ -26,7 +26,7 @@
           <!-- Top Actions -->
           <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
             <v-btn
-              color="green"
+              color="success"
               class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
               prepend-icon="mdi-plus"
               @click="openDialog()"
@@ -55,7 +55,7 @@
                   class="me-2"
                   icon="mdi-account-group"
                   size="small"
-                  color="green"
+                  color="success"
                   variant="elevated"
                   title="Procession"
                   @click="goToOfficers(item)"
@@ -68,6 +68,15 @@
                   variant="elevated"
                   title="Reservations"
                   @click="$router.push(`/ov/${item.id}.reservations`)"
+                />
+                <v-btn
+                  class="me-2"
+                  icon="mdi-file"
+                  size="small"
+                  color="info"
+                  variant="elevated"
+                  title="Attendance"
+                  @click="$router.push(`/ov/${item.id}.attendance`)"
                 />
                 <v-btn
                   icon="mdi-delete"
@@ -123,7 +132,7 @@
                     <v-btn
                       icon="mdi-account-group"
                       size="small"
-                      color="green"
+                      color="success"
                       variant="elevated"
                       title="Procession"
                       class="me-2"
@@ -141,6 +150,16 @@
                     />
 
                     <v-btn
+                      class="me-2"
+                      icon="mdi-file"
+                      size="small"
+                      color="info"
+                      variant="elevated"
+                      title="Attendance"
+                      @click="$router.push(`/ov/${item.id}.attendance`)"
+                    />
+
+                    <v-btn
                       icon="mdi-delete"
                       size="small"
                       color="red"
@@ -155,7 +174,7 @@
           <!-- Bottom Actions -->
           <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
             <v-btn
-              color="green"
+              color="success"
               class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
               prepend-icon="mdi-plus"
               @click="openDialog()"
@@ -400,6 +419,8 @@ const addOfficer = async (
     active: true,
     position,
     excludeFromProcession: false,
+    original: true,
+    attending: true,
     ovId,
   });
 };
