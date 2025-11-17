@@ -39,7 +39,7 @@
             Print
           </v-btn>
           <v-btn
-            color="primary"
+            color="success"
             prepend-icon="mdi-content-save"
             class="w-100 w-sm-auto"
             @click="saveAll"
