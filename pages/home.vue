@@ -416,9 +416,10 @@ const addOfficer = async (
 ) => {
   const activeOfficer = activeOfficers.value.find((ao) => ao.number === officerNo) as ActiveOfficer;
   const firstName = activeOfficer.familiarName ?? activeOfficer.givenName.split(' ')[0];
+  const suffix = `${activeOfficer.postNominals ? activeOfficer.postNominals : ''} (${activeOfficer.number})`;
   officers.push({
     id: 0,
-    name: `${firstName} ${activeOfficer.familyName} (${activeOfficer.number})`,
+    name: `${firstName} ${activeOfficer.familyName} ${suffix}`,
     rank: activeOfficer.provincialRank.replace('Prov', '').toUpperCase(),
     provOfficerYear: null,
     grandOfficer: false,

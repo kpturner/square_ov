@@ -68,6 +68,7 @@ model ActiveOfficer {
   givenName      String
   familyName     String
   familiarName   String?
+  postNominals   String?
 
   // Reverse relations (optional, but handy if you want to query back)
   oVMastersAsSword    OVMaster[] @relation("SwordRelation")
