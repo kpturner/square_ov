@@ -347,7 +347,7 @@ const selectedOVName = computed(() => {
   return `${selectedMasterOV.value.lodgeName.trim()}${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? ' Lodge ' : ' '}No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
 });
 
-const addVIP = async (ovId: number, vipName: string) => {
+const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
   const vip = await $fetch<VIP>(`/api/vip/${masonicYear}/${vipName}`);
   return {
     id: 0,
@@ -360,11 +360,14 @@ const addVIP = async (ovId: number, vipName: string) => {
     grandRank: null,
     active: true,
     position: 'vip',
+    original: true,
+    attending: true,
+    excludeFromProcession: null,
     ovId,
   };
 };
 
-const addDC = async (ovId: number, name: string) => {
+const addDC = async (ovId: number, name: string): Promise<Officer> => {
   const dc = activeOfficers.value.find((ao) => {
     const compareName = `${ao.familiarName ? ao.familiarName : ao.givenName} ${ao.familyName}`;
     return compareName.toUpperCase() === name.toUpperCase();
@@ -381,6 +384,9 @@ const addDC = async (ovId: number, name: string) => {
       grandRank: null,
       active: true,
       position: 'head_of_south',
+      original: true,
+      attending: true,
+      excludeFromProcession: null,
       ovId,
     };
   }
@@ -395,6 +401,9 @@ const addDC = async (ovId: number, name: string) => {
     grandRank: null,
     active: true,
     position: 'head_of_south',
+    original: true,
+    attending: true,
+    excludeFromProcession: null,
     ovId,
   };
 };
@@ -418,7 +427,7 @@ const addOfficer = async (
     grandRank: null,
     active: true,
     position,
-    excludeFromProcession: false,
+    excludeFromProcession: null,
     original: true,
     attending: true,
     ovId,
