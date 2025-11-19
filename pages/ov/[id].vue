@@ -426,16 +426,38 @@ async function confirmedDeletion() {
 }
 
 async function reservations() {
-  await saveAll();
-  router.push(`/ov/${officialVisit.value?.id}.reservations`);
+  if (await saveAll()) {
+    router.push(`/ov/${officialVisit.value?.id}.reservations`);
+  }
 }
 
 async function attendance() {
-  await saveAll();
-  router.push(`/ov/${officialVisit.value?.id}.attendance`);
+  if (await saveAll()) {
+    router.push(`/ov/${officialVisit.value?.id}.attendance`);
+  }
 }
 
 async function saveAll() {
+  // check for duplicates
+  const dups: string[] = [];
+  if (
+    officers.value.some((o) => {
+      const dup = officers.value.some(
+        (o2) => o2.id !== o.id && o2.name.toLowerCase() === o.name.toLowerCase()
+      );
+      if (dup) {
+        if (!dups.includes(o.name)) {
+          dups.push(o.name);
+        }
+      }
+      return dup;
+    })
+  ) {
+    dups.forEach((d) => {
+      makeToast(`You appear to have a duplicate name: ${d}`, 'error');
+    });
+    return false;
+  }
   const ovId = Number(route.params.id);
   await $fetch(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
@@ -446,6 +468,7 @@ async function saveAll() {
     })),
   });
   await loadOfficers();
+  return true;
 }
 
 let timeout: ReturnType<typeof setTimeout>;

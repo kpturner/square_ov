@@ -497,6 +497,11 @@ const rows = computed(() => {
     }
   }
 
+  // If we get here and we still have a populated row, add it
+  if (nextRow.south) {
+    addRow(nextRow);
+  }
+
   // Now if we have both the ProvSGW and the ProvJGW, ensure they are in the same row
   if (seniorWarden.value && juniorWarden.value && props.officialVisit?.alignWardens) {
     let sgwRowIndex = -1;
