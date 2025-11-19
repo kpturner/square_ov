@@ -48,9 +48,9 @@
           </div>
           <!-- DESKTOP -->
           <v-responsive class="hidden-md-and-down">
-            <v-data-table :headers="headers" :items="formattedOVs" class="mt-4">
+            <v-data-table :headers="headers" :items="ovs" class="mt-4">
               <template #item.ovDate="{ item }">
-                {{ item.displayDate }}
+                {{ formatDate(item.ovDate) }}
               </template>
               <template #item.actions="{ item }">
                 <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />

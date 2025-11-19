@@ -35,9 +35,9 @@
           </div>
           <!-- DESKTOP -->
           <v-responsive class="hidden-md-and-down">
-            <v-data-table :headers="headers" :items="formattedOVs" class="mt-4">
-              <template #item.ovDate="{ item }">
-                {{ item.displayDate }}
+            <v-data-table :headers="headers" :items="ovMasters" class="mt-4">
+              <template #item.date="{ item }">
+                {{ formatDate(item.date) }}
               </template>
               <template #item.actions="{ item }">
                 <v-btn
@@ -189,7 +189,7 @@ const formattedOVs = computed(() => {
 const headers = [
   { title: 'Name', key: 'lodgeName' },
   { title: 'No', key: 'lodgeNumber' },
-  { title: 'Date', key: 'displayDate' },
+  { title: 'Date', key: 'date' },
   { title: 'VIP', key: 'vip' },
   { title: 'DC', key: 'dc' },
   { title: '', key: 'actions', sortable: false },
