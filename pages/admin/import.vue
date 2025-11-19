@@ -27,11 +27,7 @@
       <v-card class="pa-6 mb-4">
         <v-row>
           <v-col>
-            <v-text-field
-              v-model="year"
-              label="Masonic year"
-              :placeholder="String(new Date().getFullYear())"
-            />
+            <v-text-field v-model="year" label="Masonic year" />
           </v-col>
         </v-row>
         <v-row>

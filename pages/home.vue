@@ -1,26 +1,38 @@
 <template>
-  <v-container>
+  <v-container fluid class="pa-4">
     <client-only>
       <v-overlay v-model="loading" absolute class="d-flex align-center justify-center">
         <v-progress-circular indeterminate size="64" color="primary" />
       </v-overlay>
     </client-only>
+
     <v-row>
       <v-col>
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
             <div class="w-100 d-flex flex-column align-start">
-              <v-btn
-                color="red-darken-3"
-                prepend-icon="mdi-import"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                title="Here be dragons!!"
-                @click="$router.push('/admin/import')"
-              >
-                Imports
-              </v-btn>
-              <span class="text-h5">Official Visits</span>
+              <div class="mb-2 w-100 d-flex justify-space-between align-start">
+                <v-btn
+                  color="red-darken-3"
+                  prepend-icon="mdi-import"
+                  small
+                  title="Here be dragons!!"
+                  @click="$router.push('/admin/import')"
+                >
+                  Imports
+                </v-btn>
+
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-clipboard-list"
+                  small
+                  title="Master OV list"
+                  @click="$router.push('/ov/list')"
+                >
+                  Master OV list
+                </v-btn>
+              </div>
+              <span class="text-h5">My Official Visits</span>
             </div>
           </v-card-title>
           <!-- Top Actions -->
@@ -97,7 +109,7 @@
                 <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
                   <v-row dense>
                     <v-col cols="12">
-                      <v-text-field v-model="item.name" label="Date" density="compact" readonly />
+                      <v-text-field v-model="item.name" label="Name" density="compact" readonly />
                     </v-col>
 
                     <v-col cols="12">
@@ -271,7 +283,7 @@ const editedOV = ref<EditedOV>({});
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Date', key: 'ovDate' },
-  { title: 'Actions', key: 'actions', sortable: false },
+  { title: '', key: 'actions', sortable: false },
 ];
 
 async function loadOVs() {
