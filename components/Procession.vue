@@ -295,9 +295,9 @@ const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
     const bnum = activeNumberToConsider(b);
     if (anum !== null && bnum !== null) {
       if (anum > bnum) {
-        return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? 1 : -1;
+        return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? -1 : 1;
       }
-      return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? -1 : 1;
+      return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? 1 : -1;
     }
   }
   return null;
