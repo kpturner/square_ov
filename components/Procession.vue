@@ -353,7 +353,7 @@ const automatic = computed(() =>
       }
 
       // Rank seniority
-      const rankRes = rankCompare(a.rank, b.rank);
+      const rankRes = rankCompare(rankToConsider(a), rankToConsider(b));
       if (rankRes !== null) {
         return rankRes;
       }
