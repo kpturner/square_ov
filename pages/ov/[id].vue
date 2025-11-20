@@ -52,7 +52,6 @@
         <!-- Top Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
           <v-btn
-            v-if="!hasVIP"
             color="red"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
             prepend-icon="mdi-plus"
@@ -85,7 +84,6 @@
         <!-- Bottom Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
           <v-btn
-            v-if="!hasVIP"
             color="red"
             class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
             prepend-icon="mdi-plus"
@@ -374,7 +372,7 @@ async function addVIP() {
       grandActive: false,
       grandRank: null,
       active: true,
-      position: 'vip',
+      position: hasVIP.value ? 'automatic' : 'vip',
       excludeFromProcession: false,
       original: true,
       attending: true,

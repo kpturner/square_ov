@@ -270,6 +270,19 @@ const provYearCompare = (a: Officer, b: Officer): number | null => {
   return null;
 };
 
+const rankCompare = (a: string | null, b: string | null): number | null => {
+  const aRankIndex = ranksInProcessionOrder.value.findIndex((r) => r.value === a);
+  const bRankIndex = ranksInProcessionOrder.value.findIndex((r) => r.value === b);
+
+  if (aRankIndex !== bRankIndex) {
+    return (
+      (aRankIndex !== -1 ? aRankIndex : ranks.length) -
+      (bRankIndex !== -1 ? bRankIndex : ranks.length)
+    );
+  }
+  return null;
+};
+
 const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
   if (
     !['JGW', 'SGW'].includes(rankToConsider(a) ?? '') &&
@@ -288,12 +301,35 @@ const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
   return null;
 };
 
+const isActiveVIP = (o: Officer) => {
+  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && o.active;
+};
+
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
   props.officers
     .filter((o) => o.position === 'automatic')
     .sort((a, b) => {
-      // Grand officer first
+      // Deal with active VIPs classed as automatic
+      if (isActiveVIP(a) && isActiveVIP(b)) {
+        // VIP Rank seniority
+        const rankRes = rankCompare(a.rank, b.rank);
+        if (rankRes !== null) {
+          return rankRes;
+        } else {
+          // Prov year for equal active VIPs
+          const pyRes = provYearCompare(a, b);
+          if (pyRes !== null) {
+            return pyRes;
+          }
+        }
+      }
+
+      // Active VIPs outrank non-active VIPs
+      if (isActiveVIP(a) && !isActiveVIP(b)) return -1;
+      if (!isActiveVIP(a) && isActiveVIP(b)) return 1;
+
+      // Grand officer comparisons
       if (a.grandOfficer && !b.grandOfficer) return -1;
       if (!a.grandOfficer && b.grandOfficer) return 1;
 
@@ -317,18 +353,10 @@ const automatic = computed(() =>
       }
 
       // Rank seniority
-      const aRankIndex = ranksInProcessionOrder.value.findIndex(
-        (r) => r.value === rankToConsider(a)
-      );
-      const bRankIndex = ranksInProcessionOrder.value.findIndex(
-        (r) => r.value === rankToConsider(b)
-      );
-
-      if (aRankIndex !== bRankIndex)
-        return (
-          (aRankIndex !== -1 ? aRankIndex : ranks.length) -
-          (bRankIndex !== -1 ? bRankIndex : ranks.length)
-        );
+      const rankRes = rankCompare(a.rank, b.rank);
+      if (rankRes !== null) {
+        return rankRes;
+      }
 
       // Grand Officers: active grand rank outranks non-active
       if (a.grandOfficer && b.grandOfficer && rankToConsider(a) === rankToConsider(b)) {
