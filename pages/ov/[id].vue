@@ -441,7 +441,7 @@ async function saveAll() {
   if (
     officers.value.some((o) => {
       const dup = officers.value.some(
-        (o2) => o2.id !== o.id && o2.name.toLowerCase() === o.name.toLowerCase()
+        (o2) => o2.id !== o.id && o2.name.trim().toLowerCase() === o.name.trim().toLowerCase()
       );
       if (dup) {
         if (!dups.includes(o.name)) {
