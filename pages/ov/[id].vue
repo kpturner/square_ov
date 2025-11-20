@@ -124,6 +124,13 @@
           hide-details
         />
         <v-checkbox
+          v-model="reverseStewardOrder"
+          class="no-print ms-3"
+          label="Reverse steward order?"
+          dense
+          hide-details
+        />
+        <v-checkbox
           v-model="activeDCsFront"
           class="no-print ms-3"
           label="Active DCs at front?"
@@ -266,6 +273,7 @@ const selectedVIPId = ref(null);
 const activeDCsFront = ref(false);
 const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
+const reverseStewardOrder = ref(false);
 
 const loading = ref(true);
 
@@ -320,6 +328,7 @@ async function loadOfficers() {
   alignActiveWardens.value = officialVisit.value?.alignWardens ?? false;
   activeDCsFront.value = officialVisit.value?.activeDCsFront ?? false;
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
+  reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
   loading.value = false;
 }
 
@@ -479,6 +488,7 @@ const saveBooleans = () => {
         alignWardens: alignActiveWardens.value,
         activeDCsFront: activeDCsFront.value,
         includeGrandOfficers: includeGrandOfficers.value,
+        reverseStewardOrder: reverseStewardOrder.value,
       };
       officialVisit.value = await $fetch<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
         method: 'PUT',
@@ -490,7 +500,10 @@ const saveBooleans = () => {
   }, 400);
 };
 
-watch([alignActiveWardens, activeDCsFront, includeGrandOfficers], saveBooleans);
+watch(
+  [alignActiveWardens, reverseStewardOrder, activeDCsFront, includeGrandOfficers],
+  saveBooleans
+);
 </script>
 
 <style lang="scss" scoped></style>

@@ -284,18 +284,20 @@ const rankCompare = (a: string | null, b: string | null): number | null => {
 };
 
 const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
+  const ranka = rankToConsider(a);
+  const rankb = rankToConsider(b);
   if (
     !['JGW', 'SGW'].includes(rankToConsider(a) ?? '') &&
-    rankToConsider(a) === rankToConsider(b) &&
+    ranka === rankb &&
     a.active === b.active
   ) {
     const anum = activeNumberToConsider(a);
     const bnum = activeNumberToConsider(b);
     if (anum !== null && bnum !== null) {
       if (anum > bnum) {
-        return 1;
+        return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? -1 : 1;
       }
-      return -1;
+      return ranka === 'GSTWD' && props.officialVisit?.reverseStewardOrder ? 1 : -1;
     }
   }
   return null;

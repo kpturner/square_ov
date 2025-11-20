@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
       alignWardens: body.alignWardens,
       activeDCsFront: body.activeDCsFront,
       includeGrandOfficers: body.includeGrandOfficers,
+      reverseStewardOrder: body.reverseStewardOrder,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
     },
   });

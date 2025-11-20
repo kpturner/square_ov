@@ -27,6 +27,7 @@ model OV {
   alignWardens         Boolean   @default(true)
   activeDCsFront       Boolean   @default(true)
   includeGrandOfficers Boolean   @default(false)
+  reverseStewardOrder  Boolean   @default(false)
 
   @@index([userId], map: "OV_userId_fkey")
 }

@@ -21,6 +21,7 @@ export default defineEventHandler(async (event) => {
       alignWardens: ov.alignWardens,
       activeDCsFront: ov.activeDCsFront,
       includeGrandOfficers: ov.includeGrandOfficers,
+      reverseStewardOrder: ov.reverseStewardOrder,
       officers: {
         create: ov.officers.map(({ id, ovId, ...officer }) => officer),
       },
