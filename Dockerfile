@@ -44,7 +44,7 @@ COPY --from=build-stage /usr/src/app/start.sh ./start.sh
 COPY --from=build-stage /usr/src/app/prisma ./prisma
 
 # Create minimal package.json for prisma only
-RUN echo '{ "dependencies": { "@prisma/client": "latest", "prisma": "latest" } }' > package.json
+RUN echo '{ "dependencies": { "@prisma/client": "6.18.0", "prisma": "6.18.0" } }' > package.json
 
 RUN yarn install --frozen-lockfile --production && \
     apt-get update && \
