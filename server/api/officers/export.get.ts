@@ -58,7 +58,7 @@ export default defineEventHandler(async (event) => {
       active: o.active ? 'Yes' : '',
       grandOfficer: o.grandOfficer ? 'Yes' : '',
       grandActive: o.grandActive ? 'Yes' : '',
-      excludeFromProcession: o.excludeFromProcession ? '' : 'Yes',
+      excludeFromProcession: o.attending ? (o.excludeFromProcession ? '' : 'Yes') : 'n/a',
     });
   });
 
