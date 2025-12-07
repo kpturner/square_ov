@@ -428,6 +428,7 @@ async function deleteOfficer(officer: Officer) {
 async function confirmedDeletion() {
   if (officerToDelete.value) {
     await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
+    makeToast(`${officerToDelete.value.name} ${officerToDelete.value.rank} removed from the list.`);
     await loadOfficers();
   }
 }
@@ -461,7 +462,7 @@ async function saveAll() {
     })
   ) {
     dups.forEach((d) => {
-      makeToast(`You appear to have a duplicate name: ${d}`, 'error');
+      makeToast(`You appear to have a duplicate name: ${d}.`, 'error');
     });
     return false;
   }
@@ -474,7 +475,7 @@ async function saveAll() {
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
     })),
   });
-  makeToast('All changes saved successfully');
+  makeToast('All changes saved successfully.');
   await loadOfficers();
   return true;
 }
