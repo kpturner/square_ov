@@ -91,11 +91,18 @@ const sortedOfficers = computed(() => {
   });
 });
 
-const headers = [
+const attendingText = computed(() => {
+  if (!props.officialVisit?.ovDate) return 'Attending';
+  const ovDate = new Date(props.officialVisit.ovDate).getTime();
+  const today = new Date().getTime();
+  return ovDate >= today ? 'Attending' : 'Attended';
+});
+
+const headers = computed(() => [
   { title: 'Name', key: 'fullName', sortable: false },
-  { title: 'Attended', key: 'attending', align: 'center' as const, width: '80px' },
+  { title: attendingText.value, key: 'attending', align: 'center' as const, width: '80px' },
   { title: 'Allocated officer', key: 'original', align: 'center' as const, width: '80px' },
-];
+]);
 </script>
 
 <style lang="scss" scoped>
