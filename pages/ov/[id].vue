@@ -474,6 +474,7 @@ async function saveAll() {
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
     })),
   });
+  makeToast('All changes saved successfully');
   await loadOfficers();
   return true;
 }
