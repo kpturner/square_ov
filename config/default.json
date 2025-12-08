@@ -67,7 +67,7 @@
       "title": "Deputy Grand Registrar"
     },
     {
-      "value": "DGSEC",
+      "value": "DEPGSEC",
       "title": "Deputy Grand Secretary"
     },
     {
@@ -75,11 +75,11 @@
       "title": "Deputy Grand Director of Ceremonies"
     },
     {
-      "value": "DGSWDB",
+      "value": "DEPGSWDB",
       "title": "Deputy Grand Sword Bearer"
     },
     {
-      "value": "DGSUPTWKS",
+      "value": "DEPGSUPTWKS",
       "title": "Deputy Grand Superintendent of Works"
     },
     {
@@ -151,7 +151,7 @@
       "title": "Assistant Grand Standard Bearer"
     },
     {
-      "value": "DGORG",
+      "value": "DEPGORG",
       "title": "Deputy Grand Organist"
     },
     {
