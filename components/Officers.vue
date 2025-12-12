@@ -115,6 +115,13 @@
 
       <template #item.actions="{ item }">
         <v-btn
+          icon="mdi-card-account-details-outline"
+          size="small"
+          color="primary"
+          title="Contact details"
+          @click="emits('officer-contact-details', item)"
+        />
+        <v-btn
           icon="mdi-delete"
           size="small"
           color="red"
@@ -234,6 +241,14 @@
                 density="compact"
               />
             </v-col>
+
+            <v-col cols="12">
+              <v-text-field v-model="item.email" type="string" label="Email" density="compact" />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field v-model="item.phone" type="string" label="Phone" density="compact" />
+            </v-col>
           </v-row>
           <v-row dense align="center" justify="end" class="mt-2">
             <v-btn
@@ -264,7 +279,7 @@ import type { Officer } from '@prisma/client';
 
 const props = defineProps<{ officers: Officer[] }>();
 
-const emits = defineEmits(['delete-officer', 'save-changes']);
+const emits = defineEmits(['delete-officer', 'save-changes', 'officer-contact-details']);
 
 const ranks = useRuntimeConfig().public.ranks as Rank[];
 

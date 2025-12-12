@@ -4,6 +4,10 @@ import { z } from 'zod';
 const VIPSchema = z.object({
   provincialRank: z.string(),
   name: z.string(),
+  address: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  mobile: z.string().nullable().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -16,6 +20,10 @@ export default defineEventHandler(async (event) => {
   const columnMap: Record<string, keyof typeof VIPSchema.shape> = {
     Office: 'provincialRank',
     Name: 'name',
+    Address: 'address',
+    Email: 'email',
+    Phone: 'phone',
+    Mobile: 'mobile',
   };
 
   const validatedVIPs = vips.map((row) => {

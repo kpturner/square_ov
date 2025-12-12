@@ -32,6 +32,8 @@ export default defineEventHandler(async (event) => {
             excludeFromProcession: o.excludeFromProcession,
             attending: o.attending,
             original: o.original,
+            email: o.email?.trim() ? o.email : null,
+            phone: o.phone?.trim() ? o.phone : null,
             ovId,
           },
         });

@@ -44,6 +44,18 @@
                 Attendance report
               </v-btn>
             </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                v-if="officialVisit"
+                color="success"
+                prepend-icon="mdi-email"
+                class="w-100"
+                small
+                @click="emailTheTeam"
+              >
+                Email the team
+              </v-btn>
+            </v-col>
           </v-row>
         </div>
       </v-card-title>
@@ -79,7 +91,12 @@
           </v-btn>
         </div>
 
-        <Officers :officers @delete-officer="deleteOfficer" @save-changes="saveAll" />
+        <Officers
+          :officers
+          @delete-officer="deleteOfficer"
+          @officer-contact-details="officerContactDetails"
+          @@save-changes="saveAll"
+        />
 
         <!-- Bottom Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
@@ -181,6 +198,18 @@
                 Attendance report
               </v-btn>
             </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                v-if="officialVisit"
+                color="success"
+                prepend-icon="mdi-email"
+                class="w-100"
+                small
+                @click="emailTheTeam"
+              >
+                Email the team
+              </v-btn>
+            </v-col>
           </v-row>
           <v-btn
             color="primary"
@@ -213,6 +242,31 @@
           <v-spacer />
           <v-btn variant="text" @click="addVIPDialog = false">Cancel</v-btn>
           <v-btn color="primary" @click="addVIP">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="contactDetailsDialog" max-width="400">
+      <v-card>
+        <v-card-title>Officer Contacts Details</v-card-title>
+        <v-card-text>
+          {{ officerToEdit?.name }}<br />
+          <v-text-field
+            v-model="officerToEdit!.email"
+            label="Email address"
+            type="email"
+            autocomplete="email"
+          />
+          <v-text-field
+            v-model="officerToEdit!.phone"
+            label="Phone number"
+            type="tel"
+            autocomplete="tel"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="contactDetailsDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="updateContactDetails">OK</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -258,6 +312,8 @@ const makeToast = useToast();
 
 const showDeleteConfirm = ref(false);
 const officerToDelete = ref<Officer | null>(null);
+const officerToEdit = ref<Officer | null>(null);
+const contactDetailsDialog = ref(false);
 const route = useRoute();
 const router = useRouter();
 const officers = ref<Officer[]>([]);
@@ -285,6 +341,12 @@ onMounted(async () => {
   await loadActiveOfficers();
   await loadOfficers();
 });
+
+function formatDate(dateStr: string | Date | undefined) {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString();
+}
 
 const activeVIPSelectionList = computed(() => {
   return vips.value.map((vip) => {
@@ -345,6 +407,8 @@ async function addOfficer() {
       id: 0,
       name,
       rank: ao.provincialRank.replace('Prov', '').toUpperCase(),
+      email: ao.primaryEmail ?? '',
+      phone: ao.preferredPhoneNo ?? '',
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -375,6 +439,8 @@ async function addVIP() {
       id: 0,
       name: vip.name,
       rank: vip.provincialRank,
+      email: vip.email ?? '',
+      phone: vip.mobile ? vip.mobile : (vip.phone ?? ''),
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -401,6 +467,8 @@ function addEmptyOfficer(position?: Position) {
     id: 0,
     name: '',
     rank: null,
+    email: '',
+    phone: '',
     provOfficerYear: null,
     grandOfficer: false,
     grandOfficerYear: null,
@@ -423,6 +491,55 @@ async function deleteOfficer(officer: Officer) {
 
   officerToDelete.value = officer;
   showDeleteConfirm.value = true;
+}
+
+async function officerContactDetails(officer: Officer) {
+  if (!officer.id) {
+    officers.value = officers.value.filter((o) => o !== officer);
+    return;
+  }
+
+  officerToEdit.value = officer;
+  contactDetailsDialog.value = true;
+}
+
+async function updateContactDetails() {
+  await $fetch<Officer>(`/api/officers/${officerToEdit.value?.id}`, {
+    method: 'PUT',
+    body: {
+      ...officerToEdit.value,
+    },
+  });
+  contactDetailsDialog.value = false;
+  makeToast(`Contact details for ${officerToEdit.value?.name} updated.`);
+}
+
+function emailTheTeam() {
+  const ovId = officialVisit.value?.id;
+  if (!ovId) return;
+
+  const missingEmails = officers.value.filter(
+    (o) => o.attending && (!o.email || o.email.trim().length === 0)
+  );
+  if (missingEmails.length > 0) {
+    missingEmails.forEach((o) => {
+      makeToast(`Officer ${o.name} has no email address set.`, 'warning');
+    });
+    return;
+  }
+
+  const emailList = officers.value
+    .filter((o) => o.attending && o.email && o.email.trim().length > 0)
+    .map((o) => o.email?.trim());
+
+  if (emailList.length === 0) return;
+
+  const subject = `Official Visit to ${officialVisit.value?.name} on ${formatDate(officialVisit.value?.ovDate)}`;
+
+  const mailtoLink =
+    `mailto:?bcc=${encodeURIComponent(emailList.join(','))}` +
+    `&subject=${encodeURIComponent(subject)}`;
+  window.location.href = mailtoLink;
 }
 
 async function confirmedDeletion() {

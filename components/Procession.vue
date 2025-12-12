@@ -448,7 +448,7 @@ const rows = computed(() => {
   ).filter((o) => !parseFixedPosition(o.position));
 
   const addOfficer = (officer: Officer) => {
-    // If the next row is empty, see if it has a pre-populated value in thr fixedPositionMap
+    // If the next row is empty, see if it has a pre-populated value in the fixedPositionMap
     if (!nextRow.south && !nextRow.north) {
       const prefilled = fixedPositionMap.value[result.length];
       if (prefilled?.north || prefilled?.south) {

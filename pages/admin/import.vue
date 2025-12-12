@@ -183,10 +183,10 @@ const importVIPs = async () => {
         const clean = {
           Office: (r[officeKey] as string).toUpperCase(),
           Name: r.__EMPTY,
-          Address: r.__EMPTY__1,
-          Email: r.__EMPTY__2,
-          Phone: r.__EMPTY__3,
-          Mobile: r.__EMPTY__4,
+          Address: r.__EMPTY_1,
+          Email: r.__EMPTY_2,
+          Phone: r.__EMPTY_3,
+          Mobile: r.__EMPTY_4,
         };
         return clean;
       })

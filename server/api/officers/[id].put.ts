@@ -1,28 +1,19 @@
-import type { Officer } from '@prisma/client';
 import prisma from '~/server/utils/dbClient';
 
 export default defineEventHandler(async (event) => {
+  const id = parseInt(event.context.params?.id || '');
+  if (isNaN(id)) throw createError({ statusCode: 400, statusMessage: 'Invalid ID' });
+
   const body = await readBody(event);
 
-  const updates = body.map((o: Officer) =>
-    prisma.officer.update({
-      where: { id: o.id },
-      data: {
-        rank: o.rank?.trim() ? o.rank : null,
-        provOfficerYear: o.provOfficerYear,
-        active: o.active,
-        grandOfficer: o.grandOfficer,
-        grandOfficerYear: o.grandOfficerYear,
-        grandRank: o.grandRank?.trim() ? o.grandRank : null,
-        grandActive: o.grandActive,
-        excludeFromProcession: o.excludeFromProcession,
-        attending: o.attending,
-        original: o.original,
-        position: o.position,
-      },
-    })
-  );
-
-  await Promise.all(updates);
-  return { success: true };
+  return prisma.officer.update({
+    where: { id },
+    data: {
+      ...body,
+      rank: body.rank?.trim() ? body.rank : null,
+      grandRank: body.grandRank?.trim() ? body.grandRank : null,
+      email: body.email?.trim() ? body.email : null,
+      phone: body.phone?.trim() ? body.phone : null,
+    },
+  });
 });

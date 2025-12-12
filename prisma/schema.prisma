@@ -35,6 +35,8 @@ model OV {
 model Officer {
   id                    Int      @id @default(autoincrement())
   name                  String
+  email                 String?
+  phone                 String?
   rank                  String?
   provOfficerYear       Int?
   grandOfficer          Boolean
@@ -62,14 +64,16 @@ enum Position {
 }
 
 model ActiveOfficer {
-  id             Int     @id @default(autoincrement())
-  year           String
-  number         Int
-  provincialRank String
-  givenName      String
-  familyName     String
-  familiarName   String?
-  postNominals   String?
+  id               Int     @id @default(autoincrement())
+  year             String
+  number           Int
+  provincialRank   String
+  givenName        String
+  familyName       String
+  familiarName     String?
+  postNominals     String?
+  primaryEmail     String?
+  preferredPhoneNo String?
 
   // Reverse relations (optional, but handy if you want to query back)
   oVMastersAsSword    OVMaster[] @relation("SwordRelation")
@@ -123,10 +127,14 @@ model OVMaster {
 }
 
 model VIP {
-  id             Int    @id @default(autoincrement())
+  id             Int     @id @default(autoincrement())
   year           String
   provincialRank String
   name           String
+  address        String?
+  email          String?
+  phone          String?
+  mobile         String?
 
   @@unique([year, name], name: "year_name")
 }

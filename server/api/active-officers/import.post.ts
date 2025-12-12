@@ -11,6 +11,8 @@ const officerSchema = z.object({
   familyName: z.string(),
   familiarName: z.string().nullable().optional(),
   postNominals: z.string().nullable().optional(),
+  primaryEmail: z.string().nullable().optional(),
+  preferredPhoneNo: z.string().nullable().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -27,6 +29,8 @@ export default defineEventHandler(async (event) => {
     'Family Name': 'familyName',
     'Familiar Name': 'familiarName',
     'Post Nominals': 'postNominals',
+    'Primary Email': 'primaryEmail',
+    'Preferred Phone No.': 'preferredPhoneNo',
   };
 
   const validatedOfficers = officers.map((row) => {
