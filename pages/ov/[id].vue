@@ -523,7 +523,10 @@ function emailTheTeam() {
   );
   if (missingEmails.length > 0) {
     missingEmails.forEach((o) => {
-      makeToast(`Officer ${o.name} has no email address defined.`, 'warning');
+      makeToast(
+        `Officer "${o.name}" has no email address defined. Edit their contact details and try again.`,
+        'warning'
+      );
     });
     return;
   }
