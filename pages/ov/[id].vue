@@ -95,7 +95,7 @@
           :officers
           @delete-officer="deleteOfficer"
           @officer-contact-details="officerContactDetails"
-          @@save-changes="saveAll"
+          @save-changes="saveAll"
         />
 
         <!-- Bottom Actions -->
