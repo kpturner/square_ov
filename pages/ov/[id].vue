@@ -305,8 +305,10 @@
 <script setup lang="ts">
 import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
+import { useAuthStore } from '~/stores/auth';
 
 const logger = useLogger('officers');
+const authStore = useAuthStore();
 
 const makeToast = useToast();
 
@@ -565,6 +567,8 @@ function emailTheTeam() {
 
   const emailList = officers.value
     .filter((o) => o.attending && o.email && o.email.trim().length > 0)
+    // filter out the user's own email
+    .filter((o) => o.email?.trim().toLowerCase() !== authStore.user?.email?.trim().toLowerCase())
     .map((o) => o.email?.trim());
 
   if (emailList.length === 0) return;
