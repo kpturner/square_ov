@@ -526,6 +526,13 @@ function emailTheTeam() {
   if (missingEmails.length > 0) {
     let emailPossible = true;
     missingEmails.forEach((o) => {
+      // First try the VIP list
+      const vip = vips.value.find((v) => v.name === o.name);
+      if (vip && vip.email && vip.email.trim().length > 0) {
+        o.email = vip.email.trim();
+        saveDetails = true;
+        return;
+      }
       // Try to get the email address from the active officers list
       // We only need to find the (xx) number at the end of the name and use that for a search
       const match = o.name.match(/\((\d+)\)$/);
