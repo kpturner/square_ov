@@ -518,17 +518,42 @@ function emailTheTeam() {
   const ovId = officialVisit.value?.id;
   if (!ovId) return;
 
+  let saveDetails = false;
+
   const missingEmails = officers.value.filter(
     (o) => o.attending && (!o.email || o.email.trim().length === 0)
   );
   if (missingEmails.length > 0) {
+    let emailPossible = true;
     missingEmails.forEach((o) => {
-      makeToast(
-        `Officer "${o.name}" has no email address defined. Edit their contact details and try again.`,
-        'warning'
-      );
+      // Try to get the email address from the active officers list
+      // We only need to find the (xx) number at the end of the name and use that for a search
+      const match = o.name.match(/\((\d+)\)$/);
+      if (!match) {
+        emailPossible = false;
+      } else {
+        const officerNumber = Number(match[1]);
+        const ao = activeOfficers.value.find((ao) => ao.number === officerNumber);
+
+        if (ao && ao.primaryEmail && ao.primaryEmail.trim().length > 0) {
+          o.email = ao.primaryEmail.trim();
+          saveDetails = true;
+          return;
+        }
+      }
+      if (!o.email) {
+        makeToast(
+          `Officer "${o.name}" has no email address defined. Edit their contact details and try
+          again.`,
+          'warning'
+        );
+      }
     });
-    return;
+    if (!emailPossible) return;
+  }
+
+  if (saveDetails) {
+    saveAll();
   }
 
   const emailList = officers.value
