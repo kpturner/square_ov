@@ -64,6 +64,20 @@ export default defineEventHandler(async (event) => {
     },
   });
 
+  const JW = await prisma.vIP.findMany({
+    where: {
+      year,
+      provincialRank: 'JW',
+    },
+  });
+
+  const SW = await prisma.vIP.findMany({
+    where: {
+      year,
+      provincialRank: 'SW',
+    },
+  });
+
   const columnMap: Record<string, keyof typeof officialVisitSchema.shape> = {
     'Visit No': 'number',
     Date: 'date',
@@ -109,13 +123,17 @@ export default defineEventHandler(async (event) => {
         }
       }
 
-      // Try to get the VIP full name rather than just the surname we see on the spreadsheet
       if (column === 'VIP' && value) {
         if (value === 'PGM') {
           value = PGM[0]?.name;
         } else if (value === 'DPGM') {
           value = DPGM[0]?.name;
+        } else if (value === 'Junior Warden') {
+          value = JW[0]?.name;
+        } else if (value === 'Senior Warden') {
+          value = SW[0]?.name;
         } else {
+          // Try to get the VIP full name rather than just the surname we see on the spreadsheet
           const vip = VIPs.filter(
             (vip) => vip.name.toLowerCase().indexOf(value.toLowerCase()) >= 0
           );

@@ -32,7 +32,8 @@ export default defineEventHandler(async (event) => {
     for (const [column, field] of Object.entries(columnMap)) {
       let value = row[column];
       if (value === undefined || value === '') value = null;
-
+      if (value === 'JW') value = 'JGW';
+      if (value === 'SW') value = 'SGW';
       mapped[field] = value;
     }
 

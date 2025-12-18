@@ -105,11 +105,11 @@ const logger = useLogger('import');
 
 const makeToast = useToast();
 const loading = ref(false);
-const { masonicYear } = useMasonicYear();
+const { masonicYear, paddedMasonicYear } = useMasonicYear();
 const year = ref(masonicYear);
 const vipSheetName = ref('VIP Contact Details');
 const aoSheetName = ref('Active Officers');
-const ovSheetName = ref(`${masonicYear} Visits`);
+const ovSheetName = ref(`${paddedMasonicYear} Visits`);
 const file = ref<File | null>(null);
 const importErrorsExist = ref(false);
 const importErrorsFound = ref<string[]>([]);
