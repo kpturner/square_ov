@@ -23,10 +23,17 @@
             </div>
           </v-card-title>
           <!-- Top Actions -->
-          <div class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+          <div class="d-flex flex-column flex-sm-row justify-end ga-2 mb-2 no-print">
             <v-text-field
               v-model="year"
               label="Masonic year"
+              hide-details
+              @click:prepend-inner="load"
+              @keyup.enter="load"
+            />
+            <v-text-field
+              v-model="search"
+              label="Search"
               prepend-inner-icon="mdi-magnify"
               hide-details
               @click:prepend-inner="load"
@@ -178,6 +185,7 @@ const { masonicYear } = useMasonicYear();
 const ovMasters = ref<OVMaster[]>([]);
 
 const year = ref(masonicYear);
+const search = ref('');
 
 const formattedOVs = computed(() => {
   return ovMasters.value.map((ov) => ({
@@ -197,6 +205,16 @@ const headers = [
 
 async function loadOVs() {
   ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${year.value}`);
+  if (search.value && search.value.trim().length > 0) {
+    const searchLower = search.value.trim().toLowerCase();
+    ovMasters.value = ovMasters.value.filter(
+      (ov) =>
+        ov.lodgeName.toLowerCase().includes(searchLower) ||
+        ov.lodgeNumber.toString().includes(searchLower) ||
+        (ov.vip && ov.vip.toLowerCase().includes(searchLower)) ||
+        (ov.dc && ov.dc.toLowerCase().includes(searchLower))
+    );
+  }
 }
 
 async function loadActiveOfficers() {
