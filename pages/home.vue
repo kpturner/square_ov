@@ -36,16 +36,32 @@
             </div>
           </v-card-title>
           <!-- Top Actions -->
-          <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+          <div
+            v-if="!loading"
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center ga-2 mb-2 no-print"
+          >
+            <!-- Search field on the left -->
+            <v-text-field
+              v-model="search"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              hide-details
+              class="mb-2 mb-sm-0 w-100 w-sm-auto"
+              @click:prepend-inner="loadOVs"
+              @keyup.enter="loadOVs"
+            />
+
+            <!-- Add Official Visit button on the right -->
             <v-btn
               color="success"
-              class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
+              class="w-100 w-sm-auto"
               prepend-icon="mdi-plus"
               @click="openDialog()"
             >
               Add Official Visit
             </v-btn>
           </div>
+
           <!-- DESKTOP -->
           <v-responsive class="hidden-md-and-down">
             <v-data-table :headers="headers" :items="ovs" class="mt-4">
@@ -255,6 +271,7 @@ type Position = (typeof _positionsRes)[number];
 const showDeleteConfirm = ref(false);
 const ovToDelete = ref<Partial<OV | null>>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
+const search = ref('');
 
 const authStore = useAuthStore();
 
@@ -289,6 +306,14 @@ const headers = [
 async function loadOVs() {
   ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
   ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
+  if (search.value && search.value.trim().length > 0) {
+    const searchLower = search.value.trim().toLowerCase();
+    ovs.value = ovs.value.filter(
+      (ov) =>
+        ov.name.toLowerCase().includes(searchLower) ||
+        formatDate(ov.ovDate).toLowerCase().includes(searchLower)
+    );
+  }
   loading.value = false;
 }
 
