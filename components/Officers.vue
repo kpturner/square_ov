@@ -382,7 +382,7 @@ const availablePositions = computed(() => {
 });
 
 const headers = [
-  { title: '', key: 'attending', align: 'center' as const },
+  { title: 'Att', key: 'attending', align: 'center' as const },
   { title: 'Name', key: 'name', minWidth: '230px' },
   { title: 'Provincial Rank', key: 'rank', width: '200px' },
   { title: 'Active', key: 'active', align: 'center' as const },
