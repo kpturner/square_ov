@@ -2,7 +2,7 @@ name: Delete old container images
 
 on:
   schedule:
-    - cron: "0 0 * * *" # Midnight
+    - cron: '0 0 * * *' # Midnight
   workflow_dispatch:
 
 jobs:
@@ -11,11 +11,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Delete old images
-        uses: snok/container-retention-policy@v3.0.0
+        uses: snok/container-retention-policy@v3.0.1
         with:
           account: user
-          image-names: "square-ov"
+          image-names: 'square-ov'
           cut-off: 1month
           keep-n-most-recent: 1
-          image-tags: "sha-*,square-ov-latest"
+          image-tags: 'sha-*,square-ov-latest'
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
