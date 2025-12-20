@@ -132,7 +132,7 @@
     <hr />
 
     <v-card>
-      <div class="no-print d-flex align-center">
+      <div class="no-print d-flex flex-column flex-md-row">
         <v-checkbox
           v-model="alignActiveWardens"
           label="Align active wardens?"
@@ -142,14 +142,14 @@
         />
         <v-checkbox
           v-model="reverseStewardOrder"
-          class="no-print ms-3"
+          class="no-print ms-md-3"
           label="Reverse steward order?"
           dense
           hide-details
         />
         <v-checkbox
           v-model="activeDCsFront"
-          class="no-print ms-3"
+          class="no-print ms-md-3"
           label="Active DCs at front?"
           dense
           hide-details
@@ -157,7 +157,7 @@
         <v-checkbox
           v-if="activeDCsFront"
           v-model="includeGrandOfficers"
-          class="no-print ms-3"
+          class="no-print ms-md-3"
           label="GO DCs at front also?"
           dense
           hide-details

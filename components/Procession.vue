@@ -1,6 +1,6 @@
 <template>
   <v-card class="pa-0 pa-lg-4">
-    <v-card-title class="d-flex justify-space-between align-center mb-2">
+    <v-card-title class="d-flex flex-column flex-md-row justify-space-between align-center mb-2">
       <div class="d-flex align-center procession-header">
         <span class="text-subtitle-1 text-lg-h6 mr-4"
           >Procession for OV to {{ officialVisit?.name || '...' }}</span
