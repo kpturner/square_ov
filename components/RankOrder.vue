@@ -26,7 +26,7 @@ const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
 .rank-item {
   font-size: 0.7rem;
   line-height: 1.1;
-  min-height: 20px;
+  min-height: 20px !important;
   padding-top: 2px;
   padding-bottom: 2px;
 }
