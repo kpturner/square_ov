@@ -13,153 +13,161 @@
     </v-card-title>
 
     <v-card-text>
-      <div v-if="vip" class="d-flex justify-center mb-4">
-        <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
-          <div class="d-flex justify-center align-center">
-            <v-icon color="black" icon="mdi-star" size="large" class="ms-2" />
-            <strong>{{ vip.name }}</strong>
-            <v-icon color="black" icon="mdi-star" size="large" />
-          </div>
-          <div class="text-caption">{{ rankCaption(vip) }}</div>
-        </v-card>
-      </div>
+      <v-row>
+        <v-col cols="3">
+          <rank-order />
+        </v-col>
 
-      <div v-if="swordBearer || standardBearer" class="d-flex justify-center mb-4">
-        <v-card
-          v-if="swordBearer"
-          class="pa-3 text-center mr-1 officer-card sword-bearer"
-          color="#FFF59D"
-        >
-          <div class="d-flex justify-center align-center">
-            <strong>{{ swordBearer.name }}</strong>
-            <v-icon color="black" icon="mdi-sword" size="small" class="ms-2" />
+        <v-col cols="9">
+          <div v-if="vip" class="d-flex justify-center mb-4">
+            <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
+              <div class="d-flex justify-center align-center">
+                <v-icon color="black" icon="mdi-star" size="large" class="ms-2" />
+                <strong>{{ vip.name }}</strong>
+                <v-icon color="black" icon="mdi-star" size="large" />
+              </div>
+              <div class="text-caption">{{ rankCaption(vip) }}</div>
+            </v-card>
           </div>
-          <div class="text-caption">Sword Bearer</div>
-        </v-card>
 
-        <v-card
-          v-if="standardBearer"
-          class="pa-3 text-center ml-1 officer-card standard-bearer"
-          color="#FFF59D"
-        >
-          <div class="d-flex justify-center align-center">
-            <strong>{{ standardBearer.name }}</strong>
-            <v-icon color="black" icon="mdi-flag" size="small" class="ms-2" />
+          <div v-if="swordBearer || standardBearer" class="d-flex justify-center mb-4">
+            <v-card
+              v-if="swordBearer"
+              class="pa-3 text-center mr-1 officer-card sword-bearer"
+              color="#FFF59D"
+            >
+              <div class="d-flex justify-center align-center">
+                <strong>{{ swordBearer.name }}</strong>
+                <v-icon color="black" icon="mdi-sword" size="small" class="ms-2" />
+              </div>
+              <div class="text-caption">Sword Bearer</div>
+            </v-card>
+
+            <v-card
+              v-if="standardBearer"
+              class="pa-3 text-center ml-1 officer-card standard-bearer"
+              color="#FFF59D"
+            >
+              <div class="d-flex justify-center align-center">
+                <strong>{{ standardBearer.name }}</strong>
+                <v-icon color="black" icon="mdi-flag" size="small" class="ms-2" />
+              </div>
+              <div class="text-caption">Standard Bearer</div>
+            </v-card>
           </div>
-          <div class="text-caption">Standard Bearer</div>
-        </v-card>
-      </div>
 
-      <div class="d-flex justify-center flex-wrap mb-2">
-        <div class="row-number no-print"></div>
-        <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-          <strong>SOUTH</strong>
-        </div>
-        <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-          <strong>NORTH</strong>
-        </div>
-      </div>
-      <div
-        v-for="(row, idx) in rows"
-        :key="idx"
-        class="d-flex align-center justify-center flex-wrap mb-2"
-      >
-        <div class="row-number no-print">{{ idx + 1 }}</div>
-        <!-- South column -->
-        <div
-          v-if="row.south"
-          class="pa-1"
-          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
-        >
-          <v-card
-            class="pa-2 text-center officer-card"
-            :class="[row.south.grandOfficer ? 'grand-officer' : 'prov-officer', row.south.rank]"
-            :color="row.south.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
-          >
-            <div class="d-flex justify-center align-center">
-              {{ row.south.name }}
-              <v-icon
-                v-if="row.south.rank === 'AGDC' && row.south.active"
-                color="black"
-                icon="mdi-auto-fix"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['GDC', 'DEPGDC'].includes(row.south.rank ?? '') && row.south.active"
-                color="black"
-                icon="mdi-magic-staff"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
-                color="black"
-                icon="mdi-star"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['APGM', 'DPGM'].includes(row.south.rank ?? '') && row.south.active"
-                color="black"
-                icon="mdi-star"
-                size="small"
-                class="ms-2"
-              />
+          <div class="d-flex justify-center flex-wrap mb-2">
+            <div class="row-number no-print"></div>
+            <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+              <strong>SOUTH</strong>
             </div>
-            <div class="text-caption">{{ rankCaption(row.south) }}</div>
-          </v-card>
-        </div>
-
-        <!-- North column -->
-        <div
-          v-if="row.north"
-          class="pa-1"
-          style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
-        >
-          <v-card
-            class="pa-2 text-center officer-card"
-            :class="[row.north.grandOfficer ? 'grand-officer' : 'prov-officer', row.north.rank]"
-            :color="row.north.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
-          >
-            <div class="d-flex justify-center align-center">
-              {{ row.north.name }}
-              <v-icon
-                v-if="row.north.rank === 'AGDC' && row.north.active"
-                color="black"
-                icon="mdi-auto-fix"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['GDC', 'DEPGDC'].includes(row.north.rank ?? '') && row.north.active"
-                color="black"
-                icon="mdi-magic-staff"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
-                color="black"
-                icon="mdi-star"
-                size="small"
-                class="ms-2"
-              />
-              <v-icon
-                v-if="['APGM', 'DPGM'].includes(row.north.rank ?? '') && row.north.active"
-                color="black"
-                icon="mdi-star"
-                size="small"
-                class="ms-2"
-              />
+            <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+              <strong>NORTH</strong>
             </div>
-            <div class="text-caption">{{ rankCaption(row.north) }}</div>
-          </v-card>
-        </div>
-        <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-          <!-- Nobody here! -->
-        </div>
-      </div>
+          </div>
+          <div
+            v-for="(row, idx) in rows"
+            :key="idx"
+            class="d-flex align-center justify-center flex-wrap mb-2"
+          >
+            <div class="row-number no-print">{{ idx + 1 }}</div>
+            <!-- South column -->
+            <div
+              v-if="row.south"
+              class="pa-1"
+              style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
+            >
+              <v-card
+                class="pa-2 text-center officer-card"
+                :class="[row.south.grandOfficer ? 'grand-officer' : 'prov-officer', row.south.rank]"
+                :color="row.south.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
+              >
+                <div class="d-flex justify-center align-center">
+                  {{ row.south.name }}
+                  <v-icon
+                    v-if="row.south.rank === 'AGDC' && row.south.active"
+                    color="black"
+                    icon="mdi-auto-fix"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['GDC', 'DEPGDC'].includes(row.south.rank ?? '') && row.south.active"
+                    color="black"
+                    icon="mdi-magic-staff"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
+                    color="black"
+                    icon="mdi-star"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['APGM', 'DPGM'].includes(row.south.rank ?? '') && row.south.active"
+                    color="black"
+                    icon="mdi-star"
+                    size="small"
+                    class="ms-2"
+                  />
+                </div>
+                <div class="text-caption">{{ rankCaption(row.south) }}</div>
+              </v-card>
+            </div>
+
+            <!-- North column -->
+            <div
+              v-if="row.north"
+              class="pa-1"
+              style="flex: 1 1 45%; max-width: 300px; min-width: 150px"
+            >
+              <v-card
+                class="pa-2 text-center officer-card"
+                :class="[row.north.grandOfficer ? 'grand-officer' : 'prov-officer', row.north.rank]"
+                :color="row.north.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
+              >
+                <div class="d-flex justify-center align-center">
+                  {{ row.north.name }}
+                  <v-icon
+                    v-if="row.north.rank === 'AGDC' && row.north.active"
+                    color="black"
+                    icon="mdi-auto-fix"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['GDC', 'DEPGDC'].includes(row.north.rank ?? '') && row.north.active"
+                    color="black"
+                    icon="mdi-magic-staff"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
+                    color="black"
+                    icon="mdi-star"
+                    size="small"
+                    class="ms-2"
+                  />
+                  <v-icon
+                    v-if="['APGM', 'DPGM'].includes(row.north.rank ?? '') && row.north.active"
+                    color="black"
+                    icon="mdi-star"
+                    size="small"
+                    class="ms-2"
+                  />
+                </div>
+                <div class="text-caption">{{ rankCaption(row.north) }}</div>
+              </v-card>
+            </div>
+            <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+              <!-- Nobody here! -->
+            </div>
+          </div>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
