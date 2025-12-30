@@ -2,7 +2,7 @@
   <v-card class="pa-0">
     <v-card-title class="d-flex flex-column flex-md-row justify-space-between align-center mb-2">
       <div class="d-flex align-center">
-        <span class="text-subtitle-1 text-lg-h6 mr-4">Rank Order</span>
+        <span class="text-subtitle-1 text-lg-h7 mr-4 ml-4">Rank Order</span>
       </div>
     </v-card-title>
 
@@ -29,6 +29,11 @@ const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
   min-height: 20px;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+@media (max-width: 600px) {
+  .rank-item {
+    font-size: 0.35rem;
+  }
 }
 @media print {
   .rank-item {
