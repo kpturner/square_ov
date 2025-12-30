@@ -132,7 +132,7 @@
     <hr />
 
     <v-card>
-      <div class="no-print d-flex flex-column flex-md-row">
+      <div class="no-print d-flex flex-column flex-sm-row">
         <v-checkbox
           v-model="alignActiveWardens"
           label="Align active wardens?"

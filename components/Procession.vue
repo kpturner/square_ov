@@ -29,11 +29,11 @@
 
     <v-card-text>
       <v-row>
-        <v-col cols="3" class="sm:pa-0">
+        <v-col cols="3" class="d-none d-sm-block sm:pa-0">
           <rank-order />
         </v-col>
 
-        <v-col cols="9">
+        <v-col cols="12" sm="9">
           <ProcessionContent :officers="officers" :official-visit="officialVisit" />
         </v-col>
       </v-row>
