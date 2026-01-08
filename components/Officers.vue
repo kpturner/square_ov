@@ -7,9 +7,17 @@
       item-value="id"
       class="mt-2"
       density="compact"
+      :row-props="getRowProps"
     >
       <template #item.name="{ item }">
-        <v-text-field v-model="item.name" density="compact" hide-details placeholder="Name" />
+        <v-text-field
+          v-model="item.name"
+          density="compact"
+          hide-details
+          placeholder="Name"
+          :autofocus="item.id === justAddedId"
+          @focus="justAddedId = null"
+        />
       </template>
 
       <template #item.rank="{ item }">
@@ -136,7 +144,12 @@
   <v-responsive class="hidden-lg-and-up">
     <v-row dense>
       <v-col v-for="(item, i) in sortedOfficers" :key="item.id ?? i" cols="12">
-        <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
+        <v-card
+          :ref="(el) => setCardRef(item.id!, el as HTMLElement)"
+          class="officer-card pa-3 mb-2"
+          elevation="3"
+          variant="tonal"
+        >
           <v-row dense>
             <v-col cols="6">
               <v-checkbox
@@ -157,7 +170,13 @@
             </v-col>
 
             <v-col cols="12">
-              <v-text-field v-model="item.name" label="Name" density="compact" />
+              <v-text-field
+                v-model="item.name"
+                label="Name"
+                density="compact"
+                :autofocus="item.id === justAddedId"
+                @focus="justAddedId = null"
+              />
             </v-col>
 
             <v-col cols="12">
@@ -279,6 +298,26 @@ import type { Officer } from '@prisma/client';
 
 const props = defineProps<{ officers: Officer[] }>();
 
+const justAddedId = ref<string | number | null>(null);
+
+const getRowProps = ({ item }: { item: Officer }) => {
+  return item.id === justAddedId.value ? { 'data-new-row': 'true' } : {};
+};
+
+const cardRefs = ref<Record<string | number, HTMLElement>>({});
+
+const setCardRef = (id: string | number, el: HTMLElement | null) => {
+  if (!el) return;
+
+  // If el is a component instance (Vuetify)
+  if ('$el' in el) {
+    cardRefs.value[id] = el.$el as HTMLElement;
+  } else {
+    // raw HTMLElement
+    cardRefs.value[id] = el as HTMLElement;
+  }
+};
+
 const emits = defineEmits(['delete-officer', 'save-changes', 'officer-contact-details']);
 
 const ranks = useRuntimeConfig().public.ranks as Rank[];
@@ -395,6 +434,42 @@ const headers = [
   { title: 'Excl', key: 'excludeFromProcession', align: 'center' as const },
   { title: '', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
 ];
+
+watch(
+  () => props.officers.length,
+  async (newLen, oldLen) => {
+    if (newLen <= oldLen) return;
+    if (oldLen === 0) return; // Don't do this on the initial load
+
+    const isVisible = (el: HTMLElement | null) => {
+      if (!el) return true;
+      const rect = el.getBoundingClientRect();
+      return rect.top >= 0 && rect.bottom <= window.innerHeight;
+    };
+
+    const newOfficer = props.officers[newLen - 1];
+    justAddedId.value = newOfficer?.id ?? null;
+
+    if (justAddedId.value === null) return;
+
+    await nextTick();
+
+    const row = document.querySelector('tr[data-new-row="true"]');
+
+    if (row && !isVisible(row as HTMLElement)) {
+      row?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+
+    if (newOfficer === undefined) return;
+    const cardEl = cardRefs.value[newOfficer.id] ?? null;
+    if (cardEl && !isVisible(cardEl)) {
+      cardEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+);
 </script>
 
 <style lang="scss" scoped>
