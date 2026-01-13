@@ -315,9 +315,10 @@ const automatic = computed(() =>
       if (
         a.grandOfficer &&
         b.grandOfficer &&
+        rankToConsider(a) === rankToConsider(b) &&
+        a.grandActive === b.grandActive &&
         a.grandOfficerYear &&
-        b.grandOfficerYear &&
-        rankToConsider(a) === rankToConsider(b)
+        b.grandOfficerYear
       ) {
         if (a.grandOfficerYear !== b.grandOfficerYear)
           return a.grandOfficerYear - b.grandOfficerYear;
