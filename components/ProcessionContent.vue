@@ -236,12 +236,24 @@ const activeNumberToConsider = (officer: Officer): number | null => {
 
 const provYearCompare = (a: Officer, b: Officer): number | null => {
   if (
-    a.active === b.active &&
+    !!a.active === !!b.active && // Treat null and false as equal
     a.provOfficerYear &&
     b.provOfficerYear &&
     rankToConsider(a) === rankToConsider(b)
   ) {
     if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
+  }
+  return null;
+};
+
+const grandYearCompare = (a: Officer, b: Officer): number | null => {
+  if (
+    !!a.grandActive === !!b.grandActive && // Treat null and false as equal
+    a.grandOfficerYear &&
+    b.grandOfficerYear &&
+    rankToConsider(a) === rankToConsider(b)
+  ) {
+    if (a.grandOfficerYear !== b.grandOfficerYear) return a.grandOfficerYear - b.grandOfficerYear;
   }
   return null;
 };
@@ -312,16 +324,9 @@ const automatic = computed(() =>
       if (!a.grandOfficer && b.grandOfficer) return 1;
 
       // Grand year for equal rank and active status
-      if (
-        a.grandOfficer &&
-        b.grandOfficer &&
-        rankToConsider(a) === rankToConsider(b) &&
-        a.grandActive === b.grandActive &&
-        a.grandOfficerYear &&
-        b.grandOfficerYear
-      ) {
-        if (a.grandOfficerYear !== b.grandOfficerYear)
-          return a.grandOfficerYear - b.grandOfficerYear;
+      const gyRes = grandYearCompare(a, b);
+      if (gyRes !== null) {
+        return gyRes;
       }
 
       // Prov year for equal rank and active status
@@ -343,7 +348,7 @@ const automatic = computed(() =>
       }
 
       // Prov Officers: active prov rank outranks non-active
-      if (rankToConsider(a) === rankToConsider(b)) {
+      if (!a.grandOfficer && !b.grandOfficer && rankToConsider(a) === rankToConsider(b)) {
         if (a.active && !b.active) return -1;
         if (!a.active && b.active) return 1;
       }
