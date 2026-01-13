@@ -30,14 +30,12 @@
       "value": "JGW",
       "title": "Junior Grand Warden"
     },
-    {
-      "value": "GTREAS",
-      "title": "Grand Treasurer"
-    },
-    {
       "value": "GCHAP",
       "title": "Grand Chaplain"
     },
+    {
+      "value": "GTREAS",
+      "title": "Treasurer"
     {
       "value": "GREG",
       "title": "Grand Registrar"
@@ -159,12 +157,11 @@
       "title": "Grand Pursuivant"
     },
     {
-      "value": "GSTWD",
-      "title": "Grand Steward"
-    },
-    {
       "value": "AGPURS",
       "title": "Assistant Grand Pursuivant"
+    {
+      "value": "GSTWD",
+      "title": "Grand Steward"
     },
     {
       "value": "GTYLER",
