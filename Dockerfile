@@ -39,7 +39,7 @@ ENV NITRO_PORT=4000
 
 # Copy built output and minimal runtime files from build stage
 COPY --from=build-stage /usr/src/app/.output ./.output
-COPY --from=build-stage /usr/src/app/config/secrets ./config/secrets
+COPY --from=build-stage /usr/src/app/config ./config
 COPY --from=build-stage /usr/src/app/start.sh ./start.sh
 COPY --from=build-stage /usr/src/app/prisma ./prisma
 
