@@ -62,13 +62,13 @@
             </v-btn>
           </div>
 
-          <!-- DESKTOP -->
-          <v-responsive class="hidden-md-and-down">
-            <v-data-table :headers="headers" :items="ovs" class="mt-4">
-              <template #item.ovDate="{ item }">
-                {{ formatDate(item.ovDate) }}
-              </template>
-              <template #item.actions="{ item }">
+          <v-data-table :headers="headers" :items="ovs" class="mt-4">
+            <template #item.ovDate="{ item }">
+              {{ formatDate(item.ovDate) }}
+            </template>
+            <template #item.actions="{ item }">
+              <!-- Inline buttons for md+ screens -->
+              <div class="d-none d-md-flex align-center">
                 <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />
                 <v-btn
                   class="me-2"
@@ -114,59 +114,46 @@
                   title="Delete OV"
                   @click="confirmOVDeletion(item)"
                 />
-              </template>
-            </v-data-table>
-          </v-responsive>
+              </div>
+              <!-- Three-dot menu for xs and sm screens -->
+              <div class="d-flex d-md-none">
+                <v-menu
+                  activator="parent"
+                  offset-y
+                  transition="scale-transition"
+                  content-class="context-menu-content bg-surface-light dark:bg-surface-dark rounded-pill"
+                >
+                  <template #activator="{ props }">
+                    <v-btn icon size="small" v-bind="props">
+                      <v-icon>mdi-dots-vertical</v-icon>
+                    </v-btn>
+                  </template>
 
-          <!-- MOBILE -->
-          <v-responsive class="hidden-lg-and-up"
-            ><v-row dense>
-              <v-col v-for="(item, i) in formattedOVs" :key="item.id ?? i" cols="12">
-                <v-card class="officer-card pa-3 mb-2" elevation="3" variant="tonal">
-                  <v-row dense>
-                    <v-col cols="12">
-                      <v-text-field v-model="item.name" label="Name" density="compact" readonly />
-                    </v-col>
-
-                    <v-col cols="12">
-                      <v-text-field
-                        v-model="item.displayDate"
-                        label="Date"
-                        density="compact"
-                        readonly
-                      />
-                    </v-col>
-                  </v-row>
-                  <v-row dense align="center" justify="end" class="mt-2">
+                  <div
+                    class="d-flex align-center px-3 py-1 rounded-pill border border-2"
+                    :class="
+                      isDark ? 'border-white bg-surface-dark' : 'border-gray-500 bg-surface-light'
+                    "
+                  >
+                    <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editOV(item)" />
                     <v-btn
-                      icon="mdi-pencil"
-                      size="small"
-                      variant="text"
-                      title="Edit OV"
                       class="me-2"
-                      @click="editOV(item)"
-                    />
-
-                    <v-btn
                       icon="mdi-content-copy"
                       size="small"
                       color="blue"
                       variant="elevated"
                       title="Copy OV"
-                      class="me-2"
                       @click="copyOV(item)"
                     />
-
                     <v-btn
+                      class="me-2"
                       icon="mdi-account-group"
                       size="small"
                       color="success"
                       variant="elevated"
                       title="Procession"
-                      class="me-2"
                       @click="goToOfficers(item)"
                     />
-
                     <v-btn
                       class="me-2"
                       icon="mdi-seat"
@@ -176,7 +163,6 @@
                       title="Reservations"
                       @click="$router.push(`/ov/${item.id}.reservations`)"
                     />
-
                     <v-btn
                       class="me-2"
                       icon="mdi-file"
@@ -186,7 +172,6 @@
                       title="Attendance"
                       @click="$router.push(`/ov/${item.id}.attendance`)"
                     />
-
                     <v-btn
                       icon="mdi-delete"
                       size="small"
@@ -195,10 +180,12 @@
                       title="Delete OV"
                       @click="confirmOVDeletion(item)"
                     />
-                  </v-row>
-                </v-card>
-              </v-col> </v-row
-          ></v-responsive>
+                  </div>
+                </v-menu>
+              </div>
+            </template>
+          </v-data-table>
+
           <!-- Bottom Actions -->
           <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
             <v-btn
@@ -272,6 +259,7 @@ const showDeleteConfirm = ref(false);
 const ovToDelete = ref<Partial<OV | null>>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const search = ref('');
+const { isDark } = useIsDark();
 
 const authStore = useAuthStore();
 
@@ -282,13 +270,6 @@ function formatDate(dateStr: string | Date) {
   const date = new Date(dateStr);
   return date.toLocaleDateString();
 }
-
-const formattedOVs = computed(() => {
-  return ovs.value.map((ov) => ({
-    ...ov,
-    displayDate: formatDate(ov.ovDate),
-  }));
-});
 
 const { masonicYear } = useMasonicYear();
 const selectedMasterOvId = ref<number | null>(null);
