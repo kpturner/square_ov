@@ -16,16 +16,24 @@ inputs:
   db_password_secret:
     description: DB password secret
     required: false
-    default: "secrets/db_password_secret.txt"
+    default: 'secrets/db_password_secret.txt'
+  brevo_api_key_secret:
+    description: Brevo API key
+    required: false
+    default: 'secrets/brevo_api_key_secret.txt'
+  session_secret:
+    description: Session secret
+    required: false
+    default: 'secrets/session_secret.txt'
   opts:
     description: Run time options
     required: false
   ecr-uri:
     description: ECS docker image registry
-    default: "ghcr.io"
+    default: 'ghcr.io'
 
 runs:
-  using: "composite"
+  using: 'composite'
   steps:
     - name: Build and push image to GitHub
       id: build-and-push-github
@@ -36,5 +44,7 @@ runs:
         dockerfile: Dockerfile
         repo: ${{ inputs.repo }}
         db_password_secret: ${{ inputs.db_password_secret }}
+        brevo_api_key_secret: ${{ inputs.brevo_api_key_secret }}
+        session_secret: ${{ inputs.session_secret }}
         opts: ${{ inputs.opts }}
         tag: ${{ inputs.version }}
