@@ -50,6 +50,8 @@ COPY --from=build-stage /usr/src/app/.output ./.output
 COPY --from=build-stage /usr/src/app/config ./config
 COPY --from=build-stage /usr/src/app/start.sh ./start.sh
 COPY --from=build-stage /usr/src/app/prisma ./prisma
+RUN mkdir -p ./server/templates
+COPY --from=build-stage /usr/src/app/server/templates ./server/templates
 
 # Create minimal package.json for prisma only
 RUN echo '{ "dependencies": { "@prisma/client": "6.18.0", "prisma": "6.18.0" } }' > package.json
