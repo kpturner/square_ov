@@ -16,6 +16,12 @@ export default defineNuxtConfig({
     port: 4000,
   },
   runtimeConfig: {
+    brevo: {
+      apiKey: config.get<string>('brevo_api_key'),
+    },
+    appUrl: config.get<string>('appUrl'),
+    emailDomain: config.get<string>('emailDomain'),
+    sessionSecret: config.get<string>('sessionSecret'),
     database: {
       user: config.get<string>('database.user'),
       pass: config.get<string>('database.password'),
@@ -27,6 +33,7 @@ export default defineNuxtConfig({
       logLevel: config.get('log_level'),
       logToFile: config.get<boolean>('log_to_file'),
       ranks: config.get<Rank[]>('ranks'),
+      admins: config.get<string[]>('admins'),
     },
   },
   build: {

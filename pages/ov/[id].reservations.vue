@@ -95,7 +95,7 @@ const attendingOfficers = computed(() => {
 
 async function loadOfficers() {
   const ovId = Number(route.params.id);
-  const res = await $fetch(`/api/officers?ovId=${ovId}`);
+  const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
     ? {

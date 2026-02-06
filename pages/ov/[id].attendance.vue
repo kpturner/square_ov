@@ -135,7 +135,7 @@ function formatDate(dateStr: string | Date) {
 }
 
 async function loadOfficers() {
-  const res = await $fetch(`/api/officers?ovId=${ovId}`);
+  const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
     ? {
@@ -149,7 +149,7 @@ async function loadOfficers() {
 
 async function saveAll() {
   const ovId = Number(route.params.id);
-  await $fetch(`/api/officers?ovId=${ovId}`, {
+  await useApi()(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
     body: officers.value.map((o) => ({
       ...o,

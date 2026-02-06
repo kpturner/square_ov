@@ -7,6 +7,11 @@
     "password": "",
     "name": "square-ov"
   },
+  "admins": ["kevin@kpturner.co.uk"],
+  "appUrl": "http://localhost:4001",
+  "emailDomain": "kpturner.co.uk",
+  "brevo_api_key": "",
+  "sessionSecret": "it_is_a_secret",
   "log_level": "info",
   "log_to_file": false,
   "ranks": [

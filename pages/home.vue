@@ -9,32 +9,42 @@
     <v-row>
       <v-col>
         <v-card>
+          <div class="d-flex gap-2">
+            <v-btn
+              color="red-darken-3"
+              prepend-icon="mdi-import"
+              small
+              title="Here be dragons!!"
+              @click="$router.push('/admin/import')"
+            >
+              Imports
+            </v-btn>
+
+            <v-btn
+              v-if="isAdmin"
+              color="secondary"
+              class="ms-2"
+              prepend-icon="mdi-account-group"
+              @click="goToUsers"
+              >Users
+            </v-btn>
+          </div>
           <v-card-title class="d-flex justify-space-between align-center">
             <div class="w-100 d-flex flex-column align-start">
-              <div class="mb-2 w-100 d-flex justify-space-between align-start">
-                <v-btn
-                  color="red-darken-3"
-                  prepend-icon="mdi-import"
-                  small
-                  title="Here be dragons!!"
-                  @click="$router.push('/admin/import')"
-                >
-                  Imports
-                </v-btn>
-
-                <v-btn
-                  color="primary"
-                  prepend-icon="mdi-clipboard-list"
-                  small
-                  title="Master OV list"
-                  @click="$router.push('/ov/list')"
-                >
-                  Master OV list
-                </v-btn>
-              </div>
+              <div class="mb-2 w-100 d-flex justify-space-between align-start"></div>
               <span class="text-h5">My Official Visits</span>
             </div>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-clipboard-list"
+              small
+              title="Master OV list"
+              @click="$router.push('/ov/list')"
+            >
+              Master OV list
+            </v-btn>
           </v-card-title>
+
           <!-- Top Actions -->
           <div
             v-if="!loading"
@@ -235,7 +245,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <ConfirmDialog
+    <DialogConfirm
       v-model="showDeleteConfirm"
       title="Delete Official Visit"
       :message="`Are you sure you want to delete
@@ -260,6 +270,7 @@ const ovToDelete = ref<Partial<OV | null>>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const search = ref('');
 const { isDark } = useIsDark();
+const isAdmin = useIsAdmin();
 
 const authStore = useAuthStore();
 
@@ -284,9 +295,13 @@ const headers = [
   { title: '', key: 'actions', sortable: false },
 ];
 
+function goToUsers() {
+  navigateTo('/users');
+}
+
 async function loadOVs() {
-  ovs.value = await $fetch<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
-  ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
+  ovs.value = await useApi()<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
+  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovs.value = ovs.value.filter(
@@ -299,7 +314,9 @@ async function loadOVs() {
 }
 
 async function loadActiveOfficers() {
-  activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
+  activeOfficers.value = await useApi()<ActiveOfficer[]>(
+    `/api/active-officers?year=${masonicYear}`
+  );
 }
 
 const ovSelectionList = computed(() => {
@@ -344,7 +361,7 @@ async function copyOV(item: OV) {
 
   loading.value = true;
   try {
-    await $fetch(`/api/ov/${item.id}/copy`, { method: 'POST' });
+    await useApi()(`/api/ov/${item.id}/copy`, { method: 'POST' });
     await loadOVs();
   } catch (err) {
     logger.error('Failed to copy OV:', err);
@@ -366,7 +383,7 @@ const selectedOVName = computed(() => {
 });
 
 const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
-  const vip = await $fetch<VIP>(`/api/vip/${masonicYear}/${vipName}`);
+  const vip = await useApi()<VIP>(`/api/vip/${masonicYear}/${vipName}`);
   return {
     id: 0,
     name: vipName,
@@ -463,7 +480,7 @@ const addOfficer = async (
 
 async function saveOV() {
   if (editedOV.value.id) {
-    await $fetch(`/api/ov/${editedOV.value.id}`, {
+    await useApi()(`/api/ov/${editedOV.value.id}`, {
       method: 'PUT',
       body: { ...editedOV.value, userId: authStore.user?.id },
     });
@@ -485,7 +502,7 @@ async function saveOV() {
     }
 
     try {
-      const updatedOV = await $fetch('/api/ov', {
+      const updatedOV = await useApi()<OV>('/api/ov', {
         method: 'POST',
         body: { ...editedOV.value, userId: authStore.user?.id },
       });
@@ -495,13 +512,13 @@ async function saveOV() {
         const officers: Officer[] = [];
         // Always do the VIP first so we can guarantee he is at the top
         const vip = await addVIP(updatedOV.id, selectedMasterOV.value.vip);
-        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
+        await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
           body: [vip],
         });
         // DC second
         const dc = await addDC(updatedOV.id, selectedMasterOV.value.dc);
-        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
+        await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
           body: [dc],
         });
@@ -541,7 +558,7 @@ async function saveOV() {
         if (selectedMasterOV.value.officer7) {
           await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer7, 'automatic');
         }
-        await $fetch(`/api/officers?ovId=${updatedOV.id}`, {
+        await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
           body: officers,
         });
@@ -561,7 +578,7 @@ function confirmOVDeletion(item: Partial<OV>) {
 }
 
 async function deleteOV() {
-  await $fetch(`/api/ov/${ovToDelete.value?.id}`, { method: 'DELETE' });
+  await useApi()(`/api/ov/${ovToDelete.value?.id}`, { method: 'DELETE' });
   await loadOVs();
 }
 

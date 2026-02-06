@@ -64,7 +64,7 @@ onMounted(() => {
 async function submit() {
   error.value = '';
   try {
-    const res = await $fetch<{ success: boolean; authUser: AuthUser }>('/api/' + mode.value, {
+    const res = await useApi()<{ success: boolean; authUser: AuthUser }>('/api/' + mode.value, {
       method: 'POST',
       body: { name: name.value, email: email.value, password: password.value },
     });

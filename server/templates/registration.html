@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New User Registered</title>
+    {{> styles }}
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Square OV - New User Registered</div>
+      <div class="content">
+        <p>
+          This is an automated notification from Square OV to inform you that a new user account has
+          been created.
+        </p>
+
+        <p>
+          The registration was completed successfully and the account details are shown below for
+          reference.
+        </p>
+
+        <h4>User details:</h4>
+        <p>Name: {{USER.name}}</p>
+        <p>Email: {{USER.email}}</p>
+        <p>Customer ID: {{USER.stripeCustomerId}}</p>
+
+        <p style="text-align: center">
+          <a class="button" href="https://ov.kpturner.co.uk/users"> View User Page </a>
+        </p>
+      </div>
+      <div class="footer">&copy; {{YEAR}} Square OV. All rights reserved.</div>
+    </div>
+  </body>
+</html>

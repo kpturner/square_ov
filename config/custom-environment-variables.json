@@ -4,6 +4,13 @@
     "port": "DB_PORT",
     "password": "DB_PASSWORD"
   },
+  "appUrl": "APP_URL",
+  "emailDomain": "EMAIL_DOMAIN",
+  "admins": {
+    "__name": "ADMINS",
+    "__format": "json"
+  },
+  "brevo_api_key": "BREVO_API_KEY",
   "log_level": "LOG_LEVEL",
   "log_to_file": "LOG_TO_FILE"
 }

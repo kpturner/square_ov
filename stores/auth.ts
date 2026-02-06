@@ -1,11 +1,9 @@
 import { defineStore } from 'pinia';
-import type { AuthUser } from '~/types/user';
+import type { AuthUser } from '~/types';
 
 export const useAuthStore = defineStore('auth', {
-  persist: true,
   state: () => ({
     user: null as AuthUser | null,
-    token: null as string | null,
   }),
 
   getters: {
@@ -13,17 +11,24 @@ export const useAuthStore = defineStore('auth', {
   },
 
   actions: {
-    setUser(user: AuthUser) {
+    setUser(user: AuthUser | null) {
       this.user = user;
-    },
-
-    setToken(token: string) {
-      this.token = token;
     },
 
     logout() {
       this.user = null;
-      this.token = null;
+      // Clear server cookie via endpoint
+      useApi()('/api/logout', { method: 'POST' }).catch(() => {});
+    },
+
+    /** Fetch current user from server (on app load / refresh) */
+    async fetchUser() {
+      try {
+        const user = await $fetch<AuthUser | null>('/api/me');
+        this.user = user;
+      } catch {
+        this.user = null;
+      }
     },
   },
 });

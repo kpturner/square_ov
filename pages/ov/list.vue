@@ -204,7 +204,7 @@ const headers = [
 ];
 
 async function loadOVs() {
-  ovMasters.value = await $fetch<OVMaster[]>(`/api/ov-master?year=${year.value}`);
+  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${year.value}`);
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovMasters.value = ovMasters.value.filter(
@@ -218,7 +218,9 @@ async function loadOVs() {
 }
 
 async function loadActiveOfficers() {
-  activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
+  activeOfficers.value = await useApi()<ActiveOfficer[]>(
+    `/api/active-officers?year=${masonicYear}`
+  );
 }
 
 const officerName = (ao: ActiveOfficer | null) => {

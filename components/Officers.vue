@@ -294,7 +294,7 @@
 
 <script setup lang="ts">
 import type { Rank } from '~/types/officers';
-import type { Officer } from '@prisma/client';
+import type { Officer, Position } from '@prisma/client';
 
 const props = defineProps<{ officers: Officer[] }>();
 
@@ -322,7 +322,8 @@ const emits = defineEmits(['delete-officer', 'save-changes', 'officer-contact-de
 
 const ranks = useRuntimeConfig().public.ranks as Rank[];
 
-const _positionsRes = await $fetch('/api/ov/positions');
+// Do not use useApi() here
+const _positionsRes = await $fetch<Position>('/api/ov/positions');
 const positions = _positionsRes ?? [];
 
 const sortedOfficers = computed(() => {

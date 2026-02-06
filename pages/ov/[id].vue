@@ -291,7 +291,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <ConfirmDialog
+    <DialogConfirm
       v-model="showDeleteConfirm"
       title="Delete Officer"
       :message="`Are you sure you want to delete
@@ -371,16 +371,18 @@ const activeOfficerSelectionList = computed(() => {
 const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
 
 async function loadActiveOfficers() {
-  activeOfficers.value = await $fetch<ActiveOfficer[]>(`/api/active-officers?year=${masonicYear}`);
+  activeOfficers.value = await useApi()<ActiveOfficer[]>(
+    `/api/active-officers?year=${masonicYear}`
+  );
 }
 
 async function loadVIPs() {
-  vips.value = await $fetch<VIP[]>(`/api/vip?year=${masonicYear}`);
+  vips.value = await useApi()<VIP[]>(`/api/vip?year=${masonicYear}`);
 }
 
 async function loadOfficers() {
   const ovId = Number(route.params.id);
-  const res = await $fetch(`/api/officers?ovId=${ovId}`);
+  const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
     ? {
@@ -506,7 +508,7 @@ async function officerContactDetails(officer: Officer) {
 }
 
 async function updateContactDetails() {
-  await $fetch<Officer>(`/api/officers/${officerToEdit.value?.id}`, {
+  await useApi()<Officer>(`/api/officers/${officerToEdit.value?.id}`, {
     method: 'PUT',
     body: {
       ...officerToEdit.value,
@@ -583,7 +585,7 @@ function emailTheTeam() {
 
 async function confirmedDeletion() {
   if (officerToDelete.value) {
-    await $fetch(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
+    await useApi()(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
     makeToast(`${officerToDelete.value.name} ${officerToDelete.value.rank} removed from the list.`);
     await loadOfficers();
   }
@@ -623,7 +625,7 @@ async function saveAll() {
     return false;
   }
   const ovId = Number(route.params.id);
-  await $fetch(`/api/officers?ovId=${ovId}`, {
+  await useApi()(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
     body: officers.value.map((o) => ({
       ...o,
@@ -648,7 +650,7 @@ const saveBooleans = () => {
         includeGrandOfficers: includeGrandOfficers.value,
         reverseStewardOrder: reverseStewardOrder.value,
       };
-      officialVisit.value = await $fetch<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
+      officialVisit.value = await useApi()<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
         method: 'PUT',
         body,
       });

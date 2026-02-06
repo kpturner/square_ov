@@ -1,4 +1,6 @@
 {
   "log_level": "info",
-  "log_to_file": true
+  "log_to_file": true,
+  "appUrl": "http://ov.kpturner.co.uke",
+  "emailDomain": "kpturner.co.uk"
 }

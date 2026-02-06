@@ -11,8 +11,8 @@
         </client-only>
       </v-app-bar-title>
       <v-spacer />
-      <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOff">
-        Log Off
+      <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOut">
+        Log Out
       </v-btn>
       <v-btn
         v-if="$route.path !== '/'"
@@ -68,14 +68,20 @@ const password = ref<string | null>(null);
 const error = ref('');
 
 const { theme, toggleTheme } = useSetTheme();
-function logOff() {
-  authStore.user = null;
-  navigateTo('/');
+function logOut() {
+  authStore.logout();
+  navigateTo('/login');
 }
 
-onMounted(() => {
-  if (!authStore.user && route.path !== '/') {
-    navigateTo('/');
+onMounted(async () => {
+  if (!PUBLIC_PAGES.includes(route.path)) {
+    if (!authStore.user) {
+      await authStore.fetchUser();
+    }
+
+    if (!authStore.user) {
+      navigateTo('/login');
+    }
   }
 });
 
@@ -98,16 +104,10 @@ async function saveProfile() {
   error.value = '';
   try {
     const body: Partial<User> = { ...user.value };
-    if (password.value) {
-      body.password = password.value;
-    }
-    const res = await $fetch<{ success: boolean; authUser: AuthUser }>(
-      `/api/user/${user.value.id}`,
-      {
-        method: 'PUT',
-        body,
-      }
-    );
+    const res = await useApi()<{ success: boolean; authUser: AuthUser }>('/api/me', {
+      method: 'PUT',
+      body,
+    });
     if (res.success) {
       authStore.setUser(res.authUser);
     }
