@@ -31,16 +31,11 @@ export default defineEventHandler(async (event) => {
   const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
   logger.debug(`Send password reset link to ${email}: ${resetUrl}`);
 
-  await sendEmail(
-    'passwordReset',
-    [{ email, name: user.name }],
-    'Reset Your Simple Table Plan Password',
-    {
-      NAME: user.name,
-      RESET_URL: resetUrl,
-      YEAR: new Date().getFullYear(),
-    }
-  );
+  await sendEmail('passwordReset', [{ email, name: user.name }], 'Reset Your Square OV Password', {
+    NAME: user.name,
+    RESET_URL: resetUrl,
+    YEAR: new Date().getFullYear(),
+  });
 
   return { success: true };
 });
