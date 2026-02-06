@@ -29,7 +29,7 @@ export default defineEventHandler(async (event) => {
 
   const { appUrl } = useRuntimeConfig();
   const resetUrl = `${appUrl}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-  logger.debug(`Send password reset link to ${email}: ${resetUrl}`);
+  logger.debug(`Sent password reset link to ${email}: ${resetUrl}`);
 
   await sendEmail('passwordReset', [{ email, name: user.name }], 'Reset Your Square OV Password', {
     NAME: user.name,

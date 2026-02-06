@@ -25,7 +25,7 @@
           {{ error }}
         </v-alert>
         <v-alert v-if="success" type="success" class="mt-4" density="compact">
-          Password successfully reset! You can now <router-link to="/">login</router-link>.
+          Password successfully reset! You can now <router-link to="/login">login</router-link>.
         </v-alert>
       </v-card-text>
 
