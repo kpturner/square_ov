@@ -1,7 +1,8 @@
 import jwt from 'jsonwebtoken';
 import { COOKIE, PUBLIC_ENDPOINTS } from '~/utils/constants';
 
-const DEFAULT_AGE = 60 * 60 * 24 * 30;
+const ONE_DAY = 60 * 60 * 24;
+const DEFAULT_AGE = ONE_DAY * 30;
 
 export default defineEventHandler(async (event) => {
   const url = event.node.req.url || '';
@@ -28,9 +29,9 @@ export default defineEventHandler(async (event) => {
     event.context.impersonating = payload.impersonating;
     // Make no changes to cookie for the /api/me route
     if (!me) {
-      // If impersonating the expiry should remain at 30 mins
-      const maxAge = payload.impersonating ? 60 * 30 : DEFAULT_AGE;
-      const expiresIn = payload.impersonating ? '30m' : '30d';
+      // If impersonating the expiry should remain at 24 hours
+      const maxAge = payload.impersonating ? ONE_DAY : DEFAULT_AGE;
+      const expiresIn = payload.impersonating ? '1d' : '30d';
       const newToken = jwt.sign(
         { userId: payload.userId, impersonating: payload.impersonating },
         sessionSecret!,
