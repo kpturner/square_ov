@@ -11,6 +11,7 @@ export default defineEventHandler(async (event) => {
     email: string;
     password: string;
     stripeCustomerId: string;
+    masonicYear: string;
   }>(event);
 
   if (!body.name || !body.email || !body.password) {
@@ -28,6 +29,17 @@ export default defineEventHandler(async (event) => {
 
   if (!isValidEmail(body.email)) {
     throw createError({ statusCode: 400, statusMessage: 'Invalid email address' });
+  }
+
+  // Only active officers can register an account
+  const ao = await prisma.activeOfficer.findUnique({
+    where: { year_email: { year: body.masonicYear, primaryEmail: body.email } },
+  });
+  if (!ao) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Email address ${body.email} is not a primary email address for any active officer in ${body.masonicYear}`,
+    });
   }
 
   const passwordHash = await bcrypt.hash(body.password, 12);

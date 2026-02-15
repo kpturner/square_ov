@@ -90,6 +90,7 @@ model ActiveOfficer {
   oVMastersAsOfficer7 OVMaster[] @relation("Officer7Relation")
 
   @@unique([year, number], name: "year_number")
+  @@unique([year, primaryEmail], name: "year_email")
 }
 
 model OVMaster {

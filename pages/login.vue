@@ -122,6 +122,7 @@ const confirmPassword = ref('');
 const mode = ref<'login' | 'register'>('login');
 const error = ref('');
 const router = useRouter();
+const { masonicYear } = useMasonicYear();
 
 const showResetDialog = ref(false);
 const resetEmail = ref('');
@@ -166,6 +167,7 @@ async function submit() {
         email: email.value,
         password: password.value,
         stripeCustomerId: stripeCustomerId.value,
+        masonicYear,
       },
     });
     if (res.success) {
