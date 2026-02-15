@@ -18,7 +18,10 @@ export default defineNuxtRouteMiddleware(async (to) => {
     if (ADMIN_PAGES.includes(to.path)) {
       const { admins } = useRuntimeConfig().public;
       if (!admins.includes(user.email)) {
-        return navigateTo('/home');
+        const isImpersonating = await $fetch('/api/impersonating');
+        if (!isImpersonating) {
+          return navigateTo('/home');
+        }
       }
     } else {
       // The index page can redirect to home if we have an authenticated user

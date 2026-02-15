@@ -25,6 +25,7 @@ export default defineEventHandler(async (event) => {
       impersonating?: boolean;
     };
     event.context.userId = payload.userId;
+    event.context.impersonating = payload.impersonating;
     // Make no changes to cookie for the /api/me route
     if (!me) {
       // If impersonating the expiry should remain at 30 mins

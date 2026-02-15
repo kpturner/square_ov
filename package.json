@@ -12,7 +12,9 @@
     "postinstall": "nuxt prepare",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "typecheck": "vue-tsc --noEmit"
+    "typecheck:client": "vue-tsc --noEmit",
+    "typecheck:server": "tsc --noEmit --project .nuxt/tsconfig.server.json",
+    "typecheck": "npm run typecheck:client && npm run typecheck:server"
   },
   "dependencies": {
     "@fontsource/unifrakturmaguntia": "^5.2.8",

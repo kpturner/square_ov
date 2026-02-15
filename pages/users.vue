@@ -104,6 +104,7 @@ const loading = ref(true);
 const users = ref<User[]>([]);
 const showImpersonaterDialog = ref(false);
 const impersonated = ref<User | null>(null);
+const isImpersonating = ref(false);
 const dialog = ref(false);
 const editedUser = ref<Partial<User>>({});
 const headers = [
@@ -166,7 +167,8 @@ async function saveUser() {
 }
 
 onMounted(async () => {
-  if (!isAdmin.value) {
+  isImpersonating.value = await useApi()('/api/impersonating');
+  if (!isAdmin.value && !isImpersonating.value) {
     navigateTo('/home');
   }
   await loadUsers();

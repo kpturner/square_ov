@@ -21,7 +21,7 @@
             </v-btn>
 
             <v-btn
-              v-if="isAdmin"
+              v-if="isAdmin || isImpersonating"
               color="secondary"
               class="ms-2"
               prepend-icon="mdi-account-group"
@@ -271,6 +271,7 @@ const activeOfficers = ref<ActiveOfficer[]>([]);
 const search = ref('');
 const { isDark } = useIsDark();
 const isAdmin = useIsAdmin();
+const isImpersonating = ref(false);
 
 const authStore = useAuthStore();
 
@@ -589,5 +590,6 @@ function goToOfficers(item: OV) {
 onMounted(async () => {
   await loadActiveOfficers();
   await loadOVs();
+  isImpersonating.value = await useApi()('/api/impersonating');
 });
 </script>
