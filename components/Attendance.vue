@@ -15,7 +15,12 @@
       >
         <template #item.attending="{ item }">
           <div class="checkbox-cell">
-            <v-checkbox v-model="item.attending" hide-details density="compact" />
+            <v-checkbox
+              v-model="item.attending"
+              :label="attendingText"
+              hide-details
+              density="compact"
+            />
           </div>
         </template>
 
