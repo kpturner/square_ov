@@ -15,12 +15,7 @@
       >
         <template #item.attending="{ item }">
           <div class="checkbox-cell">
-            <v-checkbox
-              v-model="item.attending"
-              :label="attendingText"
-              hide-details
-              density="compact"
-            />
+            <v-checkbox v-model="item.attending" hide-details density="compact" />
           </div>
         </template>
 
@@ -42,7 +37,11 @@
             <span class="ms-2">{{ fullName(item) }}</span></v-col
           >
           <v-col cols="2">
-            <v-checkbox v-model="item.attending" label="Attended" hide-details density="compact"
+            <v-checkbox
+              v-model="item.attending"
+              :label="attendingText"
+              hide-details
+              density="compact"
           /></v-col>
           <v-col cols="2">
             <v-checkbox v-model="item.original" label="Allocated" hide-details density="compact"
