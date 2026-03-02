@@ -478,7 +478,7 @@ function addEmptyOfficer(position?: Position) {
     grandOfficerYear: null,
     grandActive: false,
     grandRank: null,
-    active: true,
+    active: false,
     position: position ?? 'automatic',
     excludeFromProcession: false,
     original: false,
