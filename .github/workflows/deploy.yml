@@ -27,7 +27,7 @@ jobs:
     steps:
       - name: Setup the runner matrix
         id: setrunner
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             const splits = '${{ github.event.inputs.tag }}'.split(',');
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy
         shell: bash

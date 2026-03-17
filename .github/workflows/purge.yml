@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Check out the private purge action
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: kpturner/action-purge
@@ -39,7 +39,7 @@ jobs:
           deleteAll: ${{ inputs.deleteAll }}
 
       - name: Fool post runner into working
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: kpturner/action-purge

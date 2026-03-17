@@ -1,7 +1,11 @@
 <template>
   <v-row dense>
     <v-col v-for="(item, i) in officers" :key="item.id ?? i" cols="12">
-      <v-card class="reservation-card ml-1 mb-1" :elevation="printMode ? '0' : '3'" variant="tonal">
+      <v-card
+        class="reservation-card ml-1 mb-1"
+        :elevation="printMode ? '0' : '3'"
+        :variant="printMode ? 'elevated' : 'tonal'"
+      >
         <v-row dense class="align-center text-center no-gutters">
           <v-col cols="2" class="d-flex justify-center align-center crest-column">
             <img class="crest" :src="hiowCrest" alt="HIoW Crest" />
