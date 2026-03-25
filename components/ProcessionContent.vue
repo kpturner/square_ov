@@ -534,7 +534,11 @@ const rows = computed(() => {
         if (swRow && jwRow) {
           const officerToMove = { ...swRow.north };
           swRow.north = juniorWarden.value;
-          jwRow.north = officerToMove as Officer;
+          if (jwRow.north?.id === juniorWarden.value.id) {
+            jwRow.north = officerToMove as Officer;
+          } else {
+            jwRow.south = officerToMove as Officer;
+          }
         }
       } else {
         // SW is in a the north
