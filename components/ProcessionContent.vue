@@ -291,12 +291,16 @@ const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
   return null;
 };
 
+const isVIP = (o: Officer) => {
+  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '');
+};
+
 const isActiveVIP = (o: Officer) => {
   return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && o.active;
 };
 
 const isPastVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && o.active;
+  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && !o.active;
 };
 
 // Automatic officers sorted by seniority
@@ -320,9 +324,9 @@ const automatic = computed(() =>
       }
 
       // Active VIPs outrank non-active VIPs of the same rank
-      if (a.rank === b.rank) {
+      if (isVIP(a) && isVIP(b) && a.rank === b.rank) {
         if (isActiveVIP(a) && isPastVIP(b)) return -1;
-        if (!isActiveVIP(a) && isPastVIP(b)) return 1;
+        if (isPastVIP(a) && isActiveVIP(b)) return 1;
       }
 
       // Grand officer comparisons
