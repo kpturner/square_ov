@@ -595,6 +595,10 @@ const rows = computed(() => {
   border: 4px solid #fbc02d;
 }
 
+.GSTWD {
+  border-color: #a0171d;
+}
+
 .vip,
 .APGM,
 .DPGM {
