@@ -323,6 +323,10 @@ const automatic = computed(() =>
         }
       }
 
+      // Past and present VIPs outrank non-VIPs
+      if (isVIP(a) && !isVIP(b)) return -1;
+      if (!isVIP(a) && isVIP(b)) return 1;
+
       // Active VIPs outrank non-active VIPs of the same rank
       if (isVIP(a) && isVIP(b) && a.rank === b.rank) {
         if (isActiveVIP(a) && isPastVIP(b)) return -1;
