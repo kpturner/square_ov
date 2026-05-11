@@ -408,8 +408,8 @@ const activeDCs = computed(() => {
       }
 
       return 0;
-    })
-    .reverse();
+    });
+  // .reverse();  We will want Deps between the Stewards and the ADCs, so do not reverse the order
 });
 
 function parseFixedPosition(position?: string) {
