@@ -399,6 +399,7 @@ async function loadOfficers() {
 }
 
 async function addOfficer() {
+  /*  This check is no longer needed now that the absolute positioning has been fixed
   // Add ing an officer is not permitted if we have any absolutely positioned officers already.
   // This is vecuse absolute position officers can block automatic officers from being added
   const hasAbsoluteOfficers = officers.value.some(
@@ -419,6 +420,7 @@ async function addOfficer() {
     );
     return;
   }
+  */
   addOfficerDialog.value = false;
   if (selectedActiveOfficerId.value) {
     const ao = activeOfficers.value.find(
