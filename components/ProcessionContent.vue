@@ -166,6 +166,7 @@ const seniorWarden = computed(() =>
 const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
+const placedOfficerIds = new Set<number>();
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
@@ -450,33 +451,43 @@ const rows = computed(() => {
   };
 
   // Traverse the automatic officers and add rows
-  const automaticOfficers = (
-    props.officialVisit?.activeDCsFront
-      ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
-      : automatic.value
-  ).filter((o) => !parseFixedPosition(o.position));
+  const automaticOfficers = props.officialVisit?.activeDCsFront
+    ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
+    : automatic.value;
 
   const addOfficer = (officer: Officer) => {
-    // If the next row is empty, see if it has a pre-populated value in the fixedPositionMap
+    if (placedOfficerIds.has(officer.id)) {
+      return;
+    }
+
+    // If the next row is empty, see if it has a pre-populated value
     if (!nextRow.south && !nextRow.north) {
       const prefilled = fixedPositionMap.value[result.length];
+
       if (prefilled?.north || prefilled?.south) {
         nextRow = { ...prefilled };
+
+        if (prefilled.south) placedOfficerIds.add(prefilled.south.id);
+        if (prefilled.north) placedOfficerIds.add(prefilled.north.id);
       }
     }
+
     if (nextRow.south && nextRow.north) {
       addRow(nextRow);
-    } else {
-      if (!nextRow.south) {
-        nextRow.south = officer;
-        // North might be prepopulated
-        if (nextRow.north) {
-          addRow(nextRow);
-        }
-      } else if (!nextRow.north) {
-        nextRow.north = officer;
+    }
+
+    if (!nextRow.south) {
+      nextRow.south = officer;
+      placedOfficerIds.add(officer.id);
+
+      if (nextRow.north) {
         addRow(nextRow);
       }
+    } else if (!nextRow.north) {
+      nextRow.north = officer;
+      placedOfficerIds.add(officer.id);
+
+      addRow(nextRow);
     }
   };
 
@@ -493,8 +504,14 @@ const rows = computed(() => {
   // Look through the fixed positions and if we do not yet have it in the results, add it now
   for (const fp in fixedPositionMap.value) {
     const fpi = parseInt(fp);
+
     if (fpi >= result.length) {
-      result.push(fixedPositionMap.value[fp]!);
+      const row = fixedPositionMap.value[fp]!;
+
+      if (row.south) placedOfficerIds.add(row.south.id);
+      if (row.north) placedOfficerIds.add(row.north.id);
+
+      result.push(row);
     }
   }
 
