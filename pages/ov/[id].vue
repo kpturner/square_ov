@@ -399,6 +399,26 @@ async function loadOfficers() {
 }
 
 async function addOfficer() {
+  // Add ing an officer is not permitted if we have any absolutely positioned officers already.
+  // This is vecuse absolute position officers can block automatic officers from being added
+  const hasAbsoluteOfficers = officers.value.some(
+    (o) =>
+      ![
+        'automatic',
+        'head_of_south',
+        'head_of_north',
+        'vip',
+        'standard_berer',
+        'sword_bearer',
+      ].includes(o.position)
+  );
+  if (hasAbsoluteOfficers) {
+    makeToast(
+      'You cannot add an officer while you have officers with an absolute position (like "row_x_south"). Please change any absolute position officers to automatic, save, and then add the new officer.',
+      'error'
+    );
+    return;
+  }
   addOfficerDialog.value = false;
   if (selectedActiveOfficerId.value) {
     const ao = activeOfficers.value.find(
