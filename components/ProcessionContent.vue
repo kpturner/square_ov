@@ -166,7 +166,6 @@ const seniorWarden = computed(() =>
 const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
-const placedOfficerIds = new Set<number>();
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
@@ -443,6 +442,8 @@ const fixedPositionMap = computed(() => {
 const rows = computed(() => {
   const result: ProcessionRow[] = [];
 
+  const placedOfficerIds = new Set<number>();
+
   let nextRow: ProcessionRow = {};
 
   const addRow = (row: ProcessionRow) => {
@@ -455,25 +456,29 @@ const rows = computed(() => {
     ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
     : automatic.value;
 
-  const addOfficer = (officer: Officer) => {
-    if (placedOfficerIds.has(officer.id)) {
-      return;
-    }
-
-    // If the next row is empty, see if it has a pre-populated value
+  const ensurePrefilledRow = () => {
     if (!nextRow.south && !nextRow.north) {
       const prefilled = fixedPositionMap.value[result.length];
 
-      if (prefilled?.north || prefilled?.south) {
+      if (prefilled) {
         nextRow = { ...prefilled };
 
         if (prefilled.south) placedOfficerIds.add(prefilled.south.id);
         if (prefilled.north) placedOfficerIds.add(prefilled.north.id);
       }
     }
+  };
+
+  const addOfficer = (officer: Officer) => {
+    if (placedOfficerIds.has(officer.id)) {
+      return;
+    }
+
+    ensurePrefilledRow();
 
     if (nextRow.south && nextRow.north) {
       addRow(nextRow);
+      ensurePrefilledRow();
     }
 
     if (!nextRow.south) {
