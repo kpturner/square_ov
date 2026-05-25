@@ -394,6 +394,7 @@ const automatic = computed(() =>
 const activeDCs = computed(() => {
   return automatic.value
     .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
+    .filter((o) => (props.officialVisit?.activeDepsFront ? true : o.rank !== 'DEPGDC'))
     .filter((o) => (props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer))
     .sort((a, b) => {
       // Provincial year compare

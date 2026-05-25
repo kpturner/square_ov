@@ -28,6 +28,7 @@ model OV {
   officers             Officer[]
   alignWardens         Boolean   @default(true)
   activeDCsFront       Boolean   @default(true)
+  activeDepsFront      Boolean   @default(false)
   includeGrandOfficers Boolean   @default(false)
   reverseStewardOrder  Boolean   @default(false)
 

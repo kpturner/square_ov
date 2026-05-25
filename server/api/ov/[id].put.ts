@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
       name: body.name,
       alignWardens: body.alignWardens,
       activeDCsFront: body.activeDCsFront,
+      activeDepsFront: body.activeDepsFront,
       includeGrandOfficers: body.includeGrandOfficers,
       reverseStewardOrder: body.reverseStewardOrder,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
