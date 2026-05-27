@@ -357,6 +357,19 @@ const automatic = computed(() =>
         }
       }
 
+      // If aligning the Prov SGW and the Prov JGW, ensure that the Prov JGW outranks all provincial officers
+      // except the Prov SGW
+      if (
+        props.officialVisit?.alignWardens &&
+        juniorWarden.value &&
+        seniorWarden.value &&
+        !a.grandOfficer &&
+        !b.grandOfficer
+      ) {
+        if (a.id === juniorWarden.value.id && b.id !== seniorWarden.value.id) return -1;
+        if (b.id === juniorWarden.value.id && a.id !== seniorWarden.value.id) return 1;
+      }
+
       // Prov year for equal rank and active status
       const pyRes = provYearCompare(a, b);
       if (pyRes !== null) {
