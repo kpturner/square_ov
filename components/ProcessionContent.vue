@@ -456,172 +456,148 @@ const fixedPositionMap = computed(() => {
 const rows = computed(() => {
   const result: ProcessionRow[] = [];
 
-  const placedOfficerIds = new Set<number>();
+  // Pre-seed fixed rows
+  for (const [idxStr, row] of Object.entries(fixedPositionMap.value)) {
+    result[Number(idxStr)] = { ...row };
+  }
 
-  let nextRow: ProcessionRow = {};
-
-  const addRow = (row: ProcessionRow) => {
-    result.push(row);
-    nextRow = {};
-  };
-
-  // Traverse the automatic officers and add rows
   const automaticOfficers = props.officialVisit?.activeDCsFront
     ? automatic.value.filter((ao) => !activeDCs.value.includes(ao))
     : automatic.value;
 
-  const ensurePrefilledRow = () => {
-    if (!nextRow.south && !nextRow.north) {
-      const prefilled = fixedPositionMap.value[result.length];
+  const isOfficerAlreadyPlaced = (officer: Officer) => {
+    return result.some((r) => r?.south?.id === officer.id || r?.north?.id === officer.id);
+  };
 
-      if (prefilled) {
-        nextRow = { ...prefilled };
+  //
+  // Sequential row cursor
+  //
+  let currentRowIndex = 0;
 
-        if (prefilled.south) placedOfficerIds.add(prefilled.south.id);
-        if (prefilled.north) placedOfficerIds.add(prefilled.north.id);
-      }
+  const getOrCreateRow = (idx: number): ProcessionRow => {
+    if (!result[idx]) {
+      result[idx] = {};
     }
+
+    return result[idx]!;
   };
 
   const addOfficer = (officer: Officer) => {
-    if (placedOfficerIds.has(officer.id)) {
+    if (isOfficerAlreadyPlaced(officer)) {
       return;
     }
 
-    ensurePrefilledRow();
+    while (true) {
+      const row = getOrCreateRow(currentRowIndex);
 
-    if (nextRow.south && nextRow.north) {
-      addRow(nextRow);
-      ensurePrefilledRow();
-    }
-
-    if (!nextRow.south) {
-      nextRow.south = officer;
-      placedOfficerIds.add(officer.id);
-
-      if (nextRow.north) {
-        addRow(nextRow);
+      //
+      // Completely full -> move on
+      //
+      if (row.south && row.north) {
+        currentRowIndex++;
+        continue;
       }
-    } else if (!nextRow.north) {
-      nextRow.north = officer;
-      placedOfficerIds.add(officer.id);
 
-      addRow(nextRow);
+      //
+      // Fill south first
+      //
+      if (!row.south) {
+        row.south = officer;
+
+        //
+        // If north already occupied, row is complete
+        //
+        if (row.north) {
+          currentRowIndex++;
+        }
+
+        return;
+      }
+
+      //
+      // Fill north second
+      //
+      if (!row.north) {
+        row.north = officer;
+
+        //
+        // Row now complete
+        //
+        currentRowIndex++;
+
+        return;
+      }
     }
   };
 
+  //
+  // Add automatic officers
+  //
   for (const officer of automaticOfficers) {
     addOfficer(officer);
   }
 
+  //
+  // Add active DCs at front
+  //
   if (props.officialVisit?.activeDCsFront) {
     for (const officer of activeDCs.value) {
       addOfficer(officer);
     }
   }
 
-  // Look through the fixed positions and if we do not yet have it in the results, add it now
-  for (const fp in fixedPositionMap.value) {
-    const fpi = parseInt(fp);
-
-    if (fpi >= result.length) {
-      const row = fixedPositionMap.value[fp]!;
-
-      if (row.south) placedOfficerIds.add(row.south.id);
-      if (row.north) placedOfficerIds.add(row.north.id);
-
-      result.push(row);
-    }
-  }
-
-  // Cater for heads of rows
+  //
+  // Heads of rows always appended at end
+  //
   if (headSouth.value || headNorth.value) {
-    if (Object.keys(nextRow).length === 0) {
-      if (headSouth.value) {
-        nextRow.south = headSouth.value;
-      }
-      if (headNorth.value) {
-        nextRow.north = headNorth.value;
-      }
-      addRow(nextRow);
-    } else {
-      const hs = headSouth.value;
-      let hn = headNorth.value;
-      if (hs && hn) {
-        nextRow.north = hn;
-        hn = undefined;
-        addRow(nextRow);
-      }
-      if (hs) {
-        if (nextRow.south) {
-          // Swap
-          nextRow.north = nextRow.south;
-          nextRow.south = hs;
-          addRow(nextRow);
-        } else {
-          nextRow.south = hs;
-        }
-      }
-      if (hn) {
-        nextRow.north = hn;
-        addRow(nextRow);
-      }
-      if (Object.keys(nextRow).length > 0) {
-        addRow(nextRow);
-      }
-    }
+    result.push({
+      south: headSouth.value,
+      north: headNorth.value,
+    });
   }
 
-  // If we get here and we still have a populated row, add it
-  if (nextRow.south) {
-    addRow(nextRow);
-  }
+  //
+  // Remove sparse empty rows
+  //
+  const compacted = result.filter((r) => r && (r.south || r.north));
 
-  // Now if we have both the ProvSGW and the ProvJGW, ensure they are in the same row
+  //
+  // Warden alignment logic
+  //
   if (seniorWarden.value && juniorWarden.value && props.officialVisit?.alignWardens) {
     let sgwRowIndex = -1;
     let jgwRowIndex = -1;
-    result.forEach((row, idx) => {
+
+    compacted.forEach((row, idx) => {
       if (row.south?.id === seniorWarden.value?.id || row.north?.id === seniorWarden.value?.id) {
         sgwRowIndex = idx;
       }
+
       if (row.south?.id === juniorWarden.value?.id || row.north?.id === juniorWarden.value?.id) {
         jgwRowIndex = idx;
       }
     });
+
     if (sgwRowIndex !== -1 && jgwRowIndex !== -1 && sgwRowIndex !== jgwRowIndex) {
-      const swRow = result[sgwRowIndex];
-      const jwRow = result[jgwRowIndex];
-      // Is the SGW in the north or the south?
-      if (result[sgwRowIndex]?.south?.id === seniorWarden.value.id) {
-        // In the right place already, so swap the JGW into the north of that row
-        if (swRow && jwRow) {
-          const officerToMove = { ...swRow.north };
-          swRow.north = juniorWarden.value;
-          if (jwRow.north?.id === juniorWarden.value.id) {
-            jwRow.north = officerToMove as Officer;
-          } else {
-            jwRow.south = officerToMove as Officer;
-          }
-        }
-      } else {
-        // SW is in a the north
-        if (swRow && jwRow) {
-          const officerInNorthOfJWRow = { ...jwRow.north };
-          const officerInSouthOfJWRow = { ...jwRow.south };
-          const officerToMove =
-            officerInNorthOfJWRow.id === juniorWarden.value.id
-              ? officerInSouthOfJWRow
-              : officerInNorthOfJWRow;
-          jwRow.south = seniorWarden.value;
-          jwRow.north = juniorWarden.value;
-          swRow.north = officerToMove as Officer;
+      const swRow = compacted[sgwRowIndex];
+      const jwRow = compacted[jgwRowIndex];
+
+      if (swRow && jwRow) {
+        const displaced = swRow.south?.id === seniorWarden.value.id ? swRow.north : swRow.south;
+
+        swRow.south = seniorWarden.value;
+        swRow.north = juniorWarden.value;
+
+        if (jwRow.south?.id === juniorWarden.value.id) {
+          jwRow.south = displaced;
+        } else if (jwRow.north?.id === juniorWarden.value.id) {
+          jwRow.north = displaced;
         }
       }
     }
   }
 
-  return result;
+  return compacted.filter((r) => r.south || r.north);
 });
 </script>
 
