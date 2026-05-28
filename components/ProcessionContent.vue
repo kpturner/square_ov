@@ -88,6 +88,13 @@
             size="small"
             class="ms-2"
           />
+          <v-icon
+            v-if="row.south.position.indexOf('row_') !== -1"
+            color="black"
+            icon="mdi-pin"
+            size="small"
+            class="ms-2"
+          />
         </div>
         <div class="text-caption">{{ rankCaption(row.south) }}</div>
       </v-card>
@@ -127,6 +134,13 @@
             v-if="['APGM', 'DPGM'].includes(row.north.rank ?? '') && row.north.active"
             color="black"
             icon="mdi-star"
+            size="small"
+            class="ms-2"
+          />
+          <v-icon
+            v-if="row.north.position.indexOf('row_') !== -1"
+            color="black"
+            icon="mdi-pin"
             size="small"
             class="ms-2"
           />
