@@ -20,6 +20,7 @@ export default defineEventHandler(async (event) => {
       userId: ov.userId,
       alignWardens: ov.alignWardens,
       activeDCsFront: ov.activeDCsFront,
+      activeDepsFront: ov.activeDepsFront,
       includeGrandOfficers: ov.includeGrandOfficers,
       reverseStewardOrder: ov.reverseStewardOrder,
       officers: {

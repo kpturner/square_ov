@@ -70,7 +70,7 @@
       </v-card-title>
     </v-card>
 
-    <SeatReservations class="only-print" :officers print-mode :spares />
+    <SeatReservations class="only-print" :officers="attendingOfficers" print-mode :spares />
   </v-container>
 </template>
 

@@ -156,6 +156,14 @@
         />
         <v-checkbox
           v-if="activeDCsFront"
+          v-model="activeDepsFront"
+          class="no-print ms-md-3"
+          label="Deps at front also?"
+          dense
+          hide-details
+        />
+        <v-checkbox
+          v-if="activeDCsFront"
           v-model="includeGrandOfficers"
           class="no-print ms-md-3"
           label="GO DCs at front also?"
@@ -329,6 +337,7 @@ const vips = ref<VIP[]>([]);
 const selectedVIPId = ref(null);
 
 const activeDCsFront = ref(false);
+const activeDepsFront = ref(false);
 const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
 const reverseStewardOrder = ref(false);
@@ -393,12 +402,14 @@ async function loadOfficers() {
     : null;
   alignActiveWardens.value = officialVisit.value?.alignWardens ?? false;
   activeDCsFront.value = officialVisit.value?.activeDCsFront ?? false;
+  activeDepsFront.value = officialVisit.value?.activeDepsFront ?? false;
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
   loading.value = false;
 }
 
 async function addOfficer() {
+  /*  This check is no longer needed now that the absolute positioning has been fixed
   // Add ing an officer is not permitted if we have any absolutely positioned officers already.
   // This is vecuse absolute position officers can block automatic officers from being added
   const hasAbsoluteOfficers = officers.value.some(
@@ -419,6 +430,7 @@ async function addOfficer() {
     );
     return;
   }
+  */
   addOfficerDialog.value = false;
   if (selectedActiveOfficerId.value) {
     const ao = activeOfficers.value.find(
@@ -667,6 +679,7 @@ const saveBooleans = () => {
         ...officialVisit.value,
         alignWardens: alignActiveWardens.value,
         activeDCsFront: activeDCsFront.value,
+        activeDepsFront: activeDepsFront.value,
         includeGrandOfficers: includeGrandOfficers.value,
         reverseStewardOrder: reverseStewardOrder.value,
       };
@@ -681,7 +694,7 @@ const saveBooleans = () => {
 };
 
 watch(
-  [alignActiveWardens, reverseStewardOrder, activeDCsFront, includeGrandOfficers],
+  [alignActiveWardens, reverseStewardOrder, activeDCsFront, activeDepsFront, includeGrandOfficers],
   saveBooleans
 );
 </script>
