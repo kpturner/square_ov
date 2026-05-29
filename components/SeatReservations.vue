@@ -16,7 +16,7 @@
               Provincial Grand Lodge of Hampshire & Isle of Wight
             </v-row>
             <v-row class="mb-1 justify-center">
-              <div class="text-h4 font-weight-bold">
+              <div class="text-h4 font-weight-bold name-text">
                 {{ salutation(item) }} {{ cleanName(item.name.toUpperCase()) }}
               </div>
             </v-row>
@@ -83,7 +83,7 @@ const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, 
 
 .crest-column {
   border-right: 1px solid #1565c0; /* Single divider */
-  padding: 16px;
+  padding: 16px !important;
   box-sizing: border-box;
   min-height: 180px;
 }
@@ -95,6 +95,18 @@ const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, 
 
 .spare-header {
   margin-bottom: 130px;
+}
+
+.text-column {
+  min-width: 0;
+  padding: 8px !important;
+}
+
+.name-text {
+  width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.1;
 }
 
 @media print {
