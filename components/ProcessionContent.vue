@@ -1,170 +1,207 @@
 <template>
-  <div v-if="vip" class="d-flex justify-center mb-4">
-    <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
-      <div class="d-flex justify-center align-center">
-        <v-icon color="black" icon="mdi-star" size="large" class="ms-2" />
-        <strong>{{ vip.name }}</strong>
-        <v-icon color="black" icon="mdi-star" size="large" />
-      </div>
-      <div class="text-caption">{{ rankCaption(vip) }}</div>
-    </v-card>
-  </div>
-
-  <div v-if="swordBearer || standardBearer" class="d-flex justify-center mb-4">
-    <v-card
-      v-if="swordBearer"
-      class="pa-3 text-center mr-1 officer-card sword-bearer"
-      color="#FFF59D"
-    >
-      <div class="d-flex justify-center align-center">
-        <strong>{{ swordBearer.name }}</strong>
-        <v-icon color="black" icon="mdi-sword" size="small" class="ms-2" />
-      </div>
-      <div class="text-caption">Sword Bearer</div>
-    </v-card>
-
-    <v-card
-      v-if="standardBearer"
-      class="pa-3 text-center ml-1 officer-card standard-bearer"
-      color="#FFF59D"
-    >
-      <div class="d-flex justify-center align-center">
-        <strong>{{ standardBearer.name }}</strong>
-        <v-icon color="black" icon="mdi-flag" size="small" class="ms-2" />
-      </div>
-      <div class="text-caption">Standard Bearer</div>
-    </v-card>
-  </div>
-
-  <div class="d-flex justify-center flex-wrap mb-2">
-    <div class="row-number no-print"></div>
-    <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-      <strong>SOUTH</strong>
-    </div>
-    <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-      <strong>NORTH</strong>
-    </div>
-  </div>
   <div
-    v-for="(row, idx) in rows"
-    :key="idx"
-    class="d-flex align-center justify-center flex-wrap mb-2"
+    v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
+    class="d-flex justify-center align-center mt-6 mb-4"
   >
-    <div class="row-number no-print">{{ idx + 1 }}</div>
-    <!-- South column -->
-    <div v-if="row.south" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-      <v-card
-        class="pa-2 text-center officer-card"
-        :class="[row.south.grandOfficer ? 'grand-officer' : 'prov-officer', row.south.rank]"
-        :color="row.south.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
-      >
+    <strong>SPLIT COLUMNS ON CARPET</strong>
+  </div>
+
+  <template v-if="(carpetSplitMode && isRowsExceedingCarpetCapacity) || !carpetSplitMode">
+    <div v-if="vip" class="d-flex justify-center mb-4">
+      <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
         <div class="d-flex justify-center align-center">
-          {{ row.south.name }}
-          <v-icon
-            v-if="row.south.rank === 'AGDC' && row.south.active"
-            color="black"
-            icon="mdi-auto-fix"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['GDC', 'DEPGDC'].includes(row.south.rank ?? '') && row.south.active"
-            color="black"
-            icon="mdi-magic-staff"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['SGW', 'JGW'].includes(row.south.rank ?? '') && row.south.active"
-            color="black"
-            icon="mdi-star"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['APGM', 'DPGM'].includes(row.south.rank ?? '') && row.south.active"
-            color="black"
-            icon="mdi-star"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="row.south.position.indexOf('row_') !== -1"
-            color="black"
-            icon="mdi-pin"
-            size="small"
-            class="ms-2"
-          />
+          <v-icon color="black" icon="mdi-star" size="large" class="ms-2" />
+          <strong>{{ vip.name }}</strong>
+          <v-icon color="black" icon="mdi-star" size="large" />
         </div>
-        <div class="text-caption">{{ rankCaption(row.south) }}</div>
+        <div class="text-caption">{{ rankCaption(vip) }}</div>
       </v-card>
     </div>
 
-    <!-- North column -->
-    <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+    <div v-if="swordBearer || standardBearer" class="d-flex justify-center mb-4">
       <v-card
-        class="pa-2 text-center officer-card"
-        :class="[row.north.grandOfficer ? 'grand-officer' : 'prov-officer', row.north.rank]"
-        :color="row.north.grandOfficer ? 'blue-darken-3' : 'blue-darken-1'"
+        v-if="swordBearer"
+        class="pa-3 text-center mr-1 officer-card sword-bearer"
+        color="#FFF59D"
       >
         <div class="d-flex justify-center align-center">
-          {{ row.north.name }}
-          <v-icon
-            v-if="row.north.rank === 'AGDC' && row.north.active"
-            color="black"
-            icon="mdi-auto-fix"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['GDC', 'DEPGDC'].includes(row.north.rank ?? '') && row.north.active"
-            color="black"
-            icon="mdi-magic-staff"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['SGW', 'JGW'].includes(row.north.rank ?? '') && row.north.active"
-            color="black"
-            icon="mdi-star"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="['APGM', 'DPGM'].includes(row.north.rank ?? '') && row.north.active"
-            color="black"
-            icon="mdi-star"
-            size="small"
-            class="ms-2"
-          />
-          <v-icon
-            v-if="row.north.position.indexOf('row_') !== -1"
-            color="black"
-            icon="mdi-pin"
-            size="small"
-            class="ms-2"
-          />
+          <strong>{{ swordBearer.name }}</strong>
+          <v-icon color="black" icon="mdi-sword" size="small" class="ms-2" />
         </div>
-        <div class="text-caption">{{ rankCaption(row.north) }}</div>
+        <div class="text-caption">Sword Bearer</div>
+      </v-card>
+
+      <v-card
+        v-if="standardBearer"
+        class="pa-3 text-center ml-1 officer-card standard-bearer"
+        color="#FFF59D"
+      >
+        <div class="d-flex justify-center align-center">
+          <strong>{{ standardBearer.name }}</strong>
+          <v-icon color="black" icon="mdi-flag" size="small" class="ms-2" />
+        </div>
+        <div class="text-caption">Standard Bearer</div>
       </v-card>
     </div>
-    <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-      <!-- Nobody here! -->
+  </template>
+
+  <template v-if="!props.carpetSplitMode">
+    <div class="d-flex justify-center text-center flex-wrap mb-2">
+      <div class="row-number no-print"></div>
+      <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <strong>SOUTH</strong>
+      </div>
+      <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <strong>NORTH</strong>
+      </div>
     </div>
-  </div>
+
+    <div
+      v-for="(row, idx) in rows"
+      :key="idx"
+      class="d-flex align-center justify-center flex-wrap mb-2"
+    >
+      <div class="row-number no-print">{{ idx + 1 }}</div>
+      <!-- South column -->
+      <div v-if="row.south" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <OfficerCard :officer="row.south" />
+      </div>
+      <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <!-- Nobody here! -->
+      </div>
+
+      <!-- North column -->
+      <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <OfficerCard :officer="row.north" />
+      </div>
+      <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
+        <!-- Nobody here! -->
+      </div>
+    </div>
+  </template>
+
+  <template v-else>
+    <div v-if="isRowsExceedingCarpetCapacity">
+      <div class="d-flex justify-center flex-wrap mb-2 text-center">
+        <div class="row-number no-print"></div>
+
+        <!-- SOUTH spans 2 columns -->
+        <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
+          <strong>SOUTH</strong>
+        </div>
+
+        <!-- NORTH spans 2 columns -->
+        <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
+          <strong>NORTH</strong>
+        </div>
+      </div>
+
+      <div class="d-flex justify-center flex-wrap mb-2 text-center sub-header">
+        <div class="row-number no-print"></div>
+
+        <!-- SOUTH subcolumns -->
+        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+          <small>OUTER</small>
+        </div>
+        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+          <small>INNER</small>
+        </div>
+
+        <!-- NORTH subcolumns -->
+        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+          <small>INNER</small>
+        </div>
+        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+          <small>OUTER</small>
+        </div>
+      </div>
+
+      <div
+        v-for="(row, idx) in splitRows"
+        :key="idx"
+        class="d-flex align-center justify-center flex-wrap mb-2"
+      >
+        <div class="row-number no-print">{{ idx + 1 }}</div>
+        <!-- South column 1-->
+        <div
+          v-if="row.south"
+          class="pa-1"
+          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+        >
+          <OfficerCard :officer="row.south" />
+        </div>
+        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+          <!-- Nobody here! -->
+        </div>
+        <!-- South column 2-->
+        <div
+          v-if="row.south2"
+          class="pa-1"
+          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+        >
+          <OfficerCard :officer="row.south2" />
+        </div>
+        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+          <!-- Nobody here! -->
+        </div>
+        <!-- North column -->
+        <div
+          v-if="row.north"
+          class="pa-1"
+          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+        >
+          <OfficerCard :officer="row.north" />
+        </div>
+        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+          <!-- Nobody here! -->
+        </div>
+        <div
+          v-if="row.north2"
+          class="pa-1"
+          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+        >
+          <OfficerCard :officer="row.north2" />
+        </div>
+        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+          <!-- Nobody here! -->
+        </div>
+      </div>
+      <div
+        v-if="headSouth || headNorth"
+        class="d-flex align-center justify-center flex-wrap mt-4 mb-2 head-row"
+      >
+        <div class="row-number no-print">H</div>
+
+        <!-- SOUTH side (centred across OUTER + INNER) -->
+        <div
+          class="pa-1"
+          style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
+        >
+          <OfficerCard v-if="headSouth" :officer="headSouth" />
+        </div>
+
+        <!-- NORTH side -->
+        <div
+          class="pa-1"
+          style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
+        >
+          <OfficerCard v-if="headNorth" :officer="headNorth" />
+        </div>
+      </div>
+    </div>
+  </template>
 </template>
 
 <script setup lang="ts">
 import type { Officer, OV } from '@prisma/client';
-import type { Rank } from '~/types/officers';
+import type { Rank, ProcessionRow } from '~/types';
 
 const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
-
-type ProcessionRow = { south?: Officer; north?: Officer };
 
 const props = defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
+  carpetSplitMode?: boolean;
 }>();
 
 // Special roles
@@ -185,6 +222,10 @@ const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
   const gStwd = ranks.find((r) => r.value === 'GSTWD')!;
   return [...ranks.filter((r) => r.value !== 'GSTWD'), gStwd];
+});
+
+const isRowsExceedingCarpetCapacity = computed(() => {
+  return rows.value.length > (props.officialVisit?.carpetCapacity ?? 15);
 });
 
 const rankPrefix = (officer: Officer) => {
@@ -629,6 +670,34 @@ const rows = computed(() => {
 
   return compacted.filter((r) => r.south || r.north);
 });
+
+const splitRows = computed<ProcessionRow[]>(() => {
+  const capacity = props.officialVisit?.carpetCapacity ?? 15;
+
+  const processionRows = rows.value.filter(
+    (row) => row.south?.position !== 'head_of_south' && row.north?.position !== 'head_of_north'
+  );
+
+  const baseRows = processionRows.slice(0, capacity);
+  const overflowRows = processionRows.slice(capacity);
+
+  const overflowOffset = capacity - overflowRows.length;
+
+  return Array.from({ length: capacity }, (_, idx) => {
+    const base = baseRows[idx];
+    const overflow = idx >= overflowOffset ? overflowRows[idx - overflowOffset] : undefined;
+
+    return {
+      // South overflow becomes primary
+      south: overflow?.south,
+      south2: base?.south,
+
+      // North base remains primary
+      north: base?.north,
+      north2: overflow?.north,
+    };
+  }).filter((r) => r.south || r.south2 || r.north || r.north2);
+});
 </script>
 
 <style lang="scss" scoped>
@@ -642,22 +711,11 @@ const rows = computed(() => {
 }
 
 .sword-bearer,
-.standard-bearer,
-.grand-officer {
+.standard-bearer {
   border: 6px solid #fbc02d;
 }
 
-.prov-officer {
-  border: 4px solid #fbc02d;
-}
-
-.GSTWD {
-  border-color: #a0171d;
-}
-
-.vip,
-.APGM,
-.DPGM {
+.vip {
   border: 8px solid #fbc02d;
 }
 
@@ -676,19 +734,10 @@ const rows = computed(() => {
 
   .vip,
   .sword-bearer,
-  .standard-bearer,
-  .prov-officer,
-  .grand-officer {
+  .standard-bearer {
     background-color: transparent !important;
     color: black !important;
     border-color: black;
-  }
-
-  .officer-card {
-    color: black !important;
-    margin-bottom: 50px;
-    page-break-inside: avoid; /* Prevent splitting across pages */
-    break-inside: avoid;
   }
 
   .procession-header {

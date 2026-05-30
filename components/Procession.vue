@@ -37,6 +37,15 @@
           <ProcessionContent :officers="officers" :official-visit="officialVisit" />
         </v-col>
       </v-row>
+      <v-row class="print-new-page">
+        <v-col cols="12">
+          <ProcessionContent
+            :officers="officers"
+            :official-visit="officialVisit"
+            carpet-split-mode
+          />
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
@@ -58,5 +67,12 @@ async function printProcession() {
 .v-card-text {
   display: flex;
   flex-direction: column;
+}
+
+@media print {
+  .print-new-page {
+    break-before: page;
+    page-break-before: always; /* legacy support */
+  }
 }
 </style>

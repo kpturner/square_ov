@@ -15,6 +15,10 @@ export default defineEventHandler(async (event) => {
       activeDepsFront: body.activeDepsFront,
       includeGrandOfficers: body.includeGrandOfficers,
       reverseStewardOrder: body.reverseStewardOrder,
+      carpetCapacity:
+        typeof body.carpetCapacity === 'string'
+          ? parseInt(body.carpetCapacity)
+          : body.carpetCapacity,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
     },
   });

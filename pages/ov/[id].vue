@@ -170,6 +170,14 @@
           dense
           hide-details
         />
+        <v-text-field
+          v-model="carpetCapacity"
+          type="number"
+          label="Carpet Capacity"
+          class="no-print ms-md-3 carpet-capacity"
+          dense
+          hide-details
+        />
       </div>
     </v-card>
 
@@ -341,6 +349,7 @@ const activeDepsFront = ref(false);
 const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
 const reverseStewardOrder = ref(false);
+const carpetCapacity = ref(15);
 
 const loading = ref(true);
 
@@ -405,6 +414,7 @@ async function loadOfficers() {
   activeDepsFront.value = officialVisit.value?.activeDepsFront ?? false;
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
+  carpetCapacity.value = officialVisit.value?.carpetCapacity ?? 15;
   loading.value = false;
 }
 
@@ -671,7 +681,7 @@ async function saveAll() {
 }
 
 let timeout: ReturnType<typeof setTimeout>;
-const saveBooleans = () => {
+const saveControls = () => {
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
     try {
@@ -682,6 +692,7 @@ const saveBooleans = () => {
         activeDepsFront: activeDepsFront.value,
         includeGrandOfficers: includeGrandOfficers.value,
         reverseStewardOrder: reverseStewardOrder.value,
+        carpetCapacity: carpetCapacity.value,
       };
       officialVisit.value = await useApi()<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
         method: 'PUT',
@@ -694,9 +705,20 @@ const saveBooleans = () => {
 };
 
 watch(
-  [alignActiveWardens, reverseStewardOrder, activeDCsFront, activeDepsFront, includeGrandOfficers],
-  saveBooleans
+  [
+    alignActiveWardens,
+    reverseStewardOrder,
+    activeDCsFront,
+    activeDepsFront,
+    includeGrandOfficers,
+    carpetCapacity,
+  ],
+  saveControls
 );
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.carpet-capacity {
+  max-width: 150px;
+}
+</style>

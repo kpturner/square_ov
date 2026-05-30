@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
       activeDepsFront: ov.activeDepsFront,
       includeGrandOfficers: ov.includeGrandOfficers,
       reverseStewardOrder: ov.reverseStewardOrder,
+      carpetCapacity: ov.carpetCapacity,
       officers: {
         create: ov.officers.map(({ id, ovId, ...officer }) => officer),
       },
