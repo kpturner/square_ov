@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `OV` ADD COLUMN `carpetCapacity` INTEGER NOT NULL DEFAULT 15;

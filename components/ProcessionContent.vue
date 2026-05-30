@@ -597,15 +597,31 @@ const rows = computed(() => {
       const jwRow = compacted[jgwRowIndex];
 
       if (swRow && jwRow) {
-        const displaced = swRow.south?.id === seniorWarden.value.id ? swRow.north : swRow.south;
-
-        swRow.south = seniorWarden.value;
-        swRow.north = juniorWarden.value;
-
-        if (jwRow.south?.id === juniorWarden.value.id) {
-          jwRow.south = displaced;
-        } else if (jwRow.north?.id === juniorWarden.value.id) {
-          jwRow.north = displaced;
+        // Is the SGW in the north or the south?
+        if (compacted[sgwRowIndex]?.south?.id === seniorWarden.value.id) {
+          // In the right place already, so swap the JGW into the north of that row
+          if (swRow && jwRow) {
+            const officerToMove = { ...swRow.north };
+            swRow.north = juniorWarden.value;
+            if (jwRow.north?.id === juniorWarden.value.id) {
+              jwRow.north = officerToMove as Officer;
+            } else {
+              jwRow.south = officerToMove as Officer;
+            }
+          }
+        } else {
+          // SW is in a the north
+          if (swRow && jwRow) {
+            const officerInNorthOfJWRow = { ...jwRow.north };
+            const officerInSouthOfJWRow = { ...jwRow.south };
+            const officerToMove =
+              officerInNorthOfJWRow.id === juniorWarden.value.id
+                ? officerInSouthOfJWRow
+                : officerInNorthOfJWRow;
+            jwRow.south = seniorWarden.value;
+            jwRow.north = juniorWarden.value;
+            swRow.north = officerToMove as Officer;
+          }
         }
       }
     }

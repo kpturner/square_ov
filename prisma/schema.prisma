@@ -31,6 +31,7 @@ model OV {
   activeDepsFront      Boolean   @default(false)
   includeGrandOfficers Boolean   @default(false)
   reverseStewardOrder  Boolean   @default(false)
+  carpetCapacity       Int       @default(15)
 
   @@index([userId], map: "OV_userId_fkey")
 }
