@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
         typeof body.carpetCapacity === 'string'
           ? parseInt(body.carpetCapacity)
           : body.carpetCapacity,
+      splitByRow: body.splitByRow,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
     },
   });

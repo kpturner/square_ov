@@ -196,6 +196,7 @@
       v-if="!loading && officialVisit"
       :officers="officers.filter((o) => !o.excludeFromProcession && o.attending)"
       :official-visit
+      @split-by-row-change="splitByRowChange"
     />
 
     <v-card v-if="!loading" class="no-print">
@@ -735,6 +736,14 @@ const saveControls = () => {
     }
   }, 400);
 };
+
+function splitByRowChange(value: boolean) {
+  officialVisit.value = {
+    ...officialVisit.value,
+    splitByRow: value,
+  } as OV;
+  saveControls();
+}
 
 watch(
   [

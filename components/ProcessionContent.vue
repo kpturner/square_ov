@@ -82,6 +82,13 @@
 
   <template v-else>
     <div v-if="isRowsExceedingCarpetCapacity">
+      <v-checkbox
+        v-model="splitByRow"
+        class="d-flex justify-center no-print ms-md-3"
+        label="Senior to rear?"
+        dense
+        hide-details
+      />
       <div class="d-flex justify-center flex-wrap mb-2 text-center">
         <div class="row-number no-print"></div>
 
@@ -204,6 +211,8 @@ const props = defineProps<{
   carpetSplitMode?: boolean;
 }>();
 
+const emits = defineEmits(['split-by-row-change']);
+
 // Special roles
 const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
 const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'));
@@ -217,6 +226,8 @@ const seniorWarden = computed(() =>
 const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
+
+const splitByRow = ref(props.officialVisit?.splitByRow ?? true);
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
@@ -678,10 +689,51 @@ const splitRows = computed<ProcessionRow[]>(() => {
     (row) => row.south?.position !== 'head_of_south' && row.north?.position !== 'head_of_north'
   );
 
-  const baseRows = processionRows.slice(0, capacity);
   const overflowRows = processionRows.slice(capacity);
-
   const overflowOffset = capacity - overflowRows.length;
+
+  const baseRows = processionRows.slice(0, capacity);
+
+  if (splitByRow.value) {
+    const result: ProcessionRow[] = [];
+
+    const rows = processionRows; // no clone needed
+
+    const overflowStart = overflowOffset;
+
+    let i = 0;
+
+    // Phase 1: inner-only rows
+    while (i < overflowStart) {
+      const row = rows[i];
+
+      result.push({
+        south: undefined,
+        south2: row?.south,
+        north: row?.north,
+        north2: undefined,
+      });
+
+      i++;
+    }
+
+    // Phase 2: paired rows
+    while (i < rows.length) {
+      const current = rows[i];
+      const next = rows[i + 1];
+
+      result.push({
+        south: next?.south,
+        south2: current?.south,
+        north: current?.north,
+        north2: next?.north,
+      });
+
+      i += 2;
+    }
+
+    return result.filter((r) => r.south || r.south2 || r.north || r.north2);
+  }
 
   return Array.from({ length: capacity }, (_, idx) => {
     const base = baseRows[idx];
@@ -697,6 +749,10 @@ const splitRows = computed<ProcessionRow[]>(() => {
       north2: overflow?.north,
     };
   }).filter((r) => r.south || r.south2 || r.north || r.north2);
+});
+
+watch([splitByRow], () => {
+  emits('split-by-row-change', splitByRow.value);
 });
 </script>
 

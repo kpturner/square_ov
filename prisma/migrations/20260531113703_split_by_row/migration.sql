@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `OV` ADD COLUMN `splitByRow` BOOLEAN NOT NULL DEFAULT false;

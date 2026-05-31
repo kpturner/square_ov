@@ -43,6 +43,7 @@
             :officers="officers"
             :official-visit="officialVisit"
             carpet-split-mode
+            @split-by-row-change="splitByRowChange"
           />
         </v-col>
       </v-row>
@@ -58,8 +59,14 @@ defineProps<{
   officialVisit: OV | null;
 }>();
 
+const emits = defineEmits(['split-by-row-change']);
+
 async function printProcession() {
   window.print();
+}
+
+function splitByRowChange(val: boolean) {
+  emits('split-by-row-change', val);
 }
 </script>
 
