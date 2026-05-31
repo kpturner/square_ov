@@ -86,11 +86,4 @@ async function printSplitProcession() {
   display: flex;
   flex-direction: column;
 }
-
-@media print {
-  .print-new-page {
-    break-before: page;
-    page-break-before: always; /* legacy support */
-  }
-}
 </style>
