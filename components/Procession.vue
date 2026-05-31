@@ -28,7 +28,7 @@
     </v-card-title>
 
     <v-card-text>
-      <v-row>
+      <v-row :class="isPrintSplitProcession ? 'no-print' : ''">
         <v-col cols="3" class="d-none d-sm-block sm:pa-0">
           <rank-order />
         </v-col>
@@ -37,13 +37,15 @@
           <ProcessionContent :officers="officers" :official-visit="officialVisit" />
         </v-col>
       </v-row>
-      <v-row class="print-new-page">
+
+      <v-row :class="isPrintSplitProcession ? '' : 'no-print'">
         <v-col cols="12">
           <ProcessionContent
             :officers="officers"
             :official-visit="officialVisit"
             carpet-split-mode
             @split-by-row-change="splitByRowChange"
+            @print-split-procession="printSplitProcession"
           />
         </v-col>
       </v-row>
@@ -59,7 +61,8 @@ defineProps<{
   officialVisit: OV | null;
 }>();
 
-const emits = defineEmits(['split-by-row-change']);
+const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
+const isPrintSplitProcession = ref(false);
 
 async function printProcession() {
   window.print();
@@ -67,6 +70,14 @@ async function printProcession() {
 
 function splitByRowChange(val: boolean) {
   emits('split-by-row-change', val);
+}
+
+async function printSplitProcession() {
+  isPrintSplitProcession.value = true;
+  await nextTick();
+  printProcession();
+  await nextTick();
+  isPrintSplitProcession.value = false;
 }
 </script>
 

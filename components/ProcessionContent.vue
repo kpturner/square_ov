@@ -1,9 +1,18 @@
 <template>
   <div
     v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
-    class="d-flex justify-center align-center mt-6 mb-4"
+    class="d-flex flex-column justify-center align-center mt-6 mb-4"
   >
     <strong>SPLIT COLUMNS ON CARPET</strong>
+
+    <v-btn
+      class="no-print"
+      color="primary"
+      prepend-icon="mdi-printer"
+      @click="printSplitProcession"
+    >
+      Print
+    </v-btn>
   </div>
 
   <template v-if="(carpetSplitMode && isRowsExceedingCarpetCapacity) || !carpetSplitMode">
@@ -211,7 +220,7 @@ const props = defineProps<{
   carpetSplitMode?: boolean;
 }>();
 
-const emits = defineEmits(['split-by-row-change']);
+const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
 
 // Special roles
 const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
@@ -754,6 +763,10 @@ const splitRows = computed<ProcessionRow[]>(() => {
 watch([splitByRow], () => {
   emits('split-by-row-change', splitByRow.value);
 });
+
+async function printSplitProcession() {
+  emits('print-split-procession');
+}
 </script>
 
 <style lang="scss" scoped>
