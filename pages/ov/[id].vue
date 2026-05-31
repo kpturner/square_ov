@@ -133,6 +133,16 @@
 
     <v-card>
       <div class="no-print d-flex flex-column flex-sm-row">
+        <v-text-field
+          v-model="processionTotal"
+          type="number"
+          label="Procession total"
+          class="no-print ms-md-3 carpet-capacity"
+          dense
+          disabled
+          readonly
+          hide-details
+        />
         <v-checkbox
           v-model="alignActiveWardens"
           label="Align active wardens?"
@@ -175,6 +185,7 @@
           type="number"
           label="Carpet Capacity"
           class="no-print ms-md-3 carpet-capacity"
+          :min="minCapacity"
           dense
           hide-details
         />
@@ -349,7 +360,7 @@ const activeDepsFront = ref(false);
 const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
 const reverseStewardOrder = ref(false);
-const carpetCapacity = ref(15);
+const carpetCapacity = ref(0);
 
 const loading = ref(true);
 
@@ -414,7 +425,7 @@ async function loadOfficers() {
   activeDepsFront.value = officialVisit.value?.activeDepsFront ?? false;
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
-  carpetCapacity.value = officialVisit.value?.carpetCapacity ?? 15;
+  carpetCapacity.value = officialVisit.value?.carpetCapacity ?? minCapacity.value;
   loading.value = false;
 }
 
@@ -679,6 +690,27 @@ async function saveAll() {
   await loadOfficers();
   return true;
 }
+
+const processionTotal = computed(
+  () => officers.value.filter((o) => o.attending && !o.excludeFromProcession).length
+);
+
+const vip = computed(() => officers.value.find((o) => o.position === 'vip'));
+const swordBearer = computed(() => officers.value.find((o) => o.position === 'sword_bearer'));
+const standardBearer = computed(() => officers.value.find((o) => o.position === 'standard_bearer'));
+const headOfSouth = computed(() => officers.value.find((o) => o.position === 'head_of_south'));
+const headOfNorth = computed(() => officers.value.find((o) => o.position === 'head_of_north'));
+
+const minCapacity = computed(() => {
+  const columnTotal =
+    processionTotal.value -
+    (vip.value ? 1 : 0) -
+    (headOfSouth.value ? 1 : 0) -
+    (headOfNorth.value ? 1 : 0) -
+    (swordBearer.value ? 1 : 0) -
+    (standardBearer.value ? 1 : 0);
+  return Math.ceil(columnTotal / 4);
+});
 
 let timeout: ReturnType<typeof setTimeout>;
 const saveControls = () => {
