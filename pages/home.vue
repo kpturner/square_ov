@@ -381,11 +381,11 @@ async function loadActiveOfficers() {
 
 function exportOV(item: OV) {
   ovToExport.value = item;
-  userDialog.value = false;
   userDialog.value = true;
 }
 
 async function exportToUser() {
+  userDialog.value = false;
   if (!ovToExport.value || !selectedUserId.value) {
     return;
   }
