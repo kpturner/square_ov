@@ -640,7 +640,7 @@ function emailTheTeam() {
 async function confirmedDeletion() {
   if (officerToDelete.value) {
     await useApi()(`/api/officers/${officerToDelete.value.id}`, { method: 'DELETE' });
-    makeToast(`${officerToDelete.value.name} ${officerToDelete.value.rank} removed from the list.`);
+    makeToast(`${officerToDelete.value.name} removed from the list.`);
     await loadOfficers();
   }
 }

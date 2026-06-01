@@ -60,6 +60,7 @@
       <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <strong>SOUTH</strong>
       </div>
+      <v-divider vertical class="mx-2" />
       <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <strong>NORTH</strong>
       </div>
@@ -78,7 +79,7 @@
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
       </div>
-
+      <v-divider vertical class="mx-2" />
       <!-- North column -->
       <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <OfficerCard :officer="row.north" />
@@ -105,7 +106,7 @@
         <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
           <strong>SOUTH</strong>
         </div>
-
+        <v-divider vertical class="mx-2" />
         <!-- NORTH spans 2 columns -->
         <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
           <strong>NORTH</strong>
@@ -122,7 +123,7 @@
         <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
           <small>INNER</small>
         </div>
-
+        <v-divider vertical class="mx-2" />
         <!-- NORTH subcolumns -->
         <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
           <small>INNER</small>
@@ -160,6 +161,7 @@
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
         </div>
+        <v-divider vertical class="mx-2" />
         <!-- North column -->
         <div
           v-if="row.north"
@@ -195,7 +197,7 @@
         >
           <OfficerCard v-if="headSouth" :officer="headSouth" />
         </div>
-
+        <v-divider vertical class="mx-2" />
         <!-- NORTH side -->
         <div
           class="pa-1"
