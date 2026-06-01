@@ -4,6 +4,9 @@ export default defineEventHandler(async (event) => {
   const id = Number(event.context.params?.id);
   if (isNaN(id)) throw createError({ statusCode: 400, statusMessage: 'Invalid OV ID' });
 
+  const body = await readBody(event);
+  const toUserId = body.toUserId;
+
   // Fetch the existing OV including its officers
   const ov = await prisma.oV.findUnique({
     where: { id },
@@ -17,7 +20,7 @@ export default defineEventHandler(async (event) => {
     data: {
       name: `${ov.name} (Copy)`,
       ovDate: ov.ovDate,
-      userId: ov.userId,
+      userId: toUserId ? Number(toUserId) : ov.userId,
       alignWardens: ov.alignWardens,
       activeDCsFront: ov.activeDCsFront,
       activeDepsFront: ov.activeDepsFront,

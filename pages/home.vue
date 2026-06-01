@@ -91,6 +91,15 @@
                 />
                 <v-btn
                   class="me-2"
+                  icon="mdi-file-export"
+                  size="small"
+                  color="blue"
+                  variant="elevated"
+                  title="Export OV to another user"
+                  @click="exportOV(item)"
+                />
+                <v-btn
+                  class="me-2"
                   icon="mdi-account-group"
                   size="small"
                   color="success"
@@ -154,6 +163,15 @@
                       variant="elevated"
                       title="Copy OV"
                       @click="copyOV(item)"
+                    />
+                    <v-btn
+                      class="me-2"
+                      icon="mdi-file-export"
+                      size="small"
+                      color="blue"
+                      variant="elevated"
+                      title="Export OV to another user"
+                      @click="exportOV(item)"
                     />
                     <v-btn
                       class="me-2"
@@ -245,6 +263,37 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="userDialog" max-width="400">
+      <v-card>
+        <v-card-title>Export OV to another user</v-card-title>
+        <v-card-text v-show="!editedOV.id">
+          Select user to export to
+          <v-autocomplete
+            v-model="selectedUserId"
+            class="hidden-sm-and-down"
+            :items="userSelectionList"
+            density="compact"
+            clearable
+            placeholder="Select user"
+          />
+          <v-select
+            v-model="selectedUserId"
+            class="hidden-md-and-up"
+            :items="userSelectionList"
+            density="compact"
+            clearable
+            placeholder="Select user"
+          />
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="userDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="exportToUser">Export</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <DialogConfirm
       v-model="showDeleteConfirm"
       title="Delete Official Visit"
@@ -257,7 +306,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer, VIP, Officer } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User } from '@prisma/client';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -272,6 +321,11 @@ const search = ref('');
 const { isDark } = useIsDark();
 const isAdmin = useIsAdmin();
 const isImpersonating = ref(false);
+
+const userDialog = ref(false);
+const selectedUserId = ref<number | null>(null);
+const ovToExport = ref<OV | null>(null);
+const users = ref<User[]>([]);
 
 const authStore = useAuthStore();
 
@@ -314,10 +368,44 @@ async function loadOVs() {
   loading.value = false;
 }
 
+async function loadUsers() {
+  users.value = await useApi()<User[]>('/api/user');
+  loading.value = false;
+}
+
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
     `/api/active-officers?year=${masonicYear}`
   );
+}
+
+function exportOV(item: OV) {
+  ovToExport.value = item;
+  userDialog.value = false;
+  userDialog.value = true;
+}
+
+async function exportToUser() {
+  if (!ovToExport.value || !selectedUserId.value) {
+    return;
+  }
+  loading.value = true;
+  try {
+    await useApi()(`/api/ov/${ovToExport.value.id}/copy`, {
+      method: 'POST',
+      body: { toUserId: selectedUserId.value },
+    });
+    await loadOVs();
+    makeToast(
+      `Official visit"${ovToExport.value.name}" exported to ${users.value.find((u) => u.id === selectedUserId.value)?.name} successfully`,
+      'error'
+    );
+  } catch (err) {
+    logger.error('Failed to export OV:', err);
+    alert('An error occurred while exporting this OV.');
+  } finally {
+    loading.value = false;
+  }
 }
 
 const ovSelectionList = computed(() => {
@@ -325,6 +413,15 @@ const ovSelectionList = computed(() => {
     return {
       value: ov.id,
       title: `${ov.number}: ${ov.lodgeName} ${ov.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
+    };
+  });
+});
+
+const userSelectionList = computed(() => {
+  return users.value.map((user) => {
+    return {
+      value: user.id,
+      title: user.name,
     };
   });
 });
@@ -590,6 +687,7 @@ function goToOfficers(item: OV) {
 onMounted(async () => {
   await loadActiveOfficers();
   await loadOVs();
+  await loadUsers();
   isImpersonating.value = await useApi()('/api/impersonating');
 });
 </script>
