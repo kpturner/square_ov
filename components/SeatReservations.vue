@@ -1,6 +1,6 @@
 <template>
   <v-row dense>
-    <v-col v-for="(item, i) in officers" :key="item.id ?? i" cols="12">
+    <v-col v-for="(item, i) in officersByName" :key="item.id ?? i" cols="12">
       <v-card
         class="reservation-card ml-1 mb-1"
         :elevation="printMode ? '0' : '3'"
@@ -61,7 +61,11 @@
 import type { Officer } from '@prisma/client';
 import hiowCrest from '~/assets/images/hiowcrest.png';
 
-defineProps<{ officers: Officer[]; spares: number; printMode?: boolean }>();
+const props = defineProps<{ officers: Officer[]; spares: number; printMode?: boolean }>();
+
+const officersByName = computed(() =>
+  [...props.officers].sort((a, b) => a.name.localeCompare(b.name))
+);
 
 const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, grandRankPrefix } =
   useSalutations();

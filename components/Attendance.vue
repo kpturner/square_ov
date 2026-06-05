@@ -79,21 +79,9 @@ const fullName = (officer: Officer) => {
   return fullName;
 };
 
-const sortedOfficers = computed(() => {
-  const priority = {
-    vip: 1,
-    sword_bearer: 2,
-    standard_bearer: 3,
-    head_of_south: 4,
-    head_of_north: 5,
-  };
-
-  return [...props.officers].sort((a, b) => {
-    const aPriority = priority[a.position as keyof typeof priority] || 999;
-    const bPriority = priority[b.position as keyof typeof priority] || 999;
-    return aPriority - bPriority;
-  });
-});
+const sortedOfficers = computed(() =>
+  [...props.officers].sort((a, b) => a.name.localeCompare(b.name))
+);
 
 const attendingText = computed(() => {
   if (!props.officialVisit?.ovDate) return 'Attending';
