@@ -238,7 +238,7 @@ const juniorWarden = computed(() =>
   props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
 
-const splitByRow = ref(props.officialVisit?.splitByRow ?? true);
+const splitByRow = ref(props.officialVisit?.splitByRow ?? false);
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)

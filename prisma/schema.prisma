@@ -32,7 +32,7 @@ model OV {
   includeGrandOfficers Boolean   @default(false)
   reverseStewardOrder  Boolean   @default(false)
   carpetCapacity       Int       @default(15)
-  splitByRow           Boolean   @default(true)
+  splitByRow           Boolean   @default(false)
 
   @@unique([userId, name])
   @@index([userId], map: "OV_userId_fkey")
