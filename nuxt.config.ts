@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   css: ['@/assets/css/global.scss', '@fontsource/unifrakturmaguntia/index.css'],
   devtools: { enabled: true },
   devServer: {
-    port: 4000,
+    port: 4003,
   },
   runtimeConfig: {
     brevo: {

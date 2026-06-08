@@ -10,7 +10,7 @@ function usage {
     echo "--name               | -n   [square-ov(default)]"
     echo "--instance           | -t   [square-ov(default)]"
     echo "--image              | -m   [image for container to use (appended with -latest) (default=$instance)]"
-    echo "--port               | -p   [4000(default)]"
+    echo "--port               | -p   [4003(default)]"
     echo "--file               | -f   [docker-compose.yml(default)]"
     echo "--action             | -a   ['up'(default), 'down']"
     echo "--update             | -u   [Fetch updated docker images]"
@@ -21,7 +21,7 @@ name="square-ov"
 file="docker-compose.yml"
 action="up -d"
 update=""
-port=4000
+port=4003
 pull=''
 instance=square-ov
 proxy=https://ov.kpturner.co.uk

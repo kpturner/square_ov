@@ -44,7 +44,7 @@ FROM node:22 AS final-stage
 WORKDIR /usr/src/app
 
 ENV OPTS=${OPTS}
-ENV NITRO_PORT=4000
+ENV NITRO_PORT=4003
 
 # Copy built output and minimal runtime files from build stage
 COPY --from=build-stage /usr/src/app/.output ./.output
@@ -62,6 +62,6 @@ RUN yarn install --frozen-lockfile --production && \
     apt-get install -y default-mysql-client && \
     rm -rf /var/lib/apt/lists/*
 
-EXPOSE 4000
+EXPOSE 4003
 
 CMD ["./start.sh"]
