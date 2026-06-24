@@ -29,6 +29,7 @@ export default defineNuxtConfig({
       port: String(config.get('database.port')),
       name: config.get<string>('database.name'),
     },
+    allowedEmails: config.get<string[]>('allowedEmails'),
     public: {
       logLevel: config.get('log_level'),
       logToFile: config.get<boolean>('log_to_file'),

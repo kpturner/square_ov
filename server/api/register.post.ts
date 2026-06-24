@@ -18,6 +18,8 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'Name, email and password are required' });
   }
 
+  const { allowedEmails } = useRuntimeConfig();
+
   const existing = await prisma.user.findUnique({ where: { email: body.email } });
   if (existing) {
     throw createError({ statusCode: 400, statusMessage: 'User already exists' });
@@ -32,14 +34,16 @@ export default defineEventHandler(async (event) => {
   }
 
   // Only active officers can register an account
-  const ao = await prisma.activeOfficer.findUnique({
-    where: { year_email: { year: body.masonicYear, primaryEmail: body.email } },
-  });
-  if (!ao) {
-    throw createError({
-      statusCode: 400,
-      statusMessage: `Email address ${body.email} is not a primary email address for any active officer in ${body.masonicYear}`,
+  if (!allowedEmails.includes(body.email)) {
+    const ao = await prisma.activeOfficer.findUnique({
+      where: { year_email: { year: body.masonicYear, primaryEmail: body.email } },
     });
+    if (!ao) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: `Email address ${body.email} is not a primary email address for any active officer in ${body.masonicYear}`,
+      });
+    }
   }
 
   const passwordHash = await bcrypt.hash(body.password, 12);
