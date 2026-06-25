@@ -17,9 +17,17 @@
 </template>
 
 <script setup lang="ts">
+import type { OVType } from '@prisma/client';
 import type { Rank } from '~/types/officers';
 
-const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
+const props = defineProps<{
+  ovType: OVType | null;
+}>();
+
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () => (props.ovType === 'craft' || !props.ovType ? cfg.ranks : cfg.raRanks) as Rank[]
+);
 </script>
 
 <style lang="scss" scoped>

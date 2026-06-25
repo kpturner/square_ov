@@ -34,6 +34,7 @@ export default defineNuxtConfig({
       logLevel: config.get('log_level'),
       logToFile: config.get<boolean>('log_to_file'),
       ranks: config.get<Rank[]>('ranks'),
+      raRanks: config.get<Rank[]>('raRanks'),
       admins: config.get<string[]>('admins'),
     },
   },

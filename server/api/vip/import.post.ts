@@ -1,5 +1,6 @@
 import prisma from '~/server/utils/dbClient';
 import { z } from 'zod';
+import { OVType } from '@prisma/client';
 
 const VIPSchema = z.object({
   provincialRank: z.string(),
@@ -13,8 +14,12 @@ const VIPSchema = z.object({
 export default defineEventHandler(async (event) => {
   const importErrors: string[] = [];
   const body = await readBody(event);
-  const { year, vips } = z
-    .object({ year: z.string(), vips: z.array(z.record(z.string(), z.any())) })
+  const { ovType, year, vips } = z
+    .object({
+      ovType: z.enum(OVType),
+      year: z.string(),
+      vips: z.array(z.record(z.string(), z.any())),
+    })
     .parse(body);
 
   const columnMap: Record<string, keyof typeof VIPSchema.shape> = {
@@ -42,7 +47,7 @@ export default defineEventHandler(async (event) => {
 
   const promises = validatedVIPs.map((vip) =>
     prisma.vIP.upsert({
-      where: { year_name: { year, name: vip.name } },
+      where: { type_year_name: { ovType, year, name: vip.name } },
       update: vip,
       create: { ...vip, year },
     })

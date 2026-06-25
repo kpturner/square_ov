@@ -76,7 +76,10 @@
         <v-select
           v-model="item.grandRank"
           :items="
-            [{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))
+            [{ value: '' }, ...ranks].filter(
+              (r) =>
+                !['PGM', 'DPGM', 'APGM', 'MEGS', 'DGS', '2NDGP', '3RDGP', 'AGP'].includes(r.value)
+            )
           "
           item-title="value"
           density="compact"
@@ -294,9 +297,9 @@
 
 <script setup lang="ts">
 import type { Rank } from '~/types/officers';
-import type { Officer, Position } from '@prisma/client';
+import type { Officer, Position, OVType } from '@prisma/client';
 
-const props = defineProps<{ officers: Officer[] }>();
+const props = defineProps<{ ovType: OVType | null; officers: Officer[] }>();
 
 const justAddedId = ref<string | number | null>(null);
 
@@ -320,7 +323,10 @@ const setCardRef = (id: string | number, el: HTMLElement | null) => {
 
 const emits = defineEmits(['delete-officer', 'save-changes', 'officer-contact-details']);
 
-const ranks = useRuntimeConfig().public.ranks as Rank[];
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () => (props.ovType === 'craft' || !props.ovType ? cfg.ranks : cfg.raRanks) as Rank[]
+);
 
 // Do not use useApi() here
 const _positionsRes = await $fetch<Position>('/api/ov/positions');

@@ -66,7 +66,9 @@ function formatDate(dateStr?: string | Date) {
   return date.toLocaleDateString();
 }
 
-const { salutation, provincialRankPrefixAbbrev, grandRankPrefixAbbrev } = useSalutations();
+const { salutation, provincialRankPrefixAbbrev, grandRankPrefixAbbrev } = useSalutations(
+  props.officialVisit?.ovType ?? null
+);
 
 const fullName = (officer: Officer) => {
   let fullName = `${salutation(officer)} ${officer.name}`;

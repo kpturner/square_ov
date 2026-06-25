@@ -30,9 +30,9 @@
             </v-btn>
           </div>
           <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex flex-column align-start">
-              <div class="mb-2 w-100 d-flex justify-space-between align-start"></div>
-              <span class="text-h5">My Official Visits</span>
+            <div class="w-100 d-flex justify-center align-center ga-4">
+              <span class="text-h5 me-4">My Official Visits</span>
+              <OVTypeSelector v-model="ovType" />
             </div>
             <v-btn
               color="primary"
@@ -231,7 +231,9 @@
 
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
+        <v-card-title
+          >{{ editedOV.id ? 'Edit' : 'Add' }} {{ ovTypeLabel(ovType) }} OV
+        </v-card-title>
         <v-card-text v-show="!editedOV.id">
           Either select from the master list
           <v-autocomplete
@@ -306,7 +308,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -342,8 +344,9 @@ const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
 const ovMasters = ref<OVMaster[]>([]);
 const dialog = ref(false);
-type EditedOV = { id?: number; name?: string; ovDate?: string };
+type EditedOV = { id?: number; name?: string; ovDate?: string; ovType?: OVType };
 const editedOV = ref<EditedOV>({});
+const ovType = ref<OVType>('craft');
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Date', key: 'ovDate' },
@@ -355,8 +358,10 @@ function goToUsers() {
 }
 
 async function loadOVs() {
-  ovs.value = await useApi()<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
-  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
+  ovs.value = await useApi()<OV[]>(`/api/ov?ovType=${ovType.value}&userId=${authStore.user?.id}`);
+  ovMasters.value = await useApi()<OVMaster[]>(
+    `/api/ov-master?ovType=${ovType.value}&year=${masonicYear}`
+  );
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovs.value = ovs.value.filter(
@@ -375,7 +380,7 @@ async function loadUsers() {
 
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${ovType.value}&year=${masonicYear}`
   );
 }
 
@@ -481,7 +486,7 @@ const selectedOVName = computed(() => {
 });
 
 const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
-  const vip = await useApi()<VIP>(`/api/vip/${masonicYear}/${vipName}`);
+  const vip = await useApi()<VIP>(`/api/vip/${ovType.value}/${masonicYear}/${vipName}`);
   return {
     id: 0,
     name: vipName,
@@ -580,7 +585,7 @@ async function saveOV() {
   if (editedOV.value.id) {
     await useApi()(`/api/ov/${editedOV.value.id}`, {
       method: 'PUT',
-      body: { ...editedOV.value, userId: authStore.user?.id },
+      body: { ...editedOV.value, userId: authStore.user?.id, ovType: ovType.value },
     });
   } else {
     // Depends on whether they selected a master OV or entered stuff manually
@@ -593,6 +598,7 @@ async function saveOV() {
           return;
         }
         editedOV.value = {
+          ovType: selectedMasterOV.value.ovType,
           name,
           ovDate: formatForDateInput(selectedMasterOV.value.date),
         };
@@ -602,7 +608,7 @@ async function saveOV() {
     try {
       const updatedOV = await useApi()<OV>('/api/ov', {
         method: 'POST',
-        body: { ...editedOV.value, userId: authStore.user?.id },
+        body: { ...editedOV.value, userId: authStore.user?.id, ovType: ovType.value },
       });
 
       // Populate the officers if selected from the master list
@@ -689,5 +695,11 @@ onMounted(async () => {
   await loadOVs();
   await loadUsers();
   isImpersonating.value = await useApi()('/api/impersonating');
+});
+
+watch(ovType, async () => {
+  loading.value = true;
+  await loadActiveOfficers();
+  await loadOVs();
 });
 </script>

@@ -58,17 +58,22 @@
 </template>
 
 <script setup lang="ts">
-import type { Officer } from '@prisma/client';
+import type { Officer, OVType } from '@prisma/client';
 import hiowCrest from '~/assets/images/hiowcrest.png';
 
-const props = defineProps<{ officers: Officer[]; spares: number; printMode?: boolean }>();
+const props = defineProps<{
+  ovType: OVType | null;
+  officers: Officer[];
+  spares: number;
+  printMode?: boolean;
+}>();
 
 const officersByName = computed(() =>
   [...props.officers].sort((a, b) => a.name.localeCompare(b.name))
 );
 
 const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, grandRankPrefix } =
-  useSalutations();
+  useSalutations(props.ovType);
 </script>
 
 <style lang="scss" scoped>

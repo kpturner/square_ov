@@ -11,3 +11,23 @@ export const PUBLIC_ENDPOINTS = [
   '/api/password/reset',
   '/api/ov/positions',
 ];
+
+export const OV_TYPES = [
+  {
+    title: 'Craft',
+    value: 'craft',
+  },
+  {
+    title: 'Royal Arch',
+    value: 'ra',
+  },
+] as const;
+
+export const OV_TYPE_LABELS = {
+  craft: 'Craft',
+  ra: 'Royal Arch',
+} as const;
+
+export function ovTypeLabel(type: 'craft' | 'ra') {
+  return OV_TYPE_LABELS[type];
+}

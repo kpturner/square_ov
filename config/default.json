@@ -10,20 +10,11 @@
   "admins": ["kevin@kpturner.co.uk"],
   "allowedEmails": [
     "ianpreece7262@btinternet.com",
-    "adriantimothyridley@yahoo.co.uk",
     "stevemorganprovdepgdc@gmail.com",
     "bwpprovdepgdc@gmail.com",
     "bockleprovdgdc@gmail.com",
-    "rwbettridgeprovagdc2025@gmail.com",
-    "paulbrownprovagdc2025@gmail.com",
-    "connollyprovagdc2025@gmail.com",
-    "simongough@sky.com",
-    "alanhprovagdc@gmail.com",
-    "mortonprovagdc2025@gmail.com",
-    "ejportprovagdc2025@gmail.com",
     "ed.woodprovagdc@hotmail.com",
     "garlandprovagdc2026@gmail.com",
-    "the.wilsonfamily@btinternet.com",
     "oliverprovagdc2026@hotmail.com",
     "martin@p-e-s.co.uk",
     "iow.swallow@hotmail.co.uk",
@@ -207,6 +198,124 @@
     {
       "value": "GTYLER",
       "title": "Grand Tyler"
+    }
+  ],
+  "raRanks": [
+    {
+      "value": "MEGS",
+      "title": "Most Excellent Grand Superintendent"
+    },
+    {
+      "value": "DGS",
+      "title": "Deputy Grand Superintendent"
+    },
+    {
+      "value": "2NDGP",
+      "title": "2nd Grand Principal"
+    },
+    {
+      "value": "3RDGP",
+      "title": "3rd Grand Principal"
+    },
+    {
+      "value": "AGP",
+      "title": "Assistant Grand Principal"
+    },
+    {
+      "value": "GSE",
+      "title": "Grand Scribe E"
+    },
+    {
+      "value": "GSN",
+      "title": "Grand Scribe N"
+    },
+    {
+      "value": "GREAS",
+      "title": "Grand Treasurer"
+    },
+    {
+      "value": "GREG",
+      "title": "Grand Registrar"
+    },
+    {
+      "value": "GDC",
+      "title": "Grand Director of Ceremonies"
+    },
+    {
+      "value": "GSWDB",
+      "title": "Grand Sword Bearer"
+    },
+    {
+      "value": "DEPGDC",
+      "title": "Deputy Grand Director of Ceremonies"
+    },
+    {
+      "value": "GALM",
+      "title": "Grand Almoner"
+    },
+    {
+      "value": "GCHSTWD",
+      "title": "Grand Charity Steward"
+    },
+    {
+      "value": "GMO",
+      "title": "Grand Membership Officer"
+    },
+    {
+      "value": "GCO",
+      "title": "Grand Communications Officer"
+    },
+    {
+      "value": "GMEN",
+      "title": "Grand Mentor"
+    },
+    {
+      "value": "GSOJ",
+      "title": "Grand Sojourner"
+    },
+    {
+      "value": "1STAGSOJ",
+      "title": "1st Assistant Grand Sojourner"
+    },
+    {
+      "value": "2NDAGSOJ",
+      "title": "2nd Assistant Grand Sojourner"
+    },
+    {
+      "value": "AGSE",
+      "title": "Assistant Grand Scribe E"
+    },
+    {
+      "value": "AGDC",
+      "title": "Assistant Grand Director of Ceremonies"
+    },
+    {
+      "value": "AGSWDB",
+      "title": "Assistant Grand Sword Bearer"
+    },
+    {
+      "value": "GORG",
+      "title": "Grand Organist"
+    },
+    {
+      "value": "GSTB",
+      "title": "Grand Standard Bearer"
+    },
+    {
+      "value": "AGSTB",
+      "title": "Assistant Grand Standard Bearer"
+    },
+    {
+      "value": "DEPGORG",
+      "title": "Deputy Grand Organist"
+    },
+    {
+      "value": "GSTWD",
+      "title": "Grand Steward"
+    },
+    {
+      "value": "GJAN",
+      "title": "Grand Janitor"
     }
   ]
 }

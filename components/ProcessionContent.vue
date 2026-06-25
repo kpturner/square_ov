@@ -214,13 +214,21 @@
 import type { Officer, OV } from '@prisma/client';
 import type { Rank, ProcessionRow } from '~/types';
 
-const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
-
 const props = defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
   carpetSplitMode?: boolean;
 }>();
+
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () =>
+    (props.officialVisit
+      ? props.officialVisit.ovType === 'craft'
+        ? cfg.ranks
+        : cfg.raRanks
+      : []) as Rank[]
+);
 
 const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
 
@@ -242,8 +250,8 @@ const splitByRow = ref(props.officialVisit?.splitByRow ?? false);
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
-  const gStwd = ranks.find((r) => r.value === 'GSTWD')!;
-  return [...ranks.filter((r) => r.value !== 'GSTWD'), gStwd];
+  const gStwd = ranks.value.find((r) => r.value === 'GSTWD')!;
+  return [...ranks.value.filter((r) => r.value !== 'GSTWD'), gStwd];
 });
 
 const isRowsExceedingCarpetCapacity = computed(() => {
@@ -341,8 +349,8 @@ const rankCompare = (a: string | null, b: string | null): number | null => {
 
   if (aRankIndex !== bRankIndex) {
     return (
-      (aRankIndex !== -1 ? aRankIndex : ranks.length) -
-      (bRankIndex !== -1 ? bRankIndex : ranks.length)
+      (aRankIndex !== -1 ? aRankIndex : ranks.value.length) -
+      (bRankIndex !== -1 ? bRankIndex : ranks.value.length)
     );
   }
   return null;

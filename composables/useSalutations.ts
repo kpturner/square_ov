@@ -1,8 +1,10 @@
 import type { Rank } from '~/types/officers';
-import type { Officer } from '@prisma/client';
+import type { Officer, OVType } from '@prisma/client';
 
-export const useSalutations = () => {
-  const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
+export const useSalutations = (ovType?: OVType | null) => {
+  const cfg = useRuntimeConfig().public;
+
+  const ranks = computed(() => (!ovType || ovType === 'craft' ? cfg.ranks : cfg.raRanks) as Rank[]);
 
   const salutation = (officer: Officer) => {
     if (officer.rank === 'PGM') {
@@ -22,7 +24,7 @@ export const useSalutations = () => {
     if (!officer.rank) {
       return '';
     }
-    return ranks.find((r) => r.value === officer.rank)?.title;
+    return ranks.value.find((r) => r.value === officer.rank)?.title;
   };
 
   const provincialRankPrefix = (officer: Officer) => {
@@ -49,7 +51,7 @@ export const useSalutations = () => {
     if (!officer.grandOfficer) {
       return;
     }
-    return ranks.find((r) => r.value === officer.grandRank)?.title;
+    return ranks.value.find((r) => r.value === officer.grandRank)?.title;
   };
 
   const grandRankPrefix = (officer: Officer) => {

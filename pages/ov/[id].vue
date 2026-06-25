@@ -92,6 +92,7 @@
         </div>
 
         <Officers
+          :ov-type="officialVisit?.ovType ?? null"
           :officers
           @delete-officer="deleteOfficer"
           @officer-contact-details="officerContactDetails"
@@ -346,6 +347,7 @@ const officerToEdit = ref<Officer | null>(null);
 const contactDetailsDialog = ref(false);
 const route = useRoute();
 const router = useRouter();
+const ovId = Number(route.params.id);
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
@@ -369,9 +371,9 @@ const _positionsRes = await $fetch('/api/ov/positions');
 type Position = (typeof _positionsRes)[number];
 
 onMounted(async () => {
+  await loadOfficers();
   await loadVIPs();
   await loadActiveOfficers();
-  await loadOfficers();
 });
 
 function formatDate(dateStr: string | Date | undefined) {
@@ -401,17 +403,20 @@ const activeOfficerSelectionList = computed(() => {
 const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
 
 async function loadActiveOfficers() {
+  if (!officialVisit.value) return;
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${officialVisit.value.ovType}&year=${masonicYear}`
   );
 }
 
 async function loadVIPs() {
-  vips.value = await useApi()<VIP[]>(`/api/vip?year=${masonicYear}`);
+  if (!officialVisit.value) return;
+  vips.value = await useApi()<VIP[]>(
+    `/api/vip?ovType=${officialVisit.value.ovType}&year=${masonicYear}`
+  );
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id);
   const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
