@@ -101,7 +101,6 @@
 
 <script setup lang="ts">
 import * as XLSX from 'xlsx';
-import type { OVType } from '@prisma/client';
 
 const logger = useLogger('import');
 
@@ -115,7 +114,7 @@ const ovSheetName = ref(`${paddedMasonicYear} Visits`);
 const file = ref<File | null>(null);
 const importErrorsExist = ref(false);
 const importErrorsFound = ref<string[]>([]);
-const ovType = ref<OVType>('craft');
+const { ovType, saveOvType } = useOvType();
 
 const handleFile = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -220,4 +219,8 @@ async function readExcel(file: File, sheetName: string) {
   if (!sheet) throw new Error(`Sheet "${sheetName}" not found`);
   return XLSX.utils.sheet_to_json(sheet);
 }
+
+watch(ovType, async () => {
+  saveOvType(ovType.value);
+});
 </script>

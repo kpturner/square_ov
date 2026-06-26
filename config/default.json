@@ -206,20 +206,20 @@
       "title": "Most Excellent Grand Superintendent"
     },
     {
-      "value": "DGS",
+      "value": "DGSUPT",
       "title": "Deputy Grand Superintendent"
     },
     {
-      "value": "2NDGP",
-      "title": "2nd Grand Principal"
+      "value": "2NDPGP",
+      "title": "2nd Provincial Grand Principal"
     },
     {
-      "value": "3RDGP",
-      "title": "3rd Grand Principal"
+      "value": "3RDPGP",
+      "title": "3rd Provincial Grand Principal"
     },
     {
-      "value": "AGP",
-      "title": "Assistant Grand Principal"
+      "value": "APGP",
+      "title": "Assistant Provincial Grand Principal"
     },
     {
       "value": "GSE",
@@ -230,7 +230,7 @@
       "title": "Grand Scribe N"
     },
     {
-      "value": "GREAS",
+      "value": "GTREAS",
       "title": "Grand Treasurer"
     },
     {
@@ -246,8 +246,24 @@
       "title": "Grand Sword Bearer"
     },
     {
+      "value": "DEPGREG",
+      "title": "Deputy Grand Registrar"
+    },
+    {
+      "value": "DEPGSE",
+      "title": "Deputy Grand Scribe E"
+    },
+    {
+      "value": "DEPGSN",
+      "title": "Deputy Grand Scribe N"
+    },
+    {
       "value": "DEPGDC",
       "title": "Deputy Grand Director of Ceremonies"
+    },
+    {
+      "value": "DEPGSWDB",
+      "title": "Deputy Grand Sword Bearer"
     },
     {
       "value": "GALM",
@@ -284,6 +300,10 @@
     {
       "value": "AGSE",
       "title": "Assistant Grand Scribe E"
+    },
+    {
+      "value": "AGSN",
+      "title": "Assistant Grand Scribe N"
     },
     {
       "value": "AGDC",

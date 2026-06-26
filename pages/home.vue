@@ -346,7 +346,7 @@ const ovMasters = ref<OVMaster[]>([]);
 const dialog = ref(false);
 type EditedOV = { id?: number; name?: string; ovDate?: string; ovType?: OVType };
 const editedOV = ref<EditedOV>({});
-const ovType = ref<OVType>('craft');
+const { ovType, saveOvType } = useOvType();
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Date', key: 'ovDate' },
@@ -699,6 +699,7 @@ onMounted(async () => {
 
 watch(ovType, async () => {
   loading.value = true;
+  saveOvType(ovType.value);
   await loadActiveOfficers();
   await loadOVs();
 });

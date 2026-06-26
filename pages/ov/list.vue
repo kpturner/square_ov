@@ -163,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OVMaster, ActiveOfficer, OVType } from '@prisma/client';
+import type { OVMaster, ActiveOfficer } from '@prisma/client';
 import { useDisplay } from 'vuetify';
 
 const { mdAndDown } = useDisplay();
@@ -175,7 +175,7 @@ const standardBearer = ref<ActiveOfficer | null>(null);
 const steward = ref<ActiveOfficer | null>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const officers = ref<{ name: string | null }[]>([]);
-const ovType = ref<OVType>('craft');
+const { ovType, saveOvType } = useOvType();
 
 function formatDate(dateStr: string | Date) {
   if (!dateStr) return '';
@@ -293,5 +293,6 @@ onMounted(async () => {
 
 watch(ovType, async () => {
   await load();
+  saveOvType(ovType.value);
 });
 </script>

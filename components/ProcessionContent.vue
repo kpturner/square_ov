@@ -74,7 +74,7 @@
       <div class="row-number no-print">{{ idx + 1 }}</div>
       <!-- South column -->
       <div v-if="row.south" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-        <OfficerCard :officer="row.south" />
+        <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
       </div>
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
@@ -82,7 +82,7 @@
       <v-divider vertical class="mx-2" />
       <!-- North column -->
       <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-        <OfficerCard :officer="row.north" />
+        <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
       </div>
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
@@ -145,7 +145,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.south" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -156,7 +156,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.south2" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south2" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -168,7 +168,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.north" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -178,7 +178,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.north2" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north2" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -195,7 +195,11 @@
           class="pa-1"
           style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
         >
-          <OfficerCard v-if="headSouth" :officer="headSouth" />
+          <OfficerCard
+            v-if="headSouth"
+            :ov-type="officialVisit?.ovType ?? null"
+            :officer="headSouth"
+          />
         </div>
         <v-divider vertical class="mx-2" />
         <!-- NORTH side -->
@@ -203,7 +207,11 @@
           class="pa-1"
           style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
         >
-          <OfficerCard v-if="headNorth" :officer="headNorth" />
+          <OfficerCard
+            v-if="headNorth"
+            :ov-type="officialVisit?.ovType ?? null"
+            :officer="headNorth"
+          />
         </div>
       </div>
     </div>
@@ -259,7 +267,7 @@ const isRowsExceedingCarpetCapacity = computed(() => {
 });
 
 const rankPrefix = (officer: Officer) => {
-  if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
+  if (VIP_RANKS.includes(officer.rank ?? '')) {
     if (officer.active) {
       return '';
     } else {
@@ -373,15 +381,15 @@ const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
 };
 
 const isVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '');
+  return VIP_RANKS.includes(o.rank ?? '');
 };
 
 const isActiveVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && o.active;
+  return VIP_RANKS.includes(o.rank ?? '') && o.active;
 };
 
 const isPastVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && !o.active;
+  return VIP_RANKS.includes(o.rank ?? '') && !o.active;
 };
 
 // Automatic officers sorted by seniority

@@ -34,7 +34,7 @@ export const useSalutations = (ovType?: OVType | null) => {
     if (!officer.rank) {
       return '';
     }
-    if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
+    if (VIP_RANKS.includes(officer.rank)) {
       return officer.active ? '' : 'Past';
     }
     return officer.active ? 'Provincial' : 'Past Provincial';
@@ -44,7 +44,7 @@ export const useSalutations = (ovType?: OVType | null) => {
     if (!officer.rank) {
       return '';
     }
-    if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
+    if (VIP_RANKS.includes(officer.rank)) {
       return officer.active ? '' : 'P';
     }
     return officer.active ? 'Prov' : 'P';
