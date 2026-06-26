@@ -73,19 +73,19 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  const JW = await prisma.vIP.findMany({
+  const JGW = await prisma.vIP.findMany({
     where: {
       ovType,
       year,
-      provincialRank: 'JW',
+      provincialRank: 'JGW',
     },
   });
 
-  const SW = await prisma.vIP.findMany({
+  const SGW = await prisma.vIP.findMany({
     where: {
       ovType,
       year,
-      provincialRank: 'SW',
+      provincialRank: 'SGW',
     },
   });
 
@@ -140,9 +140,9 @@ export default defineEventHandler(async (event) => {
         } else if (value === 'DPGM') {
           value = DPGM[0]?.name;
         } else if (value === 'Junior Warden') {
-          value = JW[0]?.name;
+          value = JGW[0]?.name;
         } else if (value === 'Senior Warden') {
-          value = SW[0]?.name;
+          value = SGW[0]?.name;
         } else {
           // Try to get the VIP full name rather than just the surname we see on the spreadsheet
           const vip = VIPs.filter(
@@ -156,7 +156,7 @@ export default defineEventHandler(async (event) => {
 
       mapped[field] = value;
     }
-
+    logger.debug(mapped, 'Parsing');
     return officialVisitSchema.parse(mapped);
   });
 
