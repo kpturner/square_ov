@@ -20,6 +20,7 @@
                 Home
               </v-btn>
               <span class="text-h5">Official Visit Master</span>
+              <OVTypeSelector v-model="ovType" />
             </div>
           </v-card-title>
           <!-- Top Actions -->
@@ -162,7 +163,7 @@
 </template>
 
 <script setup lang="ts">
-import type { OVMaster, ActiveOfficer } from '@prisma/client';
+import type { OVMaster, ActiveOfficer, OVType } from '@prisma/client';
 import { useDisplay } from 'vuetify';
 
 const { mdAndDown } = useDisplay();
@@ -174,6 +175,7 @@ const standardBearer = ref<ActiveOfficer | null>(null);
 const steward = ref<ActiveOfficer | null>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const officers = ref<{ name: string | null }[]>([]);
+const ovType = ref<OVType>('craft');
 
 function formatDate(dateStr: string | Date) {
   if (!dateStr) return '';
@@ -204,7 +206,9 @@ const headers = [
 ];
 
 async function loadOVs() {
-  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${year.value}`);
+  ovMasters.value = await useApi()<OVMaster[]>(
+    `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
+  );
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovMasters.value = ovMasters.value.filter(
@@ -219,7 +223,7 @@ async function loadOVs() {
 
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${ovType.value}&year=${masonicYear}`
   );
 }
 
@@ -284,6 +288,10 @@ async function load() {
 }
 
 onMounted(async () => {
+  await load();
+});
+
+watch(ovType, async () => {
   await load();
 });
 </script>
