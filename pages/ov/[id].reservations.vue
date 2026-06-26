@@ -44,7 +44,8 @@
       />
 
       <SeatReservations
-        :ov-type="officialVisit?.ovType ?? null"
+        v-if="officialVisit"
+        :ov-type="officialVisit.ovType"
         :officers="attendingOfficers"
         :spares
       />
@@ -75,8 +76,9 @@
     </v-card>
 
     <SeatReservations
+      v-if="officialVisit"
       class="only-print"
-      :ov-type="officialVisit?.ovType ?? null"
+      :ov-type="officialVisit.ovType"
       :officers="attendingOfficers"
       print-mode
       :spares

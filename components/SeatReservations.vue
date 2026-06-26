@@ -13,7 +13,8 @@
 
           <v-col cols="10" class="text-column">
             <v-row class="text-h5 ma-1 old-english justify-center">
-              Provincial Grand Lodge of Hampshire & Isle of Wight
+              Provincial Grand {{ ovType === 'craft' ? 'Lodge' : 'Chapter' }} of Hampshire & Isle of
+              Wight
             </v-row>
             <v-row class="mb-1 justify-center">
               <div class="text-h4 font-weight-bold name-text">
@@ -62,7 +63,7 @@ import type { Officer, OVType } from '@prisma/client';
 import hiowCrest from '~/assets/images/hiowcrest.png';
 
 const props = defineProps<{
-  ovType: OVType | null;
+  ovType: OVType;
   officers: Officer[];
   spares: number;
   printMode?: boolean;
