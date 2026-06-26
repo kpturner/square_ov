@@ -7,6 +7,9 @@ export const useSalutations = (ovType?: OVType | null) => {
   const ranks = computed(() => (!ovType || ovType === 'craft' ? cfg.ranks : cfg.raRanks) as Rank[]);
 
   const salutation = (officer: Officer) => {
+    if (ovType === 'ra') {
+      return 'E. COMP.';
+    }
     if (officer.rank === 'PGM') {
       return 'R. W. BRO.';
     }
