@@ -398,9 +398,11 @@ async function loadUsers() {
 
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?ovType=${ovType.value}&year=${masonicYear}`
+    `/api/active-officers?ovType=${ovType.value}&year=${year.value}`
   );
 }
+
+const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
 
 function exportOV(item: OV) {
   ovToExport.value = item;
@@ -726,5 +728,6 @@ watch(ovType, async () => {
 
 watch(year, () => {
   debouncedLoadMasterOVs();
+  debouncedLoadActiveOfficers();
 });
 </script>

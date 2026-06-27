@@ -259,12 +259,21 @@
         <v-card-text>
           Either select a VIP from the master list or leave unselected to add the VIP details
           yourself
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadActiveOfficersAndVIPs"
+            @keyup.enter="loadActiveOfficersAndVIPs"
+          />
           <v-autocomplete
             v-model="selectedVIPId"
             :items="activeVIPSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} VIPs`"
+            :placeholder="`${year} VIPs`"
           />
         </v-card-text>
         <v-card-actions>
@@ -305,12 +314,21 @@
         <v-card-text>
           Either select an officer from the master list or leave unselected to add the officer
           details yourself
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadActiveOfficersAndVIPs"
+            @keyup.enter="loadActiveOfficersAndVIPs"
+          />
           <v-autocomplete
             v-model="selectedActiveOfficerId"
             :items="activeOfficerSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Active Officers`"
+            :placeholder="`${year} Active Officers`"
           />
         </v-card-text>
         <v-card-actions>
@@ -335,6 +353,7 @@
 import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
+import debounce from 'lodash/debounce';
 
 const logger = useLogger('officers');
 const authStore = useAuthStore();
@@ -353,6 +372,7 @@ const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
 const addVIPDialog = ref(false);
 const { masonicYear } = useMasonicYear();
+const year = ref(masonicYear);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const selectedActiveOfficerId = ref(null);
 const vips = ref<VIP[]>([]);
@@ -405,15 +425,23 @@ const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
 async function loadActiveOfficers() {
   if (!officialVisit.value) return;
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?ovType=${officialVisit.value.ovType}&year=${masonicYear}`
+    `/api/active-officers?ovType=${officialVisit.value.ovType}&year=${year.value}`
   );
 }
 
 async function loadVIPs() {
   if (!officialVisit.value) return;
   vips.value = await useApi()<VIP[]>(
-    `/api/vip?ovType=${officialVisit.value.ovType}&year=${masonicYear}`
+    `/api/vip?ovType=${officialVisit.value.ovType}&year=${year.value}`
   );
+}
+
+const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
+const debouncedLoadVIPs = debounce(loadVIPs, 500);
+
+async function loadActiveOfficersAndVIPs() {
+  await loadActiveOfficers();
+  await loadVIPs();
 }
 
 async function loadOfficers() {
@@ -761,6 +789,11 @@ watch(
   ],
   saveControls
 );
+
+watch(year, () => {
+  debouncedLoadActiveOfficers();
+  debouncedLoadVIPs();
+});
 </script>
 
 <style lang="scss" scoped>
