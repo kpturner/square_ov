@@ -29,20 +29,22 @@
               >Users
             </v-btn>
           </div>
-          <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex justify-center align-center ga-4">
-              <span class="text-h5 me-4">My Official Visits</span>
-              <OVTypeSelector v-model="ovType" />
+          <v-card-title>
+            <div class="d-flex justify-space-between align-center">
+              <div class="w-100">
+                <span class="text-h5 me-4">My Official Visits</span>
+              </div>
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-clipboard-list"
+                small
+                title="Master OV list"
+                @click="$router.push('/ov/list')"
+              >
+                Master OV list
+              </v-btn>
             </div>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-clipboard-list"
-              small
-              title="Master OV list"
-              @click="$router.push('/ov/list')"
-            >
-              Master OV list
-            </v-btn>
+            <OVTypeSelector v-model="ovType" />
           </v-card-title>
 
           <!-- Top Actions -->
