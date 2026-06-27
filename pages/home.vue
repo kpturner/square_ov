@@ -237,14 +237,23 @@
           >{{ editedOV.id ? 'Edit' : 'Add' }} {{ ovTypeLabel(ovType) }} OV
         </v-card-title>
         <v-card-text v-show="!editedOV.id">
-          Either select from the master list
+          <div>Either select from the master list</div>
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadMasterOVs"
+            @keyup.enter="loadMasterOVs"
+          />
           <v-autocomplete
             v-model="selectedMasterOvId"
             class="hidden-sm-and-down"
             :items="ovSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Official Visit`"
+            :placeholder="`${year} Official Visit`"
           />
           <v-select
             v-model="selectedMasterOvId"
@@ -252,7 +261,7 @@
             :items="ovSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Official Visit`"
+            :placeholder="`${year} Official Visit`"
           />
         </v-card-text>
         <v-card-text v-if="!selectedMasterOvId">
@@ -311,6 +320,7 @@
 
 <script setup lang="ts">
 import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
+import debounce from 'lodash/debounce';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -342,6 +352,7 @@ function formatDate(dateStr: string | Date) {
 }
 
 const { masonicYear } = useMasonicYear();
+const year = ref(masonicYear);
 const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
 const ovMasters = ref<OVMaster[]>([]);
@@ -359,11 +370,16 @@ function goToUsers() {
   navigateTo('/users');
 }
 
+async function loadMasterOVs() {
+  ovMasters.value = await useApi()<OVMaster[]>(
+    `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
+  );
+}
+
+const debouncedLoadMasterOVs = debounce(loadMasterOVs, 500);
+
 async function loadOVs() {
   ovs.value = await useApi()<OV[]>(`/api/ov?ovType=${ovType.value}&userId=${authStore.user?.id}`);
-  ovMasters.value = await useApi()<OVMaster[]>(
-    `/api/ov-master?ovType=${ovType.value}&year=${masonicYear}`
-  );
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovs.value = ovs.value.filter(
@@ -694,6 +710,7 @@ function goToOfficers(item: OV) {
 
 onMounted(async () => {
   await loadActiveOfficers();
+  await loadMasterOVs();
   await loadOVs();
   await loadUsers();
   isImpersonating.value = await useApi()('/api/impersonating');
@@ -703,6 +720,11 @@ watch(ovType, async () => {
   loading.value = true;
   saveOvType(ovType.value);
   await loadActiveOfficers();
+  await loadMasterOVs();
   await loadOVs();
+});
+
+watch(year, () => {
+  debouncedLoadMasterOVs();
 });
 </script>

@@ -28,6 +28,7 @@
             <v-text-field
               v-model="year"
               label="Masonic year"
+              prepend-inner-icon="mdi-calendar"
               hide-details
               @click:prepend-inner="load"
               @keyup.enter="load"
@@ -165,6 +166,7 @@
 <script setup lang="ts">
 import type { OVMaster, ActiveOfficer } from '@prisma/client';
 import { useDisplay } from 'vuetify';
+import debounce from 'lodash/debounce';
 
 const { mdAndDown } = useDisplay();
 const loading = ref(true);
@@ -280,6 +282,8 @@ function goToOfficers(item: OVMaster) {
   showAllocatedOfficers.value = true;
 }
 
+const debouncedLoad = debounce(load, 500);
+
 async function load() {
   loading.value = true;
   await loadOVs();
@@ -294,5 +298,9 @@ onMounted(async () => {
 watch(ovType, async () => {
   await load();
   saveOvType(ovType.value);
+});
+
+watch(year, () => {
+  debouncedLoad();
 });
 </script>

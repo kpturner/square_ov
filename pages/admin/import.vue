@@ -28,7 +28,7 @@
       <v-card class="pa-6 mb-4">
         <v-row>
           <v-col>
-            <v-text-field v-model="year" label="Masonic year" />
+            <v-text-field v-model="year" label="Masonic year" prepend-inner-icon="mdi-calendar" />
           </v-col>
         </v-row>
         <v-row>
