@@ -3,6 +3,7 @@
     <v-col v-for="(item, i) in officersByName" :key="item.id ?? i" cols="12">
       <v-card
         class="reservation-card ml-1 mb-1"
+        :style="{ '--accent-colour': accentColour }"
         :elevation="printMode ? '0' : '3'"
         :variant="printMode ? 'elevated' : 'tonal'"
       >
@@ -13,8 +14,7 @@
 
           <v-col cols="10" class="text-column">
             <v-row class="text-h5 ma-1 old-english justify-center">
-              Provincial Grand {{ ovType === 'craft' ? 'Lodge' : 'Chapter' }} of Hampshire & Isle of
-              Wight
+              {{ title }}
             </v-row>
             <v-row class="mb-1 justify-center">
               <div class="text-h4 font-weight-bold name-text">
@@ -36,6 +36,7 @@
       <v-col v-for="i in Number(spares)" :key="i" cols="12">
         <v-card
           class="reservation-card mb-1"
+          :style="{ '--accent-colour': accentColour }"
           :elevation="printMode ? '0' : '3'"
           :variant="printMode ? 'elevated' : 'tonal'"
         >
@@ -48,7 +49,7 @@
             <!-- Right Column: Text -->
             <v-col cols="10" class="text-column">
               <v-row class="spare-header text-h5 mt-1 old-english justify-center">
-                Provincial Grand Lodge of Hampshire & Isle of Wight
+                {{ title }}
               </v-row>
             </v-col>
           </v-row>
@@ -69,6 +70,13 @@ const props = defineProps<{
   printMode?: boolean;
 }>();
 
+const accentColour = computed(() => (props.ovType === 'ra' ? '#B01801' : '#1565c0'));
+
+const title = computed(() => {
+  return ` Provincial Grand ${props.ovType === 'craft' ? 'Lodge' : 'Chapter'} of Hampshire & Isle of
+              Wight`;
+});
+
 const officersByName = computed(() =>
   [...props.officers].sort((a, b) => a.name.localeCompare(b.name))
 );
@@ -79,9 +87,11 @@ const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, 
 
 <style lang="scss" scoped>
 .reservation-card {
+  --accent-colour: #1565c0; // default
+
   min-height: 180px;
-  border: 2px solid #1565c0;
-  outline: 2px solid #1565c0;
+  border: 2px solid var(--accent-colour);
+  outline: 2px solid var(--accent-colour);
   outline-offset: 2px;
   box-sizing: border-box;
   width: 99%;
@@ -92,7 +102,7 @@ const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, 
 }
 
 .crest-column {
-  border-right: 1px solid #1565c0; /* Single divider */
+  border-right: 1px solid var(--accent-colour); /* Single divider */
   padding: 16px !important;
   box-sizing: border-box;
   min-height: 180px;
@@ -121,7 +131,7 @@ const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, 
 
 @media print {
   .reservation-card {
-    color: #1565c0;
+    color: var(--accent-colour);
     page-break-inside: avoid; /* Prevent splitting across pages */
     break-inside: avoid;
   }
