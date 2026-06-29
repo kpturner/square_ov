@@ -1,9 +1,10 @@
 <template>
+  <hr v-if="carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print" />
   <div
     v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
     class="d-flex flex-column justify-center align-center mt-6 mb-4"
   >
-    <strong>SPLIT COLUMNS ON CARPET</strong>
+    <strong class="no-print">SPLIT COLUMNS ON CARPET</strong>
 
     <v-btn
       class="no-print"
