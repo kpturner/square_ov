@@ -389,6 +389,9 @@ import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
 import debounce from 'lodash/debounce';
 import type { Rank } from '~/types';
+definePageMeta({
+  ssr: false,
+});
 
 const logger = useLogger('officers');
 const authStore = useAuthStore();
