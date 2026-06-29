@@ -7,6 +7,11 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum OVType {
+  craft
+  ra
+}
+
 model User {
   id                   Int       @id @default(autoincrement())
   name                 String
@@ -22,6 +27,7 @@ model OV {
   id                   Int       @id @default(autoincrement())
   name                 String
   ovDate               DateTime
+  ovType               OVType    @default(craft)
   createdAt            DateTime  @default(now())
   userId               Int
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -34,7 +40,7 @@ model OV {
   carpetCapacity       Int       @default(15)
   splitByRow           Boolean   @default(false)
 
-  @@unique([userId, name])
+  @@unique([userId, name, ovType])
   @@index([userId], map: "OV_userId_fkey")
 }
 
@@ -44,6 +50,7 @@ model Officer {
   email                 String?
   phone                 String?
   rank                  String?
+  rankOverride          String?
   provOfficerYear       Int?
   grandOfficer          Boolean
   grandOfficerYear      Int?
@@ -71,6 +78,7 @@ enum Position {
 
 model ActiveOfficer {
   id               Int     @id @default(autoincrement())
+  ovType           OVType  @default(craft)
   year             String
   number           Int
   provincialRank   String
@@ -93,12 +101,13 @@ model ActiveOfficer {
   oVMastersAsOfficer6 OVMaster[] @relation("Officer6Relation")
   oVMastersAsOfficer7 OVMaster[] @relation("Officer7Relation")
 
-  @@unique([year, number], name: "year_number")
+  @@unique([ovType, year, number], name: "type_year_number")
   @@unique([year, primaryEmail], name: "year_email")
 }
 
 model OVMaster {
   id          Int      @id @default(autoincrement())
+  ovType      OVType   @default(craft)
   year        String
   number      Int
   date        DateTime
@@ -119,22 +128,23 @@ model OVMaster {
   officer7    Int?
 
   // Composite foreign key relations to (year, number) in ActiveOfficer
-  swordOfficer    ActiveOfficer? @relation("SwordRelation", fields: [year, sword], references: [year, number])
-  standardOfficer ActiveOfficer? @relation("StandardRelation", fields: [year, standard], references: [year, number])
-  stewardOfficer  ActiveOfficer? @relation("StewardRelation", fields: [year, steward], references: [year, number])
-  officer1Officer ActiveOfficer? @relation("Officer1Relation", fields: [year, officer1], references: [year, number])
-  officer2Officer ActiveOfficer? @relation("Officer2Relation", fields: [year, officer2], references: [year, number])
-  officer3Officer ActiveOfficer? @relation("Officer3Relation", fields: [year, officer3], references: [year, number])
-  officer4Officer ActiveOfficer? @relation("Officer4Relation", fields: [year, officer4], references: [year, number])
-  officer5Officer ActiveOfficer? @relation("Officer5Relation", fields: [year, officer5], references: [year, number])
-  officer6Officer ActiveOfficer? @relation("Officer6Relation", fields: [year, officer6], references: [year, number])
-  officer7Officer ActiveOfficer? @relation("Officer7Relation", fields: [year, officer7], references: [year, number])
+  swordOfficer    ActiveOfficer? @relation("SwordRelation", fields: [ovType, year, sword], references: [ovType, year, number])
+  standardOfficer ActiveOfficer? @relation("StandardRelation", fields: [ovType, year, standard], references: [ovType, year, number])
+  stewardOfficer  ActiveOfficer? @relation("StewardRelation", fields: [ovType, year, steward], references: [ovType, year, number])
+  officer1Officer ActiveOfficer? @relation("Officer1Relation", fields: [ovType, year, officer1], references: [ovType, year, number])
+  officer2Officer ActiveOfficer? @relation("Officer2Relation", fields: [ovType, year, officer2], references: [ovType, year, number])
+  officer3Officer ActiveOfficer? @relation("Officer3Relation", fields: [ovType, year, officer3], references: [ovType, year, number])
+  officer4Officer ActiveOfficer? @relation("Officer4Relation", fields: [ovType, year, officer4], references: [ovType, year, number])
+  officer5Officer ActiveOfficer? @relation("Officer5Relation", fields: [ovType, year, officer5], references: [ovType, year, number])
+  officer6Officer ActiveOfficer? @relation("Officer6Relation", fields: [ovType, year, officer6], references: [ovType, year, number])
+  officer7Officer ActiveOfficer? @relation("Officer7Relation", fields: [ovType, year, officer7], references: [ovType, year, number])
 
-  @@unique([year, number], name: "year_number")
+  @@unique([ovType, year, number], name: "type_year_number")
 }
 
 model VIP {
   id             Int     @id @default(autoincrement())
+  ovType         OVType  @default(craft)
   year           String
   provincialRank String
   name           String
@@ -143,5 +153,5 @@ model VIP {
   phone          String?
   mobile         String?
 
-  @@unique([year, name], name: "year_name")
+  @@unique([ovType, year, name], name: "type_year_name")
 }

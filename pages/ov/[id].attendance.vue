@@ -56,7 +56,7 @@
           </v-btn>
         </div>
 
-        <Attendance :official-visit :officers />
+        <Attendance v-if="officialVisit" :official-visit :officers />
 
         <!-- Bottom Actions -->
         <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2">
@@ -104,7 +104,7 @@
       </v-card-title>
     </v-card>
 
-    <Attendance class="only-print" :official-visit :officers print-mode />
+    <Attendance v-if="officialVisit" class="only-print" :official-visit :officers print-mode />
   </v-container>
 </template>
 

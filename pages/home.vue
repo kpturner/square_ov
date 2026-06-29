@@ -29,20 +29,22 @@
               >Users
             </v-btn>
           </div>
-          <v-card-title class="d-flex justify-space-between align-center">
-            <div class="w-100 d-flex flex-column align-start">
-              <div class="mb-2 w-100 d-flex justify-space-between align-start"></div>
-              <span class="text-h5">My Official Visits</span>
+          <v-card-title>
+            <div class="d-flex justify-space-between align-center">
+              <div class="w-100">
+                <span class="text-h5 me-4">My Official Visits</span>
+              </div>
+              <v-btn
+                color="primary"
+                prepend-icon="mdi-clipboard-list"
+                small
+                title="Master OV list"
+                @click="$router.push('/ov/list')"
+              >
+                Master OV list
+              </v-btn>
             </div>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-clipboard-list"
-              small
-              title="Master OV list"
-              @click="$router.push('/ov/list')"
-            >
-              Master OV list
-            </v-btn>
+            <OVTypeSelector v-model="ovType" />
           </v-card-title>
 
           <!-- Top Actions -->
@@ -231,16 +233,27 @@
 
     <v-dialog v-model="dialog" max-width="400">
       <v-card>
-        <v-card-title>{{ editedOV.id ? 'Edit OV' : 'Add OV' }}</v-card-title>
+        <v-card-title
+          >{{ editedOV.id ? 'Edit' : 'Add' }} {{ ovTypeLabel(ovType) }} OV
+        </v-card-title>
         <v-card-text v-show="!editedOV.id">
-          Either select from the master list
+          <div>Either select from the master list</div>
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadMasterOVs"
+            @keyup.enter="loadMasterOVs"
+          />
           <v-autocomplete
             v-model="selectedMasterOvId"
             class="hidden-sm-and-down"
             :items="ovSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Official Visit`"
+            :placeholder="`${year} Official Visit`"
           />
           <v-select
             v-model="selectedMasterOvId"
@@ -248,7 +261,7 @@
             :items="ovSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Official Visit`"
+            :placeholder="`${year} Official Visit`"
           />
         </v-card-text>
         <v-card-text v-if="!selectedMasterOvId">
@@ -306,7 +319,8 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User } from '@prisma/client';
+import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
+import debounce from 'lodash/debounce';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -338,12 +352,14 @@ function formatDate(dateStr: string | Date) {
 }
 
 const { masonicYear } = useMasonicYear();
+const year = ref(masonicYear);
 const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
 const ovMasters = ref<OVMaster[]>([]);
 const dialog = ref(false);
-type EditedOV = { id?: number; name?: string; ovDate?: string };
+type EditedOV = { id?: number; name?: string; ovDate?: string; ovType?: OVType };
 const editedOV = ref<EditedOV>({});
+const { ovType, saveOvType } = useOvType();
 const headers = [
   { title: 'Name', key: 'name' },
   { title: 'Date', key: 'ovDate' },
@@ -354,9 +370,16 @@ function goToUsers() {
   navigateTo('/users');
 }
 
+async function loadMasterOVs() {
+  ovMasters.value = await useApi()<OVMaster[]>(
+    `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
+  );
+}
+
+const debouncedLoadMasterOVs = debounce(loadMasterOVs, 500);
+
 async function loadOVs() {
-  ovs.value = await useApi()<OV[]>(`/api/ov?userId=${authStore.user?.id}`);
-  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${masonicYear}`);
+  ovs.value = await useApi()<OV[]>(`/api/ov?ovType=${ovType.value}&userId=${authStore.user?.id}`);
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovs.value = ovs.value.filter(
@@ -375,9 +398,11 @@ async function loadUsers() {
 
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${ovType.value}&year=${year.value}`
   );
 }
+
+const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
 
 function exportOV(item: OV) {
   ovToExport.value = item;
@@ -481,7 +506,7 @@ const selectedOVName = computed(() => {
 });
 
 const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
-  const vip = await useApi()<VIP>(`/api/vip/${masonicYear}/${vipName}`);
+  const vip = await useApi()<VIP>(`/api/vip/${ovType.value}/${masonicYear}/${vipName}`);
   return {
     id: 0,
     name: vipName,
@@ -498,6 +523,7 @@ const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
     original: true,
     attending: true,
     excludeFromProcession: null,
+    rankOverride: null,
     ovId,
   };
 };
@@ -524,6 +550,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
       original: true,
       attending: true,
       excludeFromProcession: null,
+      rankOverride: null,
       ovId,
     };
   }
@@ -543,6 +570,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
     original: true,
     attending: true,
     excludeFromProcession: null,
+    rankOverride: null,
     ovId,
   };
 };
@@ -572,6 +600,7 @@ const addOfficer = async (
     excludeFromProcession: null,
     original: true,
     attending: true,
+    rankOverride: null,
     ovId,
   });
 };
@@ -580,7 +609,7 @@ async function saveOV() {
   if (editedOV.value.id) {
     await useApi()(`/api/ov/${editedOV.value.id}`, {
       method: 'PUT',
-      body: { ...editedOV.value, userId: authStore.user?.id },
+      body: { ...editedOV.value, userId: authStore.user?.id, ovType: ovType.value },
     });
   } else {
     // Depends on whether they selected a master OV or entered stuff manually
@@ -593,6 +622,7 @@ async function saveOV() {
           return;
         }
         editedOV.value = {
+          ovType: selectedMasterOV.value.ovType,
           name,
           ovDate: formatForDateInput(selectedMasterOV.value.date),
         };
@@ -602,7 +632,7 @@ async function saveOV() {
     try {
       const updatedOV = await useApi()<OV>('/api/ov', {
         method: 'POST',
-        body: { ...editedOV.value, userId: authStore.user?.id },
+        body: { ...editedOV.value, userId: authStore.user?.id, ovType: ovType.value },
       });
 
       // Populate the officers if selected from the master list
@@ -686,8 +716,22 @@ function goToOfficers(item: OV) {
 
 onMounted(async () => {
   await loadActiveOfficers();
+  await loadMasterOVs();
   await loadOVs();
   await loadUsers();
   isImpersonating.value = await useApi()('/api/impersonating');
+});
+
+watch(ovType, async () => {
+  loading.value = true;
+  saveOvType(ovType.value);
+  await loadActiveOfficers();
+  await loadMasterOVs();
+  await loadOVs();
+});
+
+watch(year, () => {
+  debouncedLoadMasterOVs();
+  debouncedLoadActiveOfficers();
 });
 </script>

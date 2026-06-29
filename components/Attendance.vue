@@ -55,7 +55,7 @@
 import type { Officer, OV } from '@prisma/client';
 
 const props = defineProps<{
-  officialVisit: OV | null;
+  officialVisit: OV;
   officers: Officer[];
   printMode?: boolean;
 }>();
@@ -66,7 +66,9 @@ function formatDate(dateStr?: string | Date) {
   return date.toLocaleDateString();
 }
 
-const { salutation, provincialRankPrefixAbbrev, grandRankPrefixAbbrev } = useSalutations();
+const { salutation, provincialRankPrefixAbbrev, grandRankPrefixAbbrev } = useSalutations(
+  props.officialVisit.ovType
+);
 
 const fullName = (officer: Officer) => {
   let fullName = `${salutation(officer)} ${officer.name}`;

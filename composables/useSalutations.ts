@@ -1,10 +1,15 @@
 import type { Rank } from '~/types/officers';
-import type { Officer } from '@prisma/client';
+import type { Officer, OVType } from '@prisma/client';
 
-export const useSalutations = () => {
-  const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
+export const useSalutations = (ovType?: OVType | null) => {
+  const cfg = useRuntimeConfig().public;
+
+  const ranks = computed(() => (!ovType || ovType === 'craft' ? cfg.ranks : cfg.raRanks) as Rank[]);
 
   const salutation = (officer: Officer) => {
+    if (ovType === 'ra') {
+      return 'E. COMP.';
+    }
     if (officer.rank === 'PGM') {
       return 'R. W. BRO.';
     }
@@ -22,14 +27,14 @@ export const useSalutations = () => {
     if (!officer.rank) {
       return '';
     }
-    return ranks.find((r) => r.value === officer.rank)?.title;
+    return ranks.value.find((r) => r.value === officer.rank)?.title;
   };
 
   const provincialRankPrefix = (officer: Officer) => {
     if (!officer.rank) {
       return '';
     }
-    if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
+    if (VIP_RANKS.includes(officer.rank)) {
       return officer.active ? '' : 'Past';
     }
     return officer.active ? 'Provincial' : 'Past Provincial';
@@ -39,17 +44,38 @@ export const useSalutations = () => {
     if (!officer.rank) {
       return '';
     }
-    if (['PGM', 'DPGM', 'APGM'].includes(officer.rank)) {
+    if (VIP_RANKS.includes(officer.rank)) {
       return officer.active ? '' : 'P';
     }
-    return officer.active ? 'Prov' : 'P';
+    return officer.active ? 'Prov' : 'PP';
+  };
+
+  const provincialRankOverride = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return ranks.value.find((r) => r.value === officer.rankOverride)?.title;
+  };
+
+  const provincialRankOverridePrefix = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return 'Past Provincial'; // If the override rank was an active rank we would not need an override!
+  };
+
+  const provincialRankOverridePrefixAbbrev = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return 'PP'; // If the override rank was an active rank we would not need an override!
   };
 
   const grandRank = (officer: Officer) => {
     if (!officer.grandOfficer) {
       return;
     }
-    return ranks.find((r) => r.value === officer.grandRank)?.title;
+    return ranks.value.find((r) => r.value === officer.grandRank)?.title;
   };
 
   const grandRankPrefix = (officer: Officer) => {
@@ -72,6 +98,9 @@ export const useSalutations = () => {
     provincialRank,
     provincialRankPrefix,
     provincialRankPrefixAbbrev,
+    provincialRankOverride,
+    provincialRankOverridePrefix,
+    provincialRankOverridePrefixAbbrev,
     grandRank,
     grandRankPrefix,
     grandRankPrefixAbbrev,

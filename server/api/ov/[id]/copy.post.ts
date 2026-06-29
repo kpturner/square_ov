@@ -19,6 +19,7 @@ export default defineEventHandler(async (event) => {
   const newOV = await prisma.oV.create({
     data: {
       name: `${ov.name} (Copy)`,
+      ovType: ov.ovType,
       ovDate: ov.ovDate,
       userId: toUserId ? Number(toUserId) : ov.userId,
       alignWardens: ov.alignWardens,

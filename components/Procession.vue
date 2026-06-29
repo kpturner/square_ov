@@ -30,7 +30,7 @@
     <v-card-text>
       <v-row :class="isPrintSplitProcession ? 'no-print' : ''">
         <v-col cols="3" class="d-none d-sm-block sm:pa-0">
-          <rank-order />
+          <rank-order :ov-type="officialVisit?.ovType ?? null" />
         </v-col>
 
         <v-col cols="12" sm="9">

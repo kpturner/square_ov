@@ -43,7 +43,12 @@
         style="max-width: 100px"
       />
 
-      <SeatReservations :officers="attendingOfficers" :spares />
+      <SeatReservations
+        v-if="officialVisit"
+        :ov-type="officialVisit.ovType"
+        :officers="attendingOfficers"
+        :spares
+      />
     </v-card>
 
     <v-card v-if="!loading" class="no-print">
@@ -70,7 +75,14 @@
       </v-card-title>
     </v-card>
 
-    <SeatReservations class="only-print" :officers="attendingOfficers" print-mode :spares />
+    <SeatReservations
+      v-if="officialVisit"
+      class="only-print"
+      :ov-type="officialVisit.ovType"
+      :officers="attendingOfficers"
+      print-mode
+      :spares
+    />
   </v-container>
 </template>
 

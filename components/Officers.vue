@@ -31,6 +31,28 @@
         />
       </template>
 
+      <template #item.rankOverride="{ item }">
+        <v-tooltip
+          :text="
+            !!item.rankOverride
+              ? `Prov rank overridden to ${item.rankOverride}`
+              : 'Override provincial rank for procession'
+          "
+        >
+          <template #activator="{ props: roprops }">
+            <v-badge dot color="warning" :model-value="!!item.rankOverride">
+              <v-btn
+                v-bind="roprops"
+                icon="mdi-lightning-bolt"
+                size="small"
+                color="tonal"
+                @click="emits('rank-override', item)"
+              />
+            </v-badge>
+          </template>
+        </v-tooltip>
+      </template>
+
       <template #item.attending="{ item }">
         <div class="checkbox-cell">
           <v-tooltip text="Attending">
@@ -76,7 +98,10 @@
         <v-select
           v-model="item.grandRank"
           :items="
-            [{ value: '' }, ...ranks].filter((r) => !['PGM', 'DPGM', 'APGM'].includes(r.value))
+            [{ value: '' }, ...ranks].filter(
+              (r) =>
+                !['PGM', 'DPGM', 'APGM', 'MEGS', 'DGS', '2NDGP', '3RDGP', 'AGP'].includes(r.value)
+            )
           "
           item-title="value"
           density="compact"
@@ -122,20 +147,30 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-btn
-          icon="mdi-card-account-details-outline"
-          size="small"
-          color="primary"
-          title="Contact details"
-          @click="emits('officer-contact-details', item)"
-        />
-        <v-btn
-          icon="mdi-delete"
-          size="small"
-          color="red"
-          title="Delete officer"
-          @click="emits('delete-officer', item)"
-        />
+        <v-tooltip text="Update officer contact details">
+          <template #activator="{ props: cdprops }">
+            <v-btn
+              v-bind="cdprops"
+              icon="mdi-card-account-details-outline"
+              size="small"
+              color="primary"
+              title="Contact details"
+              @click="emits('officer-contact-details', item)"
+            />
+          </template>
+        </v-tooltip>
+        <v-tooltip text="Delete officer">
+          <template #activator="{ props: doprops }">
+            <v-btn
+              v-bind="doprops"
+              icon="mdi-delete"
+              size="small"
+              color="red"
+              title="Delete officer"
+              @click="emits('delete-officer', item)"
+            />
+          </template>
+        </v-tooltip>
       </template>
     </v-data-table>
   </v-responsive>
@@ -187,6 +222,29 @@
                 density="compact"
                 placeholder="Prov rank"
               />
+            </v-col>
+
+            <v-col cols="12">
+              <v-select
+                v-model="item.rankOverride"
+                :items="[{ value: '', title: '' }, ...ranks]"
+                label="Provincial Rank Override"
+                density="compact"
+                placeholder="override procession position"
+                clearable
+                clear-icon="mdi-close-circle"
+                @click:clear="item.rankOverride = null"
+              >
+                <template #append-inner>
+                  <v-tooltip
+                    text="If provided, this will be used for automatic procession ordering instead of the provincial rank"
+                  >
+                    <template #activator="{ props: ttprops }">
+                      <v-icon v-bind="ttprops" icon="mdi-information-outline" size="18" />
+                    </template>
+                  </v-tooltip>
+                </template>
+              </v-select>
             </v-col>
 
             <v-col cols="6">
@@ -294,9 +352,9 @@
 
 <script setup lang="ts">
 import type { Rank } from '~/types/officers';
-import type { Officer, Position } from '@prisma/client';
+import type { Officer, Position, OVType } from '@prisma/client';
 
-const props = defineProps<{ officers: Officer[] }>();
+const props = defineProps<{ ovType: OVType | null; officers: Officer[] }>();
 
 const justAddedId = ref<string | number | null>(null);
 
@@ -318,9 +376,17 @@ const setCardRef = (id: string | number, el: HTMLElement | null) => {
   }
 };
 
-const emits = defineEmits(['delete-officer', 'save-changes', 'officer-contact-details']);
+const emits = defineEmits([
+  'delete-officer',
+  'save-changes',
+  'officer-contact-details',
+  'rank-override',
+]);
 
-const ranks = useRuntimeConfig().public.ranks as Rank[];
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () => (props.ovType === 'craft' || !props.ovType ? cfg.ranks : cfg.raRanks) as Rank[]
+);
 
 // Do not use useApi() here
 const _positionsRes = await $fetch<Position>('/api/ov/positions');
@@ -424,12 +490,13 @@ const availablePositions = computed(() => {
 const headers = [
   { title: 'Att', key: 'attending', align: 'center' as const },
   { title: 'Name', key: 'name', minWidth: '230px' },
-  { title: 'Provincial Rank', key: 'rank', width: '200px' },
+  { title: 'Provincial Rank', key: 'rank', width: '180px' },
+  { title: '', key: 'rankOverride' },
   { title: 'Active', key: 'active', align: 'center' as const },
   { title: 'Prov year', key: 'provOfficerYear', width: '115px' },
   { title: 'Position in procession', key: 'position', width: '210px' },
   { title: 'GO', key: 'grandOfficer', align: 'center' as const },
-  { title: 'Grand Rank', key: 'grandRank', width: '200px' },
+  { title: 'Grand Rank', key: 'grandRank', width: '180px' },
   { title: 'Active', key: 'grandActive', align: 'center' as const },
   { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
   { title: 'Excl', key: 'excludeFromProcession', align: 'center' as const },

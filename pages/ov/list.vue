@@ -20,6 +20,7 @@
                 Home
               </v-btn>
               <span class="text-h5">Official Visit Master</span>
+              <OVTypeSelector v-model="ovType" />
             </div>
           </v-card-title>
           <!-- Top Actions -->
@@ -27,6 +28,7 @@
             <v-text-field
               v-model="year"
               label="Masonic year"
+              prepend-inner-icon="mdi-calendar"
               hide-details
               @click:prepend-inner="load"
               @keyup.enter="load"
@@ -164,6 +166,7 @@
 <script setup lang="ts">
 import type { OVMaster, ActiveOfficer } from '@prisma/client';
 import { useDisplay } from 'vuetify';
+import debounce from 'lodash/debounce';
 
 const { mdAndDown } = useDisplay();
 const loading = ref(true);
@@ -174,6 +177,7 @@ const standardBearer = ref<ActiveOfficer | null>(null);
 const steward = ref<ActiveOfficer | null>(null);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const officers = ref<{ name: string | null }[]>([]);
+const { ovType, saveOvType } = useOvType();
 
 function formatDate(dateStr: string | Date) {
   if (!dateStr) return '';
@@ -204,7 +208,9 @@ const headers = [
 ];
 
 async function loadOVs() {
-  ovMasters.value = await useApi()<OVMaster[]>(`/api/ov-master?year=${year.value}`);
+  ovMasters.value = await useApi()<OVMaster[]>(
+    `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
+  );
   if (search.value && search.value.trim().length > 0) {
     const searchLower = search.value.trim().toLowerCase();
     ovMasters.value = ovMasters.value.filter(
@@ -219,7 +225,7 @@ async function loadOVs() {
 
 async function loadActiveOfficers() {
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${ovType.value}&year=${masonicYear}`
   );
 }
 
@@ -276,6 +282,8 @@ function goToOfficers(item: OVMaster) {
   showAllocatedOfficers.value = true;
 }
 
+const debouncedLoad = debounce(load, 500);
+
 async function load() {
   loading.value = true;
   await loadOVs();
@@ -285,5 +293,14 @@ async function load() {
 
 onMounted(async () => {
   await load();
+});
+
+watch(ovType, async () => {
+  await load();
+  saveOvType(ovType.value);
+});
+
+watch(year, () => {
+  debouncedLoad();
 });
 </script>

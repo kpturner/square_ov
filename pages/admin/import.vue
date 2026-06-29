@@ -23,11 +23,12 @@
             <em>STOP!! Unless you know what you are doing!</em>
           </span>
         </div>
+        <OVTypeSelector v-model="ovType" />
       </v-card-title>
       <v-card class="pa-6 mb-4">
         <v-row>
           <v-col>
-            <v-text-field v-model="year" label="Masonic year" />
+            <v-text-field v-model="year" label="Masonic year" prepend-inner-icon="mdi-calendar" />
           </v-col>
         </v-row>
         <v-row>
@@ -113,6 +114,7 @@ const ovSheetName = ref(`${paddedMasonicYear} Visits`);
 const file = ref<File | null>(null);
 const importErrorsExist = ref(false);
 const importErrorsFound = ref<string[]>([]);
+const { ovType, saveOvType } = useOvType();
 
 const handleFile = (event: Event) => {
   const target = event.target as HTMLInputElement;
@@ -126,7 +128,7 @@ const importActiveOfficers = async () => {
   loading.value = true;
   try {
     const data = (await readExcel(file.value, aoSheetName.value)) as Record<string, unknown>[];
-    const { importErrors } = await useActiveOfficerApi().import(data, year.value);
+    const { importErrors } = await useActiveOfficerApi().import(ovType.value, data, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
@@ -149,7 +151,7 @@ const importOfficialVisits = async () => {
   loading.value = true;
   try {
     const data = (await readExcel(file.value, ovSheetName.value)) as Record<string, unknown>[];
-    const { importErrors } = await useOVMasterApi().import(data, year.value);
+    const { importErrors } = await useOVMasterApi().import(ovType.value, data, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
@@ -191,7 +193,7 @@ const importVIPs = async () => {
         return clean;
       })
       .filter((r) => r.Name !== 'Name');
-    const { importErrors } = await useVIPApi().import(tidy, year.value);
+    const { importErrors } = await useVIPApi().import(ovType.value, tidy, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
@@ -217,4 +219,8 @@ async function readExcel(file: File, sheetName: string) {
   if (!sheet) throw new Error(`Sheet "${sheetName}" not found`);
   return XLSX.utils.sheet_to_json(sheet);
 }
+
+watch(ovType, async () => {
+  saveOvType(ovType.value);
+});
 </script>

@@ -1,8 +1,7 @@
 import prisma from '~/server/utils/dbClient';
 import { z } from 'zod';
 import type { Rank } from '~/types/officers';
-
-const ranks = useRuntimeConfig().public.ranks as Rank[];
+import { OVType } from '@prisma/client';
 
 const officerSchema = z.object({
   number: z.number(),
@@ -18,9 +17,16 @@ const officerSchema = z.object({
 export default defineEventHandler(async (event) => {
   const importErrors: string[] = [];
   const body = await readBody(event);
-  const { year, officers } = z
-    .object({ year: z.string(), officers: z.array(z.record(z.string(), z.any())) })
+  const { ovType, year, officers } = z
+    .object({
+      ovType: z.enum(OVType),
+      year: z.string(),
+      officers: z.array(z.record(z.string(), z.any())),
+    })
     .parse(body);
+
+  const cfg = useRuntimeConfig().public;
+  const ranks = (ovType === 'craft' ? cfg.ranks : cfg.raRanks) as Rank[];
 
   const columnMap: Record<string, keyof typeof officerSchema.shape> = {
     Number: 'number',
@@ -54,9 +60,9 @@ export default defineEventHandler(async (event) => {
 
   const promises = validatedOfficers.map((officer) =>
     prisma.activeOfficer.upsert({
-      where: { year_number: { year, number: officer.number } },
+      where: { type_year_number: { ovType, year, number: officer.number } },
       update: officer,
-      create: { ...officer, year },
+      create: { ...officer, year, ovType },
     })
   );
 

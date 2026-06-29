@@ -1,9 +1,10 @@
 <template>
+  <hr v-if="carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print" />
   <div
     v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
     class="d-flex flex-column justify-center align-center mt-6 mb-4"
   >
-    <strong>SPLIT COLUMNS ON CARPET</strong>
+    <strong class="no-print">SPLIT COLUMNS ON CARPET</strong>
 
     <v-btn
       class="no-print"
@@ -74,7 +75,7 @@
       <div class="row-number no-print">{{ idx + 1 }}</div>
       <!-- South column -->
       <div v-if="row.south" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-        <OfficerCard :officer="row.south" />
+        <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
       </div>
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
@@ -82,7 +83,7 @@
       <v-divider vertical class="mx-2" />
       <!-- North column -->
       <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
-        <OfficerCard :officer="row.north" />
+        <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
       </div>
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
@@ -145,7 +146,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.south" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -156,7 +157,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.south2" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south2" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -168,7 +169,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.north" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -178,7 +179,7 @@
           class="pa-1"
           style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
         >
-          <OfficerCard :officer="row.north2" />
+          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north2" />
         </div>
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
@@ -195,7 +196,11 @@
           class="pa-1"
           style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
         >
-          <OfficerCard v-if="headSouth" :officer="headSouth" />
+          <OfficerCard
+            v-if="headSouth"
+            :ov-type="officialVisit?.ovType ?? null"
+            :officer="headSouth"
+          />
         </div>
         <v-divider vertical class="mx-2" />
         <!-- NORTH side -->
@@ -203,7 +208,11 @@
           class="pa-1"
           style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
         >
-          <OfficerCard v-if="headNorth" :officer="headNorth" />
+          <OfficerCard
+            v-if="headNorth"
+            :ov-type="officialVisit?.ovType ?? null"
+            :officer="headNorth"
+          />
         </div>
       </div>
     </div>
@@ -214,13 +223,21 @@
 import type { Officer, OV } from '@prisma/client';
 import type { Rank, ProcessionRow } from '~/types';
 
-const ranks: Rank[] = useRuntimeConfig().public.ranks as Rank[];
-
 const props = defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
   carpetSplitMode?: boolean;
 }>();
+
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () =>
+    (props.officialVisit
+      ? props.officialVisit.ovType === 'craft'
+        ? cfg.ranks
+        : cfg.raRanks
+      : []) as Rank[]
+);
 
 const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
 
@@ -242,8 +259,8 @@ const splitByRow = ref(props.officialVisit?.splitByRow ?? false);
 
 const ranksInProcessionOrder = computed(() => {
   // In the procession we want Grand Steward to be at the front (barring other overrides)
-  const gStwd = ranks.find((r) => r.value === 'GSTWD')!;
-  return [...ranks.filter((r) => r.value !== 'GSTWD'), gStwd];
+  const gStwd = ranks.value.find((r) => r.value === 'GSTWD')!;
+  return [...ranks.value.filter((r) => r.value !== 'GSTWD'), gStwd];
 });
 
 const isRowsExceedingCarpetCapacity = computed(() => {
@@ -251,7 +268,7 @@ const isRowsExceedingCarpetCapacity = computed(() => {
 });
 
 const rankPrefix = (officer: Officer) => {
-  if (['PGM', 'DPGM', 'APGM'].includes(officer.rank ?? '')) {
+  if (VIP_RANKS.includes(officer.rank ?? '')) {
     if (officer.active) {
       return '';
     } else {
@@ -295,8 +312,14 @@ const rankCaption = (officer: Officer) => {
   return caption;
 };
 
+const provRankToConsider = (officer: Officer) => {
+  return officer.rankOverride ?? officer.rank;
+};
+
 const rankToConsider = (officer: Officer) => {
-  return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
+  return officer.grandOfficer
+    ? (officer.grandRank ?? provRankToConsider(officer))
+    : provRankToConsider(officer);
 };
 
 const activeNumberToConsider = (officer: Officer): number | null => {
@@ -341,8 +364,8 @@ const rankCompare = (a: string | null, b: string | null): number | null => {
 
   if (aRankIndex !== bRankIndex) {
     return (
-      (aRankIndex !== -1 ? aRankIndex : ranks.length) -
-      (bRankIndex !== -1 ? bRankIndex : ranks.length)
+      (aRankIndex !== -1 ? aRankIndex : ranks.value.length) -
+      (bRankIndex !== -1 ? bRankIndex : ranks.value.length)
     );
   }
   return null;
@@ -365,15 +388,15 @@ const activeOfficerNumberCompare = (a: Officer, b: Officer): number | null => {
 };
 
 const isVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '');
+  return VIP_RANKS.includes(o.rank ?? '');
 };
 
 const isActiveVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && o.active;
+  return VIP_RANKS.includes(o.rank ?? '') && o.active;
 };
 
 const isPastVIP = (o: Officer) => {
-  return ['PGM', 'DPGM', 'APGM'].includes(o.rank ?? '') && !o.active;
+  return VIP_RANKS.includes(o.rank ?? '') && !o.active;
 };
 
 // Automatic officers sorted by seniority

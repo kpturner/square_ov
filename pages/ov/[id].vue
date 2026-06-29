@@ -92,9 +92,11 @@
         </div>
 
         <Officers
+          :ov-type="officialVisit?.ovType ?? null"
           :officers
           @delete-officer="deleteOfficer"
           @officer-contact-details="officerContactDetails"
+          @rank-override="rankOverride"
           @save-changes="saveAll"
         />
 
@@ -258,12 +260,21 @@
         <v-card-text>
           Either select a VIP from the master list or leave unselected to add the VIP details
           yourself
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadActiveOfficersAndVIPs"
+            @keyup.enter="loadActiveOfficersAndVIPs"
+          />
           <v-autocomplete
             v-model="selectedVIPId"
             :items="activeVIPSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} VIPs`"
+            :placeholder="`${year} VIPs`"
           />
         </v-card-text>
         <v-card-actions>
@@ -298,18 +309,60 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="rankOverrideDialog" max-width="400">
+      <v-card>
+        <v-card-title>Override Provincial Rank</v-card-title>
+        <v-card-text v-if="officerToEdit">
+          {{ officerToEdit.name }}<br />
+          <v-select
+            v-model="officerToEdit.rankOverride"
+            :items="[{ value: '', title: '' }, ...ranks]"
+            label="Provincial Rank Override"
+            density="compact"
+            placeholder="override procession position"
+            clearable
+            clear-icon="mdi-close-circle"
+            @click:clear="officerToEdit.rankOverride = null"
+          >
+            <template #append-inner>
+              <v-tooltip
+                text="If provided, this will be used for automatic procession ordering instead of the provincial rank"
+              >
+                <template #activator="{ props: ttprops }">
+                  <v-icon v-bind="ttprops" icon="mdi-information-outline" size="18" />
+                </template>
+              </v-tooltip>
+            </template>
+          </v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="rankOverrideDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="updateRankOverride">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-dialog v-model="addOfficerDialog" max-width="400">
       <v-card>
         <v-card-title>Add Officer</v-card-title>
         <v-card-text>
           Either select an officer from the master list or leave unselected to add the officer
           details yourself
+          <v-text-field
+            v-model="year"
+            class="mb-4"
+            prepend-inner-icon="mdi-calendar"
+            label="Masonic year"
+            hide-details
+            @click:prepend-inner="loadActiveOfficersAndVIPs"
+            @keyup.enter="loadActiveOfficersAndVIPs"
+          />
           <v-autocomplete
             v-model="selectedActiveOfficerId"
             :items="activeOfficerSelectionList"
             density="compact"
             clearable
-            :placeholder="`${masonicYear} Active Officers`"
+            :placeholder="`${year} Active Officers`"
           />
         </v-card-text>
         <v-card-actions>
@@ -334,6 +387,8 @@
 import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
+import debounce from 'lodash/debounce';
+import type { Rank } from '~/types';
 
 const logger = useLogger('officers');
 const authStore = useAuthStore();
@@ -346,11 +401,14 @@ const officerToEdit = ref<Officer | null>(null);
 const contactDetailsDialog = ref(false);
 const route = useRoute();
 const router = useRouter();
+const ovId = Number(route.params.id);
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
+const rankOverrideDialog = ref(false);
 const addVIPDialog = ref(false);
 const { masonicYear } = useMasonicYear();
+const year = ref(masonicYear);
 const activeOfficers = ref<ActiveOfficer[]>([]);
 const selectedActiveOfficerId = ref(null);
 const vips = ref<VIP[]>([]);
@@ -368,10 +426,18 @@ const loading = ref(true);
 const _positionsRes = await $fetch('/api/ov/positions');
 type Position = (typeof _positionsRes)[number];
 
+const cfg = useRuntimeConfig().public;
+const ranks = computed(
+  () =>
+    (officialVisit.value?.ovType === 'craft' || !officialVisit.value?.ovType
+      ? cfg.ranks
+      : cfg.raRanks) as Rank[]
+);
+
 onMounted(async () => {
+  await loadOfficers();
   await loadVIPs();
   await loadActiveOfficers();
-  await loadOfficers();
 });
 
 function formatDate(dateStr: string | Date | undefined) {
@@ -401,17 +467,28 @@ const activeOfficerSelectionList = computed(() => {
 const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
 
 async function loadActiveOfficers() {
+  if (!officialVisit.value) return;
   activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?year=${masonicYear}`
+    `/api/active-officers?ovType=${officialVisit.value.ovType}&year=${year.value}`
   );
 }
 
 async function loadVIPs() {
-  vips.value = await useApi()<VIP[]>(`/api/vip?year=${masonicYear}`);
+  if (!officialVisit.value) return;
+  vips.value = await useApi()<VIP[]>(
+    `/api/vip?ovType=${officialVisit.value.ovType}&year=${year.value}`
+  );
+}
+
+const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
+const debouncedLoadVIPs = debounce(loadVIPs, 500);
+
+async function loadActiveOfficersAndVIPs() {
+  await loadActiveOfficers();
+  await loadVIPs();
 }
 
 async function loadOfficers() {
-  const ovId = Number(route.params.id);
   const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
   officialVisit.value = res.ov
@@ -477,6 +554,7 @@ async function addOfficer() {
       excludeFromProcession: false,
       original: false,
       attending: true,
+      rankOverride: null,
       ovId: Number(route.params.id),
     });
     makeToast(`${name} ${ao.provincialRank} added to list.`);
@@ -509,6 +587,7 @@ async function addVIP() {
       excludeFromProcession: false,
       original: true,
       attending: true,
+      rankOverride: null,
       ovId: Number(route.params.id),
     });
     makeToast(`${vip.name} ${vip.provincialRank} added to list.`);
@@ -537,6 +616,7 @@ function addEmptyOfficer(position?: Position) {
     excludeFromProcession: false,
     original: false,
     attending: true,
+    rankOverride: null,
     ovId: Number(route.params.id),
   });
 }
@@ -552,13 +632,13 @@ async function deleteOfficer(officer: Officer) {
 }
 
 async function officerContactDetails(officer: Officer) {
-  if (!officer.id) {
-    officers.value = officers.value.filter((o) => o !== officer);
-    return;
-  }
-
   officerToEdit.value = officer;
   contactDetailsDialog.value = true;
+}
+
+async function rankOverride(officer: Officer) {
+  officerToEdit.value = officer;
+  rankOverrideDialog.value = true;
 }
 
 async function updateContactDetails() {
@@ -570,6 +650,19 @@ async function updateContactDetails() {
   });
   contactDetailsDialog.value = false;
   makeToast(`Contact details for ${officerToEdit.value?.name} updated.`);
+}
+
+async function updateRankOverride() {
+  await useApi()<Officer>(`/api/officers/${officerToEdit.value?.id}`, {
+    method: 'PUT',
+    body: {
+      ...officerToEdit.value,
+    },
+  });
+  rankOverrideDialog.value = false;
+  makeToast(
+    `Rank override for ${officerToEdit.value?.name} ${officerToEdit.value?.rankOverride ? `updated to ${officerToEdit.value?.rankOverride}` : 'removed'}.`
+  );
 }
 
 function emailTheTeam() {
@@ -756,6 +849,11 @@ watch(
   ],
   saveControls
 );
+
+watch(year, () => {
+  debouncedLoadActiveOfficers();
+  debouncedLoadVIPs();
+});
 </script>
 
 <style lang="scss" scoped>
