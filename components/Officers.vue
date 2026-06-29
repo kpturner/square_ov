@@ -35,7 +35,7 @@
         <v-tooltip
           :text="
             !!item.rankOverride
-              ? `Rank overridden to ${item.rankOverride}`
+              ? `Prov rank overridden to ${item.rankOverride}`
               : 'Override provincial rank for procession'
           "
         >
