@@ -47,7 +47,28 @@ export const useSalutations = (ovType?: OVType | null) => {
     if (VIP_RANKS.includes(officer.rank)) {
       return officer.active ? '' : 'P';
     }
-    return officer.active ? 'Prov' : 'P';
+    return officer.active ? 'Prov' : 'PP';
+  };
+
+  const provincialRankOverride = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return ranks.value.find((r) => r.value === officer.rankOverride)?.title;
+  };
+
+  const provincialRankOverridePrefix = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return 'Past Provincial'; // If the override rank was an active rank we would not need an override!
+  };
+
+  const provincialRankOverridePrefixAbbrev = (officer: Officer) => {
+    if (!officer.rankOverride) {
+      return '';
+    }
+    return 'PP'; // If the override rank was an active rank we would not need an override!
   };
 
   const grandRank = (officer: Officer) => {
@@ -77,6 +98,9 @@ export const useSalutations = (ovType?: OVType | null) => {
     provincialRank,
     provincialRankPrefix,
     provincialRankPrefixAbbrev,
+    provincialRankOverride,
+    provincialRankOverridePrefix,
+    provincialRankOverridePrefixAbbrev,
     grandRank,
     grandRankPrefix,
     grandRankPrefixAbbrev,

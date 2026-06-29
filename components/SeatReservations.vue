@@ -24,6 +24,11 @@
             <v-row class="justify-center">
               <div class="text-h5">{{ grandRankPrefix(item) }} {{ grandRank(item) }}</div>
             </v-row>
+            <v-row v-if="item.rankOverride" class="justify-center">
+              <div class="text-h5">
+                {{ provincialRankOverridePrefix(item) }} {{ provincialRankOverride(item) }}
+              </div>
+            </v-row>
             <v-row class="justify-center">
               <div class="text-h5">{{ provincialRankPrefix(item) }} {{ provincialRank(item) }}</div>
             </v-row>
@@ -81,8 +86,16 @@ const officersByName = computed(() =>
   [...props.officers].sort((a, b) => a.name.localeCompare(b.name))
 );
 
-const { salutation, cleanName, provincialRank, provincialRankPrefix, grandRank, grandRankPrefix } =
-  useSalutations(props.ovType);
+const {
+  salutation,
+  cleanName,
+  provincialRank,
+  provincialRankPrefix,
+  provincialRankOverride,
+  provincialRankOverridePrefix,
+  grandRank,
+  grandRankPrefix,
+} = useSalutations(props.ovType);
 </script>
 
 <style lang="scss" scoped>

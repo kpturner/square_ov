@@ -42,6 +42,9 @@ const rankIcons = computed(() => {
   return craftRankIcons;
 });
 
+const { provincialRankPrefixAbbrev, provincialRankOverridePrefixAbbrev, grandRankPrefixAbbrev } =
+  useSalutations(props.ovType);
+
 const craftRankIcons: Record<string, string> = {
   AGDC: 'mdi-auto-fix',
   GDC: 'mdi-magic-staff',
@@ -111,32 +114,24 @@ const cardStyle = computed(() => ({
   borderColor: ovColours[ov.value][tier.value].border,
 }));
 
-const rankPrefix = (officer: Officer) => {
-  if (VIP_RANKS.includes(officer.rank ?? '')) {
-    return officer.active ? '' : 'P';
-  }
-  return officer.active ? 'Prov' : 'PP';
-};
-
-const grandRankPrefix = (officer: Officer) => {
-  if (!officer.grandRank) return '';
-  return officer.grandActive ? '' : 'P';
-};
-
 const rankCaption = (officer: Officer) => {
   let caption = '';
 
   if (officer.grandOfficer && officer.grandRank) {
-    caption += `${grandRankPrefix(officer)}${officer.grandRank}`;
+    caption += `${grandRankPrefixAbbrev(officer)}${officer.grandRank}`;
 
     if (officer.grandOfficerYear) {
       caption += ` (${officer.grandOfficerYear})`;
     }
   }
 
+  if (officer.rankOverride) {
+    caption += `${provincialRankOverridePrefixAbbrev(officer)}${officer.rankOverride}`;
+  }
+
   if (officer.rank) {
     if (caption.length) caption += ' - ';
-    caption += `${rankPrefix(officer)}${officer.rank}`;
+    caption += `${provincialRankPrefixAbbrev(officer)}${officer.rank}`;
   }
 
   return caption;

@@ -6,10 +6,12 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody(event);
 
+  const { id: officerId, ...data } = body;
+
   return prisma.officer.update({
     where: { id },
     data: {
-      ...body,
+      ...data,
       rank: body.rank?.trim() ? body.rank : null,
       grandRank: body.grandRank?.trim() ? body.grandRank : null,
       email: body.email?.trim() ? body.email : null,

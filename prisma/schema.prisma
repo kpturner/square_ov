@@ -50,6 +50,7 @@ model Officer {
   email                 String?
   phone                 String?
   rank                  String?
+  rankOverride          String?
   provOfficerYear       Int?
   grandOfficer          Boolean
   grandOfficerYear      Int?

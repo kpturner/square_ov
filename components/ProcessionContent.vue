@@ -311,8 +311,14 @@ const rankCaption = (officer: Officer) => {
   return caption;
 };
 
+const provRankToConsider = (officer: Officer) => {
+  return officer.rankOverride ?? officer.rank;
+};
+
 const rankToConsider = (officer: Officer) => {
-  return officer.grandOfficer ? officer.grandRank || officer.rank : officer.rank;
+  return officer.grandOfficer
+    ? (officer.grandRank ?? provRankToConsider(officer))
+    : provRankToConsider(officer);
 };
 
 const activeNumberToConsider = (officer: Officer): number | null => {
