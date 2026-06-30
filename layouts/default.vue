@@ -11,15 +11,17 @@
         </client-only>
       </v-app-bar-title>
       <v-spacer />
-      <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOut">
-        Log Out
-      </v-btn>
-      <v-btn
-        v-if="$route.path !== '/'"
-        icon="mdi-account"
-        variant="text"
-        @click="profileDialog = true"
-      />
+      <template v-if="authStore.user">
+        <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOut">
+          Log Out
+        </v-btn>
+        <v-btn
+          v-if="$route.path !== '/'"
+          icon="mdi-account"
+          variant="text"
+          @click="profileDialog = true"
+        />
+      </template>
       <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-weather-sunny' : 'mdi-weather-night'"
         variant="text"
