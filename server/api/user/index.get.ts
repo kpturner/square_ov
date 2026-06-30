@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   }
 
   const users: User[] = await prisma.user.findMany({
-    orderBy: { name: 'desc' },
+    orderBy: { name: 'asc' },
   });
 
   return users;
