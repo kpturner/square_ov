@@ -691,8 +691,10 @@ async function saveOV() {
           body: officers,
         });
       }
+      navigateTo(`/ov/${updatedOV.id}`);
     } catch (err) {
       makeToast((err as Error).message, 'error');
+      return;
     }
   }
   dialog.value = false;
