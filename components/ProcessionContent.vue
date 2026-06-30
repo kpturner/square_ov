@@ -6,6 +6,16 @@
   >
     <strong class="no-print">SPLIT COLUMNS ON CARPET</strong>
 
+    <v-alert
+      class="d-md-none mb-3"
+      type="info"
+      density="compact"
+      variant="tonal"
+      icon="mdi-phone-rotate-landscape"
+    >
+      For the best view on a phone, rotate your device to landscape.
+    </v-alert>
+
     <v-btn
       class="no-print"
       color="primary"
@@ -61,7 +71,7 @@
       <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <strong>SOUTH</strong>
       </div>
-      <v-divider vertical class="mx-2" />
+      <v-divider vertical class="mx-2 d-none d-md-flex" />
       <div class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <strong>NORTH</strong>
       </div>
@@ -80,7 +90,7 @@
       <div v-else class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <!-- Nobody here! -->
       </div>
-      <v-divider vertical class="mx-2" />
+      <v-divider vertical class="mx-2 d-none d-md-flex" />
       <!-- North column -->
       <div v-if="row.north" class="pa-1" style="flex: 1 1 45%; max-width: 300px; min-width: 150px">
         <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
