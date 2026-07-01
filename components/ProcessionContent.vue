@@ -117,7 +117,7 @@
         <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
           <strong>SOUTH</strong>
         </div>
-        <v-divider vertical class="mx-2" />
+        <v-divider vertical class="mx-2 d-none d-md-flex" />
         <!-- NORTH spans 2 columns -->
         <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
           <strong>NORTH</strong>
@@ -134,7 +134,7 @@
         <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
           <small>INNER</small>
         </div>
-        <v-divider vertical class="mx-2" />
+        <v-divider vertical class="mx-2 d-none d-md-flex" />
         <!-- NORTH subcolumns -->
         <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
           <small>INNER</small>
@@ -172,7 +172,7 @@
         <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
           <!-- Nobody here! -->
         </div>
-        <v-divider vertical class="mx-2" />
+        <v-divider vertical class="mx-2 d-none d-md-flex" />
         <!-- North column -->
         <div
           v-if="row.north"
@@ -212,7 +212,7 @@
             :officer="headSouth"
           />
         </div>
-        <v-divider vertical class="mx-2" />
+        <v-divider vertical class="mx-2 d-none d-md-flex" />
         <!-- NORTH side -->
         <div
           class="pa-1"
