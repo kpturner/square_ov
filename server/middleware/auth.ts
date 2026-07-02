@@ -46,6 +46,7 @@ export default defineEventHandler(async (event) => {
         path: '/',
       });
     } else {
+      if (payload.impersonating) return;
       await prisma.user.update({
         where: { id: payload.userId },
         data: {
