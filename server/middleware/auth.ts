@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { COOKIE, PUBLIC_ENDPOINTS } from '~/utils/constants';
+import prisma from '~/server/utils/dbClient';
 
 const ONE_DAY = 60 * 60 * 24;
 const DEFAULT_AGE = ONE_DAY * 30;
@@ -43,6 +44,13 @@ export default defineEventHandler(async (event) => {
         sameSite: 'lax',
         maxAge,
         path: '/',
+      });
+    } else {
+      await prisma.user.update({
+        where: { id: payload.userId },
+        data: {
+          lastAccessDate: new Date(),
+        },
       });
     }
   } catch {

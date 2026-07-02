@@ -20,6 +20,7 @@ model User {
   passwordResetToken   String?
   passwordResetExpires DateTime?
   createdAt            DateTime  @default(now())
+  lastAccessDate       DateTime?
   ovs                  OV[]
 }
 

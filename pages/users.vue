@@ -109,6 +109,7 @@ const dialog = ref(false);
 const editedUser = ref<Partial<User>>({});
 const headers = [
   { title: 'Name', key: 'name' },
+  { title: 'Last Accessed', key: 'lastAccessDate' },
   { title: '', key: 'actions', sortable: false },
 ];
 
