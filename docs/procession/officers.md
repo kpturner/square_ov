@@ -8,7 +8,7 @@ tags: [ovs, official-visits, active-officers, officers, vips]
 
 ## What this feature does
 
-This feature allows you to add, change or remove officers from your official visit, including the VIP. Below the list of officers, the system will show you the procession order for the officers you have entered. It will also show you the list of ranks in order for a visual reference. You can provide the following information for an officer:
+This feature allows you to add, change or remove officers from your official visit, including the VIP. Below the list of officers, the system will show you the procession order for the officers you have entered. It will also show you the list of ranks in order for a visual reference. You can provide the following information for an officer (note: on a mobile device each officer will appear as an editable card whereas on a desktop device the officers will appear in an editable table):
 
 - A checkbox to indicate that the officer is expected to attend. Sometimes an allocated officer may not be able to attend, so you can use this to exclude them from everything whilst still keeping a record of the fact that they were allocated to the official visit.
 - Name

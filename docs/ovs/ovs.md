@@ -31,7 +31,7 @@ Alternatively you can just enter a name and date for an official visit that you 
 
 ## What are the options I can take for my official visit?
 
-The home page will list your official visits and the date that the will take (or took) place. You have the following options that are provided in the form on action buttons next to each official visit:
+The home page will list your official visits and the date that the will take (or took) place. You have the following options that are provided in the form on action buttons next to each official visit (note: on a mobile device the options will be found by clicking the ellipsis button (three dots)):
 
 - Edit - From here you will be able to change the name and date of the official visit.
 - Copy - Create a copy of your official visit
