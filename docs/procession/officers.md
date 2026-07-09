@@ -45,6 +45,7 @@ IMPORTANT NOTE: Changes you make to officers directly in the officer list will o
 - Seat reservations - You can click this button to see, and print, the seat reservations for you officers. You can optionally also print spares.
 - Attendance report - You can click this button to see, and print, the expected attendance report for your visit.
 - Email the team - Click this button to create an email in your device email client with all your officers BCCd. Every officer must have an email address defined for this to work.
+- Procession - A useful button if you have lots of officers and are using a mobile device. It enables you to scroll past the officers directly to the procession with one click.
 - Help - Click this button at the top of the page for interactive help. If you are reading this it is a fair chance you have already found this option!
 - Support - From the Help page you can click the "Support" button to send a request for support to the administrator.
 

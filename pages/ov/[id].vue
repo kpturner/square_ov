@@ -56,6 +56,17 @@
                 Email the team
               </v-btn>
             </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                color="warning"
+                prepend-icon="mdi-arrow-down-bold-circle"
+                class="w-100"
+                small
+                @click="scrollToProcessionControls"
+              >
+                Procession
+              </v-btn>
+            </v-col>
           </v-row>
         </div>
       </v-card-title>
@@ -131,7 +142,7 @@
         </div>
       </v-container>
     </v-card>
-    <hr />
+    <hr ref="processionControls" />
 
     <v-card>
       <div class="no-print d-flex flex-column flex-sm-row">
@@ -399,6 +410,7 @@ const authStore = useAuthStore();
 
 const makeToast = useToast();
 
+const processionControls = ref<HTMLElement | null>(null);
 const showDeleteConfirm = ref(false);
 const officerToDelete = ref<Officer | null>(null);
 const officerToEdit = ref<Officer | null>(null);
@@ -446,6 +458,13 @@ onMounted(async () => {
   await loadVIPs();
   await loadActiveOfficers();
 });
+
+function scrollToProcessionControls() {
+  processionControls.value?.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start',
+  });
+}
 
 function formatDate(dateStr: string | Date | undefined) {
   if (!dateStr) return '';
