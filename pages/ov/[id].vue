@@ -146,6 +146,7 @@
           hide-details
         />
         <v-checkbox
+          v-if="isCraft"
           v-model="alignActiveWardens"
           label="Align active wardens?"
           class="no-print"
@@ -430,6 +431,9 @@ const _positionsRes = await $fetch('/api/ov/positions');
 type Position = (typeof _positionsRes)[number];
 
 const cfg = useRuntimeConfig().public;
+
+const isCraft = computed(() => officialVisit.value?.ovType === 'craft');
+
 const ranks = computed(
   () =>
     (officialVisit.value?.ovType === 'craft' || !officialVisit.value?.ovType
