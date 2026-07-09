@@ -38,6 +38,7 @@ jobs:
         run: |
           echo "${{ secrets.DB_PASSWORD_SECRET }}" > secrets/db_password_secret.txt
           echo "${{ secrets.BREVO_API_KEY }}" > secrets/brevo_api_key_secret.txt
+          echo "${{ secrets.OPENAI_API_KEY }}" > secrets/openai_api_key_secret.txt
           echo "${{ secrets.SESSION_SECRET }}" > secrets/session_secret.txt
 
       - name: Build and push with "latest" for square-ov

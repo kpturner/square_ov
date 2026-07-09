@@ -11,6 +11,7 @@
     "__format": "json"
   },
   "brevo_api_key": "BREVO_API_KEY",
+  "openai_api_key": "OPENAI_API_KEY",
   "log_level": "LOG_LEVEL",
   "log_to_file": "LOG_TO_FILE"
 }

@@ -21,6 +21,9 @@ RUN --mount=type=secret,id=SESSION_SECRET \
 RUN --mount=type=secret,id=BREVO_API_KEY \
     cp /run/secrets/BREVO_API_KEY ./config/secrets/brevo_api_key_secret.txt
 
+RUN --mount=type=secret,id=OPENAI_API_KEY \
+    cp /run/secrets/OPENAI_API_KEY ./config/secrets/openai_api_key_secret.txt
+
 RUN yarn install --frozen-lockfile
 
 RUN yarn typecheck
@@ -28,6 +31,7 @@ RUN yarn typecheck
 RUN DB_PASSWORD=$(cat ./config/secrets/db_password_secret.txt)_square-ov \
     DB_HOST=host.docker.internal \
     BREVO_API_KEY=$(cat ./config/secrets/brevo_api_key_secret.txt) \
+    OPENAI_API_KEY=$(cat ./config/secrets/openai_api_key_secret.txt) \
     SESSION_SECRET=$(cat ./config/secrets/session_secret.txt) \
     DB_PORT=3306 \
     DB_NAME=square-ov \

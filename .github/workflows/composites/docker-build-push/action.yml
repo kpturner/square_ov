@@ -16,6 +16,9 @@ inputs:
   brevo_api_key_secret:
     description: Brevo API key
     required: true
+  openai_api_key_secret:
+    description: Open API key
+    required: true
   session_secret:
     description: Session secret
     required: true
@@ -58,6 +61,7 @@ runs:
         secret-files: |
           "DB_PASSWORD_SECRET=${{ inputs.db_password_secret }}"
           "BREVO_API_KEY=${{ inputs.brevo_api_key_secret }}"
+          "OPENAI_API_KEY=${{ inputs.openai_api_key_secret }}"
           "SESSION_SECRET=${{ inputs.session_secret }}"
         build-args: |
           OPTS=${{ inputs.opts }}

@@ -21,6 +21,10 @@ inputs:
     description: Brevo API key
     required: false
     default: 'secrets/brevo_api_key_secret.txt'
+  openai_api_key_secret:
+    description: Open API key
+    required: false
+    default: 'secrets/openai_api_key_secret.txt'
   session_secret:
     description: Session secret
     required: false
@@ -45,6 +49,7 @@ runs:
         repo: ${{ inputs.repo }}
         db_password_secret: ${{ inputs.db_password_secret }}
         brevo_api_key_secret: ${{ inputs.brevo_api_key_secret }}
+        openai_api_key_secret: ${{ inputs.openai_api_key_secret }}
         session_secret: ${{ inputs.session_secret }}
         opts: ${{ inputs.opts }}
         tag: ${{ inputs.version }}
