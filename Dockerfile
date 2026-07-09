@@ -54,6 +54,7 @@ ENV NITRO_PORT=4003
 COPY --from=build-stage /usr/src/app/.output ./.output
 COPY --from=build-stage /usr/src/app/config ./config
 COPY --from=build-stage /usr/src/app/start.sh ./start.sh
+COPY --from=build-stage /usr/src/app/docs ./docs
 COPY --from=build-stage /usr/src/app/prisma ./prisma
 RUN mkdir -p ./server/templates
 COPY --from=build-stage /usr/src/app/server/templates ./server/templates
