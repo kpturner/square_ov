@@ -40,6 +40,14 @@ IMPORTANT NOTE: Changes you make to officers directly in the officer list will o
 - Contact details - You can ensure that the officers phone number and email address are correct here. The email address is important if you wish to make use of the "Email the team" button at the top of the page. If you use this option and there is an officer without an email address, you will be prompted to correct the situation first.
 - Delete - This will delete the officer from your official visit. You will be prompted to confirm this action before it is completed.
 
+## What are the options I can take for my procession
+
+- Seat reservations - You can click this button to see, and print, the seat reservations for you officers. You can optionally also print spares.
+- Attendance report - You can click this button to see, and print, the expected attendance report for your visit.
+- Email the team - Click this button to create an email in your device email client with all your officers BCCd. Every officer must have an email address defined for this to work.
+- Help - Click this button at the top of the page for interactive help. If you are reading this it is a fair chance you have already found this option!
+- Support - From the Help page you can click the "Support" button to send a request for support to the administrator.
+
 ---
 
 ## When to use it
