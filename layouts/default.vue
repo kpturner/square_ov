@@ -12,6 +12,7 @@
       </v-app-bar-title>
       <v-spacer />
       <template v-if="authStore.user">
+        <v-btn color="secondary" variant="text" @click="showHelpChat = true"> Help </v-btn>
         <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOut">
           Log Out
         </v-btn>
@@ -52,6 +53,8 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <HelpChat v-model="showHelpChat" @support="showDialogSupport = true" />
+      <DialogSupport v-model="showDialogSupport" />
     </client-only>
   </v-app>
 </template>
@@ -68,6 +71,8 @@ const profileDialog = ref(false);
 const user = ref<AuthUser | null>(null);
 const password = ref<string | null>(null);
 const error = ref('');
+const showHelpChat = ref(false);
+const showDialogSupport = ref(false);
 
 const { theme, toggleTheme } = useSetTheme();
 function logOut() {

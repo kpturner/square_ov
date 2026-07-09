@@ -19,6 +19,9 @@ export default defineNuxtConfig({
     brevo: {
       apiKey: config.get<string>('brevo_api_key'),
     },
+    openAi: {
+      apiKey: config.get<string>('openai_api_key'),
+    },
     appUrl: config.get<string>('appUrl'),
     emailDomain: config.get<string>('emailDomain'),
     sessionSecret: config.get<string>('sessionSecret'),

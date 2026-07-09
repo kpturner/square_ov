@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Support Request</title>
+    {{> styles }}
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Square OV - Support Request Received</div>
+      <div class="content">
+        <p>
+          This is an automated message from Square OV to notify you that a new support request has
+          been submitted via the website.
+        </p>
+
+        <p>The details of the request are included below for your reference.</p>
+
+        <p><strong>From:</strong> {{ USER.name }} ({{ USER.email }})</p>
+
+        <p>
+          <strong>Subject:</strong><br />
+          {{SUBJECT}}
+        </p>
+
+        <p>
+          <strong>Message:</strong><br />
+          {{#each QUESTION}} {{this}}<br />
+          {{/each}}
+        </p>
+
+        <p style="text-align: center">
+          <a
+            class="button"
+            href="mailto:{{USER.email}}?subject=Re: {{subjectForMailto SUBJECT}}&body={{mailtoBody 'Your question:' QUESTION}}"
+          >
+            Reply to User
+          </a>
+        </p>
+      </div>
+      <div class="footer">&copy; {{YEAR}} Square OV. All rights reserved.</div>
+    </div>
+  </body>
+</html>
