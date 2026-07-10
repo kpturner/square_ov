@@ -533,6 +533,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
     const compareName = `${ao.familiarName ? ao.familiarName : ao.givenName} ${ao.familyName}`;
     return compareName.toUpperCase() === name.toUpperCase();
   });
+  const position = ovType.value === 'craft' ? 'head_of_south' : 'head_of_north';
   if (!dc) {
     return {
       id: 0,
@@ -546,7 +547,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
       grandActive: false,
       grandRank: null,
       active: true,
-      position: 'head_of_south',
+      position,
       original: true,
       attending: true,
       excludeFromProcession: null,
@@ -566,7 +567,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
     grandActive: false,
     grandRank: null,
     active: true,
-    position: 'head_of_south',
+    position,
     original: true,
     attending: true,
     excludeFromProcession: null,
