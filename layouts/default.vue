@@ -10,7 +10,7 @@
           </template>
         </client-only>
       </v-app-bar-title>
-      <v-spacer />
+      <v-spacer class="hidden-sm-and-down" />
       <template v-if="authStore.user">
         <v-btn color="secondary" variant="text" @click="showHelpChat = true"> Help </v-btn>
         <v-btn v-if="$route.path !== '/'" color="grey" variant="text" small @click="logOut">
