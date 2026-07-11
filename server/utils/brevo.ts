@@ -8,28 +8,32 @@ import logger from './logger';
 import Handlebars from 'handlebars';
 import * as fs from 'fs';
 import * as path from 'path';
-import { fileURLToPath } from 'url';
 
-const { apiKey: brevoApiKey } = useRuntimeConfig().brevo;
+function loadTemplates() {
+  const runtimeDir = path.join(process.cwd(), 'server/templates');
+  const partialsDir = path.join(runtimeDir, 'partials');
 
-const apiInstance = new TransactionalEmailsApi();
+  fs.readdirSync(partialsDir).forEach((file) => {
+    const name = path.parse(file).name;
+    const content = fs.readFileSync(path.join(partialsDir, file), 'utf8');
 
-apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
+    Handlebars.registerPartial(name, content);
+  });
 
-const runtimeDir = fileURLToPath(new URL('../../server/templates', import.meta.url));
-const partialsDir = path.join(runtimeDir, 'partials');
-fs.readdirSync(partialsDir).forEach((file) => {
-  const name = path.parse(file).name;
-  const content = fs.readFileSync(path.join(partialsDir, file), 'utf8');
-  Handlebars.registerPartial(name, content);
-});
-
-function compile(templateName: string, data: any): string {
-  const templateString = fs.readFileSync(path.join(runtimeDir, `${templateName}.html`)).toString();
-  const template: HandlebarsTemplateDelegate<any> = Handlebars.compile(templateString);
-  return template({ ...data, recipient: 'Kevin' });
+  return runtimeDir;
 }
 
+function compile(templateName: string, data: any): string {
+  const runtimeDir = loadTemplates();
+
+  const templateString = fs.readFileSync(path.join(runtimeDir, `${templateName}.html`)).toString();
+
+  const template = Handlebars.compile(templateString);
+
+  return template({
+    ...data,
+  });
+}
 // Helper to encode text for URLs
 Handlebars.registerHelper('urlencode', function (str) {
   return encodeURIComponent(str);
@@ -55,6 +59,12 @@ export default async function sendEmail(
   subject: string,
   params?: any
 ) {
+  const { apiKey: brevoApiKey } = useRuntimeConfig().brevo;
+
+  const apiInstance = new TransactionalEmailsApi();
+
+  apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, brevoApiKey);
+
   const sendSmtpEmail = new SendSmtpEmail();
 
   sendSmtpEmail.htmlContent = compile(templateName, params ?? {});
@@ -62,7 +72,7 @@ export default async function sendEmail(
   sendSmtpEmail.subject = subject;
 
   const { emailDomain } = useRuntimeConfig();
-  const replyAddress = `squareov@${emailDomain}`;
+  const replyAddress = `noreply@${emailDomain}`;
 
   sendSmtpEmail.sender = { name: 'Square OV', email: replyAddress };
   sendSmtpEmail.to = to;
