@@ -103,7 +103,7 @@ model ActiveOfficer {
   oVMastersAsOfficer7 OVMaster[] @relation("Officer7Relation")
 
   @@unique([ovType, year, number], name: "type_year_number")
-  @@unique([year, primaryEmail], name: "year_email")
+  @@unique([ovType, year, primaryEmail], name: "type_year_email")
 }
 
 model OVMaster {

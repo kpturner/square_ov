@@ -14,11 +14,11 @@ const VIPSchema = z.object({
 export default defineEventHandler(async (event) => {
   const importErrors: string[] = [];
   const body = await readBody(event);
-  const { ovType, year, vips } = z
+  const { ovType, year, data } = z
     .object({
       ovType: z.enum(OVType),
       year: z.string(),
-      vips: z.array(z.record(z.string(), z.any())),
+      data: z.array(z.record(z.string(), z.any())),
     })
     .parse(body);
 
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     Mobile: 'mobile',
   };
 
-  const validatedVIPs = vips.map((row) => {
+  const validatedVIPs = data.map((row) => {
     const mapped: Record<string, unknown> = {};
 
     for (const [column, field] of Object.entries(columnMap)) {
@@ -49,7 +49,7 @@ export default defineEventHandler(async (event) => {
     prisma.vIP.upsert({
       where: { type_year_name: { ovType, year, name: vip.name } },
       update: vip,
-      create: { ...vip, year },
+      create: { ...vip, ovType, year },
     })
   );
 

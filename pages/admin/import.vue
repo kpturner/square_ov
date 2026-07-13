@@ -108,9 +108,6 @@ const makeToast = useToast();
 const loading = ref(false);
 const { masonicYear, paddedMasonicYear } = useMasonicYear();
 const year = ref(masonicYear);
-const vipSheetName = ref('VIP Contact Details');
-const aoSheetName = ref('Active Officers');
-const ovSheetName = ref(`${paddedMasonicYear} Visits`);
 const file = ref<File | null>(null);
 const importErrorsExist = ref(false);
 const importErrorsFound = ref<string[]>([]);
@@ -122,6 +119,18 @@ const handleFile = (event: Event) => {
     file.value = target.files[0];
   }
 };
+
+const aoSheetName = computed(() =>
+  ovType.value === 'craft' ? 'Active Officers' : `Matrix 20${year.value}`
+);
+
+const vipSheetName = computed(() =>
+  ovType.value === 'craft' ? 'VIP Contact Details' : `Matrix 20${year.value}`
+);
+
+const ovSheetName = computed(() =>
+  ovType.value === 'craft' ? `${paddedMasonicYear} Visits` : `Matrix 20${year.value}`
+);
 
 const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
@@ -137,7 +146,9 @@ const importActiveOfficers = async () => {
         'error'
       );
     } else {
-      makeToast(`Sheet ${aoSheetName.value} imported successfully for year ${year.value}`);
+      makeToast(
+        `Active Officers on sheet ${aoSheetName.value} imported successfully for year ${year.value}`
+      );
     }
   } catch (err) {
     makeToast((err as Error).message, 'error');
@@ -160,7 +171,7 @@ const importOfficialVisits = async () => {
         'error'
       );
     } else {
-      makeToast(`Sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
+      makeToast(`OVs from sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
     }
   } catch (err) {
     makeToast((err as Error).message, 'error');
@@ -176,23 +187,26 @@ const importVIPs = async () => {
   try {
     const data = (await readExcel(file.value, vipSheetName.value)) as Record<string, unknown>[];
     // Tidy up this data first
-    const tidy = data
-      .map((r) => {
-        const columns = Object.keys(r);
-        const officeKey = columns.find(
-          (c) => c.indexOf('Province of Hampshire and Isle of Wight') >= 0
-        ) as string;
-        const clean = {
-          Office: (r[officeKey] as string).toUpperCase(),
-          Name: r.__EMPTY,
-          Address: r.__EMPTY_1,
-          Email: r.__EMPTY_2,
-          Phone: r.__EMPTY_3,
-          Mobile: r.__EMPTY_4,
-        };
-        return clean;
-      })
-      .filter((r) => r.Name !== 'Name');
+    const tidy =
+      ovType.value === 'ra'
+        ? data
+        : data
+            .map((r) => {
+              const columns = Object.keys(r);
+              const officeKey = columns.find(
+                (c) => c.indexOf('Province of Hampshire and Isle of Wight') >= 0
+              ) as string;
+              const clean = {
+                Office: (r[officeKey] as string).toUpperCase(),
+                Name: r.__EMPTY,
+                Address: r.__EMPTY_1,
+                Email: r.__EMPTY_2,
+                Phone: r.__EMPTY_3,
+                Mobile: r.__EMPTY_4,
+              };
+              return clean;
+            })
+            .filter((r) => r.Name !== 'Name');
     const { importErrors } = await useVIPApi().import(ovType.value, tidy, year.value);
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
@@ -202,7 +216,9 @@ const importVIPs = async () => {
         'error'
       );
     } else {
-      makeToast(`Sheet ${vipSheetName.value} imported successfully for year ${year.value}`);
+      makeToast(
+        `VIPs from sheet ${vipSheetName.value} imported successfully for year ${year.value}`
+      );
     }
   } catch (err) {
     makeToast((err as Error).message, 'error');

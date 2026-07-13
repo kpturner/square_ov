@@ -3,14 +3,14 @@ import type { OVType } from '@prisma/client';
 export const useActiveOfficerApi = () => {
   const importActiveOfficers = async (
     ovType: OVType,
-    officers: Record<string, unknown>[],
+    data: Record<string, unknown>[],
     year: string
   ) => {
     const res = await useApi()<{ success: boolean; imported: number; importErrors: string[] }>(
-      '/api/active-officers/import',
+      `/api/active-officers/${ovType === 'ra' ? 'ra-' : ''}import`,
       {
         method: 'POST',
-        body: { ovType, officers, year },
+        body: { ovType, data, year },
       }
     );
     return res;

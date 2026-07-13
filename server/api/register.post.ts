@@ -35,8 +35,8 @@ export default defineEventHandler(async (event) => {
 
   // Only active officers can register an account
   if (!allowedEmails.includes(body.email)) {
-    const ao = await prisma.activeOfficer.findUnique({
-      where: { year_email: { year: body.masonicYear, primaryEmail: body.email } },
+    const ao = await prisma.activeOfficer.findFirst({
+      where: { year: body.masonicYear, primaryEmail: body.email },
     });
     if (!ao) {
       throw createError({

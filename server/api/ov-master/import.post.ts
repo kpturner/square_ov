@@ -164,7 +164,7 @@ export default defineEventHandler(async (event) => {
     prisma.oVMaster.upsert({
       where: { type_year_number: { ovType, year, number: ov.number } },
       update: ov,
-      create: { ...ov, year },
+      create: { ...ov, ovType, year },
     })
   );
 

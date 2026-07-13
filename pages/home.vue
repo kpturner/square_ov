@@ -11,6 +11,7 @@
         <v-card>
           <div class="d-flex gap-2">
             <v-btn
+              v-if="isAdmin"
               color="red-darken-3"
               prepend-icon="mdi-import"
               small
