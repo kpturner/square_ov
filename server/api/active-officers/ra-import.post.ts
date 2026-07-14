@@ -6,9 +6,9 @@ import { OVType } from '@prisma/client';
 
 const officerSchema = z.object({
   number: z.number(),
-  provincialRank: z.string(),
-  givenName: z.string(),
-  familyName: z.string(),
+  provincialRank: z.string().nullable().optional(),
+  givenName: z.string().nullable().optional(),
+  familyName: z.string().nullable().optional(),
   familiarName: z.string().nullable().optional(),
   postNominals: z.string().nullable().optional(),
   primaryEmail: z.string().nullable().optional(),
@@ -38,35 +38,35 @@ export default defineEventHandler(async (event) => {
         megsFound = true;
       }
       if (!megsFound) return false;
-      // MEGS, the principals and the assistants are VIPs so we don't need them here
+      // MEGS not needed as an active officer but others are
       if (rd.__EMPTY === 'MEGS') {
         return false;
       }
-      if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
-        return false;
-      }
-      if (rd.__EMPTY?.toUpperCase() === 'THIRD PROVINCIAL GRAND PRINCIPAL') {
-        return false;
-      }
-      if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'APGP') {
-        return false;
-      }
-      if (!rd.__EMPTY_3) {
+      if (!rd.__EMPTY) {
         return false;
       }
       return true;
     })
     .map((rd) => {
       provNumber++;
+      let givenName = rd.__EMPTY_1;
+      let familyName = rd.__EMPTY_2;
+      if (!givenName && !familyName && rd[' ']) {
+        // Area chairman
+        const names = rd[' '].split(' ');
+        givenName = names[0];
+        familyName = names[1];
+      }
+
       return {
         Number: provNumber,
-        'Provincial Rank': rd.__EMPTY_3.trim(),
-        'Given Name': rd.__EMPTY_1,
-        'Family Name': rd.__EMPTY_2,
-        'Familiar Name': rd.__EMPTY_1,
-        'Post Nominals': '',
+        'Provincial Rank': rd.__EMPTY_3 ? rd.__EMPTY_3.trim() : null,
+        'Given Name': givenName ?? null,
+        'Family Name': familyName ?? null,
+        'Familiar Name': givenName ?? null,
+        'Post Nominals': null,
         'Primary Email': rd.__EMPTY_4.trim(),
-        'Preferred Phone No.': '',
+        'Preferred Phone No.': null,
       };
     });
 

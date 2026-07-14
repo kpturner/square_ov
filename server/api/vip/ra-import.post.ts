@@ -35,13 +35,16 @@ export default defineEventHandler(async (event) => {
       if (rd.__EMPTY === 'MEGS') {
         return true;
       }
+      if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
+        return true;
+      }
       if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
         return true;
       }
       if (rd.__EMPTY?.toUpperCase() === 'THIRD PROVINCIAL GRAND PRINCIPAL') {
         return true;
       }
-      if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'APGP') {
+      if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'PROVGSN') {
         return true;
       }
       return false;
@@ -51,14 +54,17 @@ export default defineEventHandler(async (event) => {
       if (rd.__EMPTY === 'MEGS') {
         office = 'MEGS';
       }
+      if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
+        office = 'DGSUPT';
+      }
       if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
         office = '2NDPGP';
       }
       if (rd.__EMPTY?.toUpperCase() === 'THIRD PROVINCIAL GRAND PRINCIPAL') {
         office = '3RDPGP';
       }
-      if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'APGP') {
-        office = 'APGP';
+      if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'PROVGSN') {
+        office = 'GSN';
       }
       return {
         Office: office,

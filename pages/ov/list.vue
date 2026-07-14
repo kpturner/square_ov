@@ -30,7 +30,7 @@
               label="Masonic year"
               prepend-inner-icon="mdi-calendar"
               hide-details
-              @click:prepend-inner="load"
+              @click:prepend-inner="debouncedLoad"
               @keyup.enter="load"
             />
             <v-text-field
@@ -39,7 +39,7 @@
               prepend-inner-icon="mdi-magnify"
               hide-details
               @click:prepend-inner="load"
-              @keyup.enter="load"
+              @keyup.enter="debouncedLoad"
             />
           </div>
           <!-- DESKTOP -->
@@ -149,7 +149,7 @@
             /></v-col>
           </v-row>
           <v-row v-for="(officer, i) in officers" :key="i">
-            <v-col v-if="steward"
+            <v-col
               ><v-text-field
                 v-model="officer.name"
                 :label="`Officer ${i + 1}`"
@@ -164,18 +164,18 @@
 </template>
 
 <script setup lang="ts">
-import type { OVMaster, ActiveOfficer } from '@prisma/client';
+import type { ActiveOfficer } from '@prisma/client';
 import { useDisplay } from 'vuetify';
 import debounce from 'lodash/debounce';
+import type { OVMasterWithAdditionalOfficers } from '~/types';
 
 const { mdAndDown } = useDisplay();
 const loading = ref(true);
 const showAllocatedOfficers = ref(false);
-const selectedOV = ref<OVMaster | null>(null);
+const selectedOV = ref<OVMasterWithAdditionalOfficers | null>(null);
 const swordBearer = ref<ActiveOfficer | null>(null);
 const standardBearer = ref<ActiveOfficer | null>(null);
 const steward = ref<ActiveOfficer | null>(null);
-const activeOfficers = ref<ActiveOfficer[]>([]);
 const officers = ref<{ name: string | null }[]>([]);
 const { ovType, saveOvType } = useOvType();
 
@@ -186,7 +186,7 @@ function formatDate(dateStr: string | Date) {
 }
 
 const { masonicYear } = useMasonicYear();
-const ovMasters = ref<OVMaster[]>([]);
+const ovMasters = ref<OVMasterWithAdditionalOfficers[]>([]);
 
 const year = ref(masonicYear);
 const search = ref('');
@@ -208,7 +208,7 @@ const headers = [
 ];
 
 async function loadOVs() {
-  ovMasters.value = await useApi()<OVMaster[]>(
+  ovMasters.value = await useApi()<OVMasterWithAdditionalOfficers[]>(
     `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
   );
   if (search.value && search.value.trim().length > 0) {
@@ -223,15 +223,9 @@ async function loadOVs() {
   }
 }
 
-async function loadActiveOfficers() {
-  activeOfficers.value = await useApi()<ActiveOfficer[]>(
-    `/api/active-officers?ovType=${ovType.value}&year=${masonicYear}`
-  );
-}
-
 const officerName = (ao: ActiveOfficer | null) => {
   return ao
-    ? `${ao.number}: ${ao.familyName}, ${ao.familiarName ?? ao.givenName} - ${ao.provincialRank}`
+    ? `${ovType.value === 'craft' ? ao.number : ''}${ovType.value === 'craft' ? ':' : ''} ${ao.familyName}, ${ao.familiarName ?? ao.givenName} - ${ao.provincialRank ?? '*rank unknown'}`
     : ao;
 };
 
@@ -239,45 +233,44 @@ const swordBearerName = computed(() => officerName(swordBearer.value!));
 const standardBearerName = computed(() => officerName(standardBearer.value!));
 const stewardName = computed(() => officerName(steward.value!));
 
-const getActiveOfficer = (aon: number) => {
-  return aon ? (activeOfficers.value.find((ao) => ao.number === aon) ?? null) : null;
-};
-
-function goToOfficers(item: OVMaster) {
+function goToOfficers(item: OVMasterWithAdditionalOfficers) {
   selectedOV.value = item;
-  if (selectedOV.value && activeOfficers.value) {
+  if (selectedOV.value) {
     if (selectedOV.value.sword) {
-      swordBearer.value = getActiveOfficer(selectedOV.value?.sword);
+      swordBearer.value = selectedOV.value.swordOfficer;
     }
     if (selectedOV.value.standard) {
-      standardBearer.value = getActiveOfficer(selectedOV.value?.standard);
+      standardBearer.value = selectedOV.value.standardOfficer;
     }
     if (selectedOV.value.steward) {
-      steward.value = getActiveOfficer(selectedOV.value?.steward);
+      steward.value = selectedOV.value.stewardOfficer;
     }
 
     officers.value = [];
     if (selectedOV.value.officer1) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer1)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer1Officer) });
     }
     if (selectedOV.value.officer2) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer2)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer2Officer) });
     }
     if (selectedOV.value.officer3) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer3)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer3Officer) });
     }
     if (selectedOV.value.officer4) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer4)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer4Officer) });
     }
     if (selectedOV.value.officer5) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer5)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer5Officer) });
     }
     if (selectedOV.value.officer6) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer6)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer6Officer) });
     }
     if (selectedOV.value.officer7) {
-      officers.value.push({ name: officerName(getActiveOfficer(selectedOV.value.officer7)) });
+      officers.value.push({ name: officerName(selectedOV.value.officer7Officer) });
     }
+    officers.value = officers.value.concat(
+      selectedOV.value.additionalOfficers.map((ao) => ({ name: officerName(ao.activeOfficer) }))
+    );
   }
   showAllocatedOfficers.value = true;
 }
@@ -287,7 +280,6 @@ const debouncedLoad = debounce(load, 500);
 async function load() {
   loading.value = true;
   await loadOVs();
-  await loadActiveOfficers();
   loading.value = false;
 }
 

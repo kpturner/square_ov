@@ -8,5 +8,22 @@ export default defineEventHandler(async (event) => {
   return await prisma.oVMaster.findMany({
     where: { ovType, year },
     orderBy: { number: 'asc' },
+    include: {
+      swordOfficer: true,
+      standardOfficer: true,
+      stewardOfficer: true,
+      officer1Officer: true,
+      officer2Officer: true,
+      officer3Officer: true,
+      officer4Officer: true,
+      officer5Officer: true,
+      officer6Officer: true,
+      officer7Officer: true,
+      additionalOfficers: {
+        include: {
+          activeOfficer: true,
+        },
+      },
+    },
   });
 });

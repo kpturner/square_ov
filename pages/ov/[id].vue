@@ -562,12 +562,12 @@ async function addOfficer() {
       (ao) => ao.id === selectedActiveOfficerId.value
     ) as ActiveOfficer;
     selectedActiveOfficerId.value = null;
-    const firstName = ao.familiarName ?? ao.givenName.split(' ')[0];
+    const firstName = ao.familiarName ?? ao.givenName?.split(' ')[0];
     const name = `${firstName} ${ao.familyName} (${ao.number})`;
     officers.value.push({
       id: 0,
       name,
-      rank: ao.provincialRank.replace('Prov', '').toUpperCase(),
+      rank: ao.provincialRank?.replace('Prov', '').toUpperCase() ?? null,
       email: ao.primaryEmail ?? '',
       phone: ao.preferredPhoneNo ?? '',
       provOfficerYear: null,

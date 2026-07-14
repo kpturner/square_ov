@@ -101,6 +101,7 @@
 
 <script setup lang="ts">
 import * as XLSX from 'xlsx';
+import type { EnrichedCell } from '~/types';
 
 const logger = useLogger('import');
 
@@ -129,15 +130,19 @@ const vipSheetName = computed(() =>
 );
 
 const ovSheetName = computed(() =>
-  ovType.value === 'craft' ? `${paddedMasonicYear} Visits` : `Matrix 20${year.value}`
+  ovType.value === 'craft' ? `${paddedMasonicYear(year.value)} Visits` : `Matrix 20${year.value}`
 );
 
 const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
-    const data = (await readExcel(file.value, aoSheetName.value)) as Record<string, unknown>[];
-    const { importErrors } = await useActiveOfficerApi().import(ovType.value, data, year.value);
+    const data = await readExcel(file.value, aoSheetName.value);
+    const { importErrors } = await useActiveOfficerApi().import(
+      ovType.value,
+      data as Record<string, unknown>[],
+      year.value
+    );
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
@@ -161,8 +166,12 @@ const importOfficialVisits = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
-    const data = (await readExcel(file.value, ovSheetName.value)) as Record<string, unknown>[];
-    const { importErrors } = await useOVMasterApi().import(ovType.value, data, year.value);
+    const data = await readExcel(file.value, ovSheetName.value, ovType.value === 'ra');
+    const { importErrors } = await useOVMasterApi().import(
+      ovType.value,
+      data as EnrichedCell[][],
+      year.value
+    );
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
@@ -228,12 +237,49 @@ const importVIPs = async () => {
   }
 };
 
-async function readExcel(file: File, sheetName: string) {
+async function readExcel(file: File, sheetName: string, cellStyles?: boolean) {
   const arrayBuffer = await file.arrayBuffer();
-  const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+  const workbook = XLSX.read(arrayBuffer, { type: 'array', cellStyles });
   const sheet = workbook.Sheets[sheetName];
   if (!sheet) throw new Error(`Sheet "${sheetName}" not found`);
-  return XLSX.utils.sheet_to_json(sheet);
+  return cellStyles
+    ? sheetToEnrichedJson(sheet)
+    : (XLSX.utils.sheet_to_json(sheet) as Record<string, unknown>[]);
+}
+
+function isColumnHidden(sheet: XLSX.WorkSheet, colIndex: number) {
+  return sheet['!cols']?.[colIndex]?.hidden === true;
+}
+
+function sheetToEnrichedJson(sheet: XLSX.WorkSheet): EnrichedCell[][] {
+  const start = XLSX.utils.decode_cell('A1');
+  const end = XLSX.utils.decode_cell('BX100');
+
+  const rows: EnrichedCell[][] = [];
+
+  for (let r = start.r; r <= end.r; r++) {
+    const row: EnrichedCell[] = [];
+
+    for (let c = start.c; c <= end.c; c++) {
+      if (isColumnHidden(sheet, c)) {
+        logger.debug(`Col ${c} is hidden`);
+        continue;
+      }
+      const address = XLSX.utils.encode_cell({ r, c });
+      const cell = sheet[address];
+
+      row.push({
+        address,
+        row: r,
+        col: c,
+        value: cell?.v ?? null,
+        colour: cell?.s?.bgColor?.rgb,
+      });
+    }
+
+    rows.push(row);
+  }
+  return rows;
 }
 
 watch(ovType, async () => {

@@ -127,9 +127,9 @@ export default defineEventHandler(async (event) => {
 
       // Try to get the DC full name rather than just the surname we see on the spreadsheet
       if (column === 'DC' && value) {
-        const dc = activeDCs.filter((dc) => dc.familyName.toLowerCase() === value.toLowerCase());
+        const dc = activeDCs.filter((dc) => dc.familyName?.toLowerCase() === value.toLowerCase());
         if (dc.length === 1) {
-          const firstName = dc[0]?.familiarName ?? dc[0]?.givenName.split(' ')[0];
+          const firstName = dc[0]?.familiarName ?? dc[0]?.givenName?.split(' ')[0];
           value = `${firstName} ${dc[0]?.familyName}`;
         }
       }

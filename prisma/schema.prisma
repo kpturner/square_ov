@@ -82,25 +82,26 @@ model ActiveOfficer {
   ovType           OVType  @default(craft)
   year             String
   number           Int
-  provincialRank   String
-  givenName        String
-  familyName       String
+  provincialRank   String?
+  givenName        String?
+  familyName       String?
   familiarName     String?
   postNominals     String?
   primaryEmail     String?
   preferredPhoneNo String?
 
   // Reverse relations (optional, but handy if you want to query back)
-  oVMastersAsSword    OVMaster[] @relation("SwordRelation")
-  oVMastersAsStandard OVMaster[] @relation("StandardRelation")
-  oVMastersAsSteward  OVMaster[] @relation("StewardRelation")
-  oVMastersAsOfficer1 OVMaster[] @relation("Officer1Relation")
-  oVMastersAsOfficer2 OVMaster[] @relation("Officer2Relation")
-  oVMastersAsOfficer3 OVMaster[] @relation("Officer3Relation")
-  oVMastersAsOfficer4 OVMaster[] @relation("Officer4Relation")
-  oVMastersAsOfficer5 OVMaster[] @relation("Officer5Relation")
-  oVMastersAsOfficer6 OVMaster[] @relation("Officer6Relation")
-  oVMastersAsOfficer7 OVMaster[] @relation("Officer7Relation")
+  oVMastersAsSword           OVMaster[]                  @relation("SwordRelation")
+  oVMastersAsStandard        OVMaster[]                  @relation("StandardRelation")
+  oVMastersAsSteward         OVMaster[]                  @relation("StewardRelation")
+  oVMastersAsOfficer1        OVMaster[]                  @relation("Officer1Relation")
+  oVMastersAsOfficer2        OVMaster[]                  @relation("Officer2Relation")
+  oVMastersAsOfficer3        OVMaster[]                  @relation("Officer3Relation")
+  oVMastersAsOfficer4        OVMaster[]                  @relation("Officer4Relation")
+  oVMastersAsOfficer5        OVMaster[]                  @relation("Officer5Relation")
+  oVMastersAsOfficer6        OVMaster[]                  @relation("Officer6Relation")
+  oVMastersAsOfficer7        OVMaster[]                  @relation("Officer7Relation")
+  ovmasterAdditionalOfficers OVMasterAdditionalOfficer[]
 
   @@unique([ovType, year, number], name: "type_year_number")
   @@unique([ovType, year, primaryEmail], name: "type_year_email")
@@ -119,6 +120,7 @@ model OVMaster {
   dc          String
   sword       Int?
   standard    Int?
+  adc         Int? // Royal Arch only have an ADC as well as a DC
   steward     Int?
   officer1    Int?
   officer2    Int?
@@ -140,7 +142,22 @@ model OVMaster {
   officer6Officer ActiveOfficer? @relation("Officer6Relation", fields: [ovType, year, officer6], references: [ovType, year, number])
   officer7Officer ActiveOfficer? @relation("Officer7Relation", fields: [ovType, year, officer7], references: [ovType, year, number])
 
+  additionalOfficers OVMasterAdditionalOfficer[]
+
   @@unique([ovType, year, number], name: "type_year_number")
+}
+
+model OVMasterAdditionalOfficer {
+  id Int @id @default(autoincrement())
+
+  ovMasterId Int
+  ovMaster   OVMaster @relation(fields: [ovMasterId], references: [id], onDelete: Cascade)
+
+  activeOfficerId Int
+  activeOfficer   ActiveOfficer @relation(fields: [activeOfficerId], references: [id])
+
+  @@unique([ovMasterId, activeOfficerId])
+  @@index([activeOfficerId])
 }
 
 model VIP {

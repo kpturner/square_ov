@@ -17,6 +17,11 @@ export default defineEventHandler(async (event) => {
       officer5Officer: true,
       officer6Officer: true,
       officer7Officer: true,
+      additionalOfficers: {
+        include: {
+          activeOfficer: true,
+        },
+      },
     },
   });
 

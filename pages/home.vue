@@ -320,8 +320,9 @@
 </template>
 
 <script setup lang="ts">
-import type { OV, OVMaster, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
+import type { OV, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
 import debounce from 'lodash/debounce';
+import type { OVMasterWithAdditionalOfficers } from '~/types';
 
 const makeToast = useToast();
 const logger = useLogger('home');
@@ -356,7 +357,7 @@ const { masonicYear } = useMasonicYear();
 const year = ref(masonicYear);
 const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
-const ovMasters = ref<OVMaster[]>([]);
+const ovMasters = ref<OVMasterWithAdditionalOfficers[]>([]);
 const dialog = ref(false);
 type EditedOV = { id?: number; name?: string; ovDate?: string; ovType?: OVType };
 const editedOV = ref<EditedOV>({});
@@ -372,7 +373,7 @@ function goToUsers() {
 }
 
 async function loadMasterOVs() {
-  ovMasters.value = await useApi()<OVMaster[]>(
+  ovMasters.value = await useApi()<OVMasterWithAdditionalOfficers[]>(
     `/api/ov-master?ovType=${ovType.value}&year=${year.value}`
   );
 }
@@ -438,7 +439,10 @@ const ovSelectionList = computed(() => {
   return ovMasters.value.map((ov) => {
     return {
       value: ov.id,
-      title: `${ov.number}: ${ov.lodgeName} ${ov.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
+      title:
+        ov.ovType === 'ra'
+          ? `${ov.number}: ${ov.lodgeName} No. ${ov.lodgeNumber}`
+          : `${ov.number}: ${ov.lodgeName} ${ov.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
     };
   });
 });
@@ -503,11 +507,14 @@ const selectedOVName = computed(() => {
   if (!selectedMasterOV.value) {
     return '';
   }
+  if (selectedMasterOV.value.ovType === 'ra') {
+    return `${selectedMasterOV.value.lodgeName.trim()} No. ${selectedMasterOV.value.lodgeNumber}`;
+  }
   return `${selectedMasterOV.value.lodgeName.trim()}${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? ' Lodge ' : ' '}No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
 });
 
-const addVIP = async (ovId: number, vipName: string): Promise<Officer> => {
-  const vip = await useApi()<VIP>(`/api/vip/${ovType.value}/${masonicYear}/${vipName}`);
+const addVIP = async (ovId: number, vipName: string, year: string): Promise<Officer> => {
+  const vip = await useApi()<VIP>(`/api/vip/${ovType.value}/${year}/${vipName}`);
   return {
     id: 0,
     name: vipName,
@@ -559,11 +566,11 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
   return {
     id: 0,
     name: `${name} (${dc.number})`,
-    rank: dc.provincialRank.replace('Prov', '').toUpperCase(),
+    rank: dc.provincialRank?.replace('Prov', '').toUpperCase() ?? null,
     email: dc.primaryEmail,
     phone: dc.preferredPhoneNo,
     provOfficerYear: null,
-    grandOfficer: dc.provincialRank.toUpperCase() === 'PROVGDC',
+    grandOfficer: dc.provincialRank?.toUpperCase() === 'PROVGDC',
     grandOfficerYear: null,
     grandActive: false,
     grandRank: null,
@@ -577,19 +584,20 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
   };
 };
 
-const addOfficer = async (
+const addOfficer = (
   ovId: number,
   officers: Officer[],
-  officerNo: number,
+  activeOfficer: ActiveOfficer,
   position: Position
 ) => {
-  const activeOfficer = activeOfficers.value.find((ao) => ao.number === officerNo) as ActiveOfficer;
-  const firstName = activeOfficer.familiarName ?? activeOfficer.givenName.split(' ')[0];
+  const firstName =
+    activeOfficer.familiarName ??
+    (activeOfficer.givenName ? activeOfficer.givenName.split(' ')[0] : '');
   const suffix = `${activeOfficer.postNominals ? activeOfficer.postNominals : ''} (${activeOfficer.number})`;
   officers.push({
     id: 0,
     name: `${firstName} ${activeOfficer.familyName} ${suffix}`,
-    rank: activeOfficer.provincialRank.replace('Prov', '').toUpperCase(),
+    rank: activeOfficer.provincialRank?.replace('Prov', '').toUpperCase() ?? null,
     email: activeOfficer.primaryEmail,
     phone: activeOfficer.preferredPhoneNo,
     provOfficerYear: null,
@@ -641,7 +649,11 @@ async function saveOV() {
       if (selectedMasterOV.value) {
         const officers: Officer[] = [];
         // Always do the VIP first so we can guarantee he is at the top
-        const vip = await addVIP(updatedOV.id, selectedMasterOV.value.vip);
+        const vip = await addVIP(
+          updatedOV.id,
+          selectedMasterOV.value.vip,
+          selectedMasterOV.value.year
+        );
         await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',
           body: [vip],
@@ -654,39 +666,44 @@ async function saveOV() {
         });
         // Now the rest
         if (selectedMasterOV.value.sword) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.sword, 'sword_bearer');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.swordOfficer, 'sword_bearer');
         }
         if (selectedMasterOV.value.standard) {
-          await addOfficer(
+          addOfficer(
             updatedOV.id,
             officers,
-            selectedMasterOV.value.standard,
+            selectedMasterOV.value.standardOfficer,
             'standard_bearer'
           );
         }
         if (selectedMasterOV.value.steward) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.steward, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.stewardOfficer, 'automatic');
         }
         if (selectedMasterOV.value.officer1) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer1, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer1Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer2) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer2, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer2Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer3) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer3, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer3Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer4) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer4, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer4Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer5) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer5, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer5Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer6) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer6, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer6Officer, 'automatic');
         }
         if (selectedMasterOV.value.officer7) {
-          await addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer7, 'automatic');
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.officer7Officer, 'automatic');
+        }
+        if (selectedMasterOV.value.additionalOfficers.length) {
+          for (const officer of selectedMasterOV.value.additionalOfficers) {
+            addOfficer(updatedOV.id, officers, officer.activeOfficer, 'automatic');
+          }
         }
         await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
           method: 'PUT',

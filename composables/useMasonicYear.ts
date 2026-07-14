@@ -8,7 +8,12 @@ export const useMasonicYear = () => {
   const endYear = (startYear + 1) % 100;
 
   const masonicYear = `${String(startYear).padStart(2, '0')}-${String(endYear).padStart(2, '0')}`;
-  const paddedMasonicYear = `${String(startYear).padStart(2, '0')} - ${String(endYear).padStart(2, '0')}`;
+  const paddedMasonicYear = (masonicYear: string) => {
+    const splits = masonicYear.split('-');
+    const startYear = splits[0];
+    const endYear = splits[1];
+    return `${String(startYear).padStart(2, '0')} - ${String(endYear).padStart(2, '0')}`;
+  };
 
   return { masonicYear, paddedMasonicYear };
 };
