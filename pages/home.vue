@@ -441,7 +441,7 @@ const ovSelectionList = computed(() => {
       value: ov.id,
       title:
         ov.ovType === 'ra'
-          ? `${ov.number}: ${ov.lodgeName} No. ${ov.lodgeNumber}`
+          ? `${ov.number}: ${ov.lodgeName.replace(' C', ' Chapter')} No. ${ov.lodgeNumber}`
           : `${ov.number}: ${ov.lodgeName} ${ov.lodgeName.toLowerCase().indexOf('lodge') < 0 ? 'Lodge' : ''} No. ${ov.lodgeNumber.replace('L', '')} on ${formatDate(ov.date)}`,
     };
   });
@@ -508,7 +508,7 @@ const selectedOVName = computed(() => {
     return '';
   }
   if (selectedMasterOV.value.ovType === 'ra') {
-    return `${selectedMasterOV.value.lodgeName.trim()} No. ${selectedMasterOV.value.lodgeNumber}`;
+    return `${selectedMasterOV.value.lodgeName.trim().replace(' C', ' Chapter')} No. ${selectedMasterOV.value.lodgeNumber}`;
   }
   return `${selectedMasterOV.value.lodgeName.trim()}${selectedMasterOV.value.lodgeName.toLowerCase().indexOf('lodge') < 0 ? ' Lodge ' : ' '}No. ${selectedMasterOV.value.lodgeNumber.replace('L', '')}`;
 });
