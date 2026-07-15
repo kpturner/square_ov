@@ -57,10 +57,21 @@ export default defineEventHandler(async (event) => {
         givenName = names[0];
         familyName = names[1];
       }
-
+      let rank = rd.__EMPTY_3 ? rd.__EMPTY_3.trim() : null;
+      if (!rank) {
+        if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
+          rank = 'DGSUPT';
+        }
+        if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
+          rank = '2NDPGP';
+        }
+        if (rd.__EMPTY?.toUpperCase() === 'THIRD PROVINCIAL GRAND PRINCIPAL') {
+          rank = '3RDPGP';
+        }
+      }
       return {
         Number: provNumber,
-        'Provincial Rank': rd.__EMPTY_3 ? rd.__EMPTY_3.trim() : null,
+        'Provincial Rank': rank,
         'Given Name': givenName ?? null,
         'Family Name': familyName ?? null,
         'Familiar Name': givenName ?? null,
