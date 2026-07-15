@@ -35,7 +35,7 @@ function stripFrontmatter(content: string): string {
 async function loadDocs() {
   if (Object.keys(docsCache).length > 0) return;
 
-  const docsFolder = join(process.cwd(), 'docs');
+  const docsFolder = join(process.cwd(), 'docs', 'markdown');
   const files = await getAllMarkdownFiles(docsFolder);
 
   for (const file of files) {

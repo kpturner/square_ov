@@ -56,6 +56,7 @@
         <v-spacer />
 
         <v-btn text @click="close">Close</v-btn>
+        <v-btn text @click="openQuickStart">Quick Start Guide</v-btn>
         <v-btn text color="secondary" @click="support">Support</v-btn>
         <v-btn
           color="primary"
@@ -133,6 +134,10 @@ const onEnter = (e: KeyboardEvent) => {
 
   e.preventDefault();
   sendMessage();
+};
+
+const openQuickStart = () => {
+  window.open('/quick-start.pdf', '_blank', 'noopener,noreferrer');
 };
 
 async function sendMessage() {
