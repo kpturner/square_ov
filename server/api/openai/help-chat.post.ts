@@ -3,6 +3,8 @@ import { join } from 'path';
 import { defineEventHandler, readBody } from 'h3';
 import OpenAI from 'openai';
 import { promises as fs } from 'fs';
+import type { Rank } from '~/types';
+import type { OVType } from '@prisma/client';
 
 const { apiKey } = useRuntimeConfig().openAi;
 const openai = new OpenAI({ apiKey });
@@ -62,13 +64,42 @@ function filterDocsForQuestion(question: string): string[] {
   return result;
 }
 
+function rankOrderDoc(ovType: OVType, ranks: Rank[]): string {
+  if (!Array.isArray(ranks) || ranks.length === 0) return '';
+
+  const lines: string[] = ranks.map((r, idx) => {
+    if (r && (r.value !== undefined || r.title !== undefined)) {
+      const value = r.value !== undefined ? String(r.value) : `#${idx + 1}`;
+      const title = r.title !== undefined ? String(r.title) : '';
+      return title ? `${value} - ${title}` : `${value}`;
+    }
+    // Fallback: stringify unknown shape
+    try {
+      return JSON.stringify(r);
+    } catch {
+      return String(r);
+    }
+  });
+
+  return `The ${ovType === 'craft' ? 'Craft' : 'Royal Arch'} ranks in order of precedence are:\n${lines.join('\n')}`;
+}
+
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody<{ question: string }>(event);
     const question = body.question?.trim();
     if (!question) return { answer: 'No question provided.', success: false };
 
+    const cfg = useRuntimeConfig().public;
+
     await loadDocs();
+
+    // Add configuration information to document cache
+    const ranks = cfg.ranks;
+    const raRanks = cfg.raRanks;
+
+    docsCache['craft-rank-order'] = rankOrderDoc('craft', ranks as Rank[]);
+    docsCache['royal-arch-rank-order'] = rankOrderDoc('ra', raRanks as Rank[]);
 
     // Select only relevant docs
     const relevantDocs = filterDocsForQuestion(question);
