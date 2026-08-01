@@ -477,6 +477,9 @@ const activeVIPSelectionList = computed(() => {
     return {
       value: vip.id,
       title: `${vip.provincialRank} - ${vip.name}`,
+      props: {
+        disabled: officers.value.find((o) => o.email === vip.email) ? true : false,
+      },
     };
   });
 });
@@ -486,6 +489,9 @@ const activeOfficerSelectionList = computed(() => {
     return {
       value: ao.id,
       title: `${ao.number}: ${ao.givenName} ${ao.familyName}`,
+      props: {
+        disabled: officers.value.find((o) => o.email === ao.primaryEmail) ? true : false,
+      },
     };
   });
 });
