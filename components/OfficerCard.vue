@@ -59,10 +59,10 @@ const raRankIcons: Record<string, string> = {
   AGDC: 'mdi-auto-fix',
   GDC: 'mdi-magic-staff',
   DEPGDC: 'mdi-magic-staff',
-  SGW: 'mdi-star',
-  JGW: 'mdi-star',
-  APGM: 'mdi-star',
-  DPGM: 'mdi-star',
+  GSN: 'mdi-star',
+  '3RDPGP': 'mdi-star',
+  '2NDPGP': 'mdi-star',
+  DGSUPT: 'mdi-star',
   GSTWD: 'cornucopia',
 };
 
