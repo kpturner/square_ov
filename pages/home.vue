@@ -664,6 +664,10 @@ async function saveOV() {
           method: 'PUT',
           body: [dc],
         });
+        // For the RA there will be a specific ADC
+        if (selectedMasterOV.value.adc) {
+          addOfficer(updatedOV.id, officers, selectedMasterOV.value.ADCOfficer, 'head_of_south');
+        }
         // Now the rest
         if (selectedMasterOV.value.sword) {
           addOfficer(updatedOV.id, officers, selectedMasterOV.value.swordOfficer, 'sword_bearer');
