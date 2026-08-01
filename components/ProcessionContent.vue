@@ -671,44 +671,36 @@ const rows = computed(() => {
   // Heads of rows always appended at end
   //
   if (headSouth.value || headNorth.value) {
-    if (result.length) {
-      // Take a look at the last row
+    result.push({
+      south: headSouth.value,
+      north: headNorth.value,
+    });
+
+    // See if we can push any of the "heads_of" back a row to fill a gap.
+    if (result.length > 1) {
       const lastRow = result[result.length - 1];
-      if (lastRow && (!lastRow.south || !lastRow.north)) {
+      const secondLastRow = result[result.length - 2];
+      if (lastRow && secondLastRow && (!secondLastRow.south || !secondLastRow.north)) {
+        // In the craft, if the second last row has an empty slot in the north we can rejig things
         if (props.officialVisit?.ovType === 'craft') {
-          // CRAFT
-          if (!lastRow.north && headNorth.value) {
-            lastRow.north = headNorth.value;
-          }
-          if (lastRow.south && !lastRow.north) {
-            lastRow.north = lastRow.south;
-            lastRow.south = headSouth.value;
-          } else if (!lastRow.south && headSouth.value) {
-            lastRow.south = headSouth.value;
+          if (!secondLastRow.north) {
+            if (headNorth.value) {
+              secondLastRow.north = headNorth.value;
+              lastRow.north = undefined;
+            } else if (headSouth.value) {
+              secondLastRow.north = secondLastRow.south;
+              secondLastRow.south = headSouth.value;
+              lastRow.south = undefined;
+            }
           }
         } else {
-          // RA
-          if (!lastRow.south && headSouth.value) {
-            lastRow.south = headSouth.value;
-          }
-          if (lastRow.north && !lastRow.south) {
-            lastRow.south = lastRow.north;
-            lastRow.north = headNorth.value;
-          } else if (!lastRow.north && headNorth.value) {
-            lastRow.north = headNorth.value;
+          // In the RA just move the head_of_north back if there is space and there is no head_of_south
+          if (!secondLastRow.north && !headSouth.value && headNorth.value) {
+            secondLastRow.north = headNorth.value;
+            lastRow.north = undefined;
           }
         }
-      } else {
-        result.push({
-          south: headSouth.value,
-          north: headNorth.value,
-        });
       }
-    } else {
-      result.push({
-        south: headSouth.value,
-        north: headNorth.value,
-      });
     }
   }
 
