@@ -56,6 +56,8 @@ export default defineEventHandler(async (event) => {
         const names = rd[' '].split(' ');
         givenName = names[0];
         familyName = names[1];
+        // Add in the "Area Chairman" to the familyName
+        familyName = `${familyName} - ${rd.__EMPTY.replace('Area Chairman', 'AC').trim()}`;
       }
       let rank = rd.__EMPTY_3 ? rd.__EMPTY_3.trim() : null;
       if (!rank) {
