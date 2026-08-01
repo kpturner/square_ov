@@ -1,4 +1,13 @@
 <template>
+  <div v-if="positionedOfficerTotal !== processionTotal">
+    <v-alert type="warning" dense class="mb-4">
+      <strong>Warning:</strong> The number of officers in the procession ({{
+        positionedOfficerTotal
+      }}) does not match the expected total ({{ processionTotal }}). This is most likely a bug in
+      the software. Please click the support button on the "Help" option (top, right) to report it
+      and get it fixed.
+    </v-alert>
+  </div>
   <hr v-if="carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print" />
   <div
     v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
@@ -76,7 +85,6 @@
         <strong>NORTH</strong>
       </div>
     </div>
-
     <div
       v-for="(row, idx) in rows"
       :key="idx"
@@ -236,6 +244,7 @@ import type { Rank, ProcessionRow } from '~/types';
 const props = defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
+  processionTotal: number | null;
   carpetSplitMode?: boolean;
 }>();
 
@@ -662,10 +671,31 @@ const rows = computed(() => {
   // Heads of rows always appended at end
   //
   if (headSouth.value || headNorth.value) {
-    result.push({
-      south: headSouth.value,
-      north: headNorth.value,
-    });
+    // Does the last row have any empty columns?
+    const lastRow = result[result.length - 1];
+    if (lastRow && (!lastRow.south || !lastRow.north)) {
+      // If the last row south is populated and we have a "head_of_south" then move the south to the north
+      // and put head_of_south in their place. Similarly for "head_of_north". This is to avoid having a row with only one officer in it.
+      if (lastRow.south && headSouth.value) {
+        lastRow.north = lastRow.south;
+        lastRow.south = headSouth.value;
+      } else if (lastRow.north && headNorth.value) {
+        lastRow.south = lastRow.north;
+        lastRow.north = headNorth.value;
+      } else {
+        if (headSouth.value) {
+          lastRow.south = headSouth.value;
+        }
+        if (headNorth.value) {
+          lastRow.north = headNorth.value;
+        }
+      }
+    } else {
+      result.push({
+        south: headSouth.value,
+        north: headNorth.value,
+      });
+    }
   }
 
   //
@@ -726,6 +756,18 @@ const rows = computed(() => {
   }
 
   return compacted.filter((r) => r.south || r.north);
+});
+
+const positionedOfficerTotal = computed(() => {
+  let total = 0;
+  for (const row of rows.value) {
+    if (row.south) total++;
+    if (row.north) total++;
+  }
+  if (vip.value) total++;
+  if (swordBearer.value) total++;
+  if (standardBearer.value) total++;
+  return total;
 });
 
 const splitRows = computed<ProcessionRow[]>(() => {

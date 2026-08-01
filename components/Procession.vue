@@ -34,7 +34,11 @@
         </v-col>
 
         <v-col cols="12" sm="9">
-          <ProcessionContent :officers="officers" :official-visit="officialVisit" />
+          <ProcessionContent
+            :officers="officers"
+            :official-visit="officialVisit"
+            :procession-total
+          />
         </v-col>
       </v-row>
 
@@ -43,6 +47,7 @@
           <ProcessionContent
             :officers="officers"
             :official-visit="officialVisit"
+            :procession-total
             carpet-split-mode
             @split-by-row-change="splitByRowChange"
             @print-split-procession="printSplitProcession"
@@ -59,6 +64,7 @@ import type { Officer, OV } from '@prisma/client';
 defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
+  processionTotal: number | null;
 }>();
 
 const emits = defineEmits(['split-by-row-change', 'print-split-procession']);

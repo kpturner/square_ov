@@ -210,6 +210,7 @@
       v-if="!loading && officialVisit"
       :officers="officers.filter((o) => !o.excludeFromProcession && o.attending)"
       :official-visit
+      :procession-total
       @split-by-row-change="splitByRowChange"
     />
 
