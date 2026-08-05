@@ -40,7 +40,7 @@
             />
           </div>
 
-          <v-data-table :headers="headers" :items="users" class="mt-4">
+          <v-data-table :headers="headers" :items="users" :items-per-page="-1" class="mt-4">
             <template #item.actions="{ item }">
               <v-btn class="me-2" icon="mdi-pencil" size="small" @click="editUser(item)" />
               <v-btn
