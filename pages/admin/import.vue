@@ -43,6 +43,7 @@
           </v-col>
         </v-row>
       </v-card>
+
       <v-card class="pa-6 mb-4">
         <span class="text-h6">Import Active Officers</span>
         <v-row>
@@ -67,6 +68,20 @@
         <v-row>
           <v-col>
             <v-btn color="primary" @click="importVIPs">Import</v-btn>
+          </v-col>
+        </v-row>
+      </v-card>
+
+      <v-card v-if="ovType === 'ra' && masonicYear !== '25-26'" class="pa-6 mb-4">
+        <span class="text-h6">Import Contact Details</span>
+        <v-row>
+          <v-col>
+            <v-text-field v-model="raCdSheetName" label="Sheet name" />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col>
+            <v-btn color="primary" @click="importContactDetails">Import</v-btn>
           </v-col>
         </v-row>
       </v-card>
@@ -107,7 +122,7 @@ const logger = useLogger('import');
 
 const makeToast = useToast();
 const loading = ref(false);
-const { masonicYear, paddedMasonicYear } = useMasonicYear();
+const { masonicYear, paddedMasonicYear, fullMasonicYear } = useMasonicYear();
 const year = ref(masonicYear);
 const file = ref<File | null>(null);
 const importErrorsExist = ref(false);
@@ -121,17 +136,34 @@ const handleFile = (event: Event) => {
   }
 };
 
+const raAoSheetName = computed(() => {
+  if (masonicYear === '2526') return `Matrix 20${year.value}`;
+  return `${fullMasonicYear} Official Visits`;
+});
+
+const raVipSheetName = computed(() => {
+  if (masonicYear === '2526') return `Matrix 20${year.value}`;
+  return `${fullMasonicYear} Official Visits`;
+});
+
+const raOvSheetName = computed(() => {
+  if (masonicYear === '2526') return `Matrix 20${year.value}`;
+  return `${fullMasonicYear} Official Visits`;
+});
+
 const aoSheetName = computed(() =>
-  ovType.value === 'craft' ? 'Active Officers' : `Matrix 20${year.value}`
+  ovType.value === 'craft' ? 'Active Officers' : raAoSheetName.value
 );
 
 const vipSheetName = computed(() =>
-  ovType.value === 'craft' ? 'VIP Contact Details' : `Matrix 20${year.value}`
+  ovType.value === 'craft' ? 'VIP Contact Details' : raVipSheetName.value
 );
 
 const ovSheetName = computed(() =>
-  ovType.value === 'craft' ? `${paddedMasonicYear(year.value)} Visits` : `Matrix 20${year.value}`
+  ovType.value === 'craft' ? `${paddedMasonicYear(year.value)} Visits` : raOvSheetName.value
 );
+
+const raCdSheetName = computed(() => 'Contact Details');
 
 const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
@@ -153,6 +185,35 @@ const importActiveOfficers = async () => {
     } else {
       makeToast(
         `Active Officers on sheet ${aoSheetName.value} imported successfully for year ${year.value}`
+      );
+    }
+  } catch (err) {
+    makeToast((err as Error).message, 'error');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const importContactDetails = async () => {
+  if (!file.value) return alert('Select a file first.');
+  loading.value = true;
+  try {
+    const data = await readExcel(file.value, raCdSheetName.value);
+    const { importErrors } = await useContactDetailsApi().import(
+      ovType.value,
+      data as Record<string, unknown>[],
+      year.value
+    );
+    if (importErrors.length) {
+      importErrorsFound.value = importErrors;
+      importErrorsExist.value = true;
+      makeToast(
+        `Errors occurred importing sheet ${raCdSheetName.value} for year ${year.value}`,
+        'error'
+      );
+    } else {
+      makeToast(
+        `Active Officers on sheet ${raCdSheetName.value} imported successfully for year ${year.value}`
       );
     }
   } catch (err) {
@@ -273,7 +334,11 @@ function sheetToEnrichedJson(sheet: XLSX.WorkSheet): EnrichedCell[][] {
         row: r,
         col: c,
         value: cell?.v ?? null,
-        colour: cell?.s?.bgColor?.rgb,
+        colour: cell?.s?.bgColor?.rgb
+          ? cell?.s?.bgColor?.rgb
+          : cell?.s?.fgColor?.rgb
+            ? cell?.s?.fgColor?.rgb
+            : null,
       });
     }
 

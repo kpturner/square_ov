@@ -55,7 +55,7 @@ export default defineEventHandler(async (event) => {
         office = 'MEGS';
       }
       if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
-        office = 'DGSUPT';
+        office = 'DEPGSUPT';
       }
       if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
         office = '2NDPGP';
@@ -66,11 +66,19 @@ export default defineEventHandler(async (event) => {
       if (rd.__EMPTY_3 && rd.__EMPTY_3.toUpperCase() === 'PROVGSN') {
         office = 'GSN';
       }
+      const splits = rd.__EMPTY_1 ? rd.__EMPTY_1.split(' ') : [];
+      let givenName = rd.__EMPTY_1?.trim() ?? '';
+      if (splits[0].indexOf('(') === 0) {
+        givenName = splits[1].trim();
+      }
       return {
         Office: office,
-        Name: rd.__EMPTY_8,
+        Name:
+          year === '25-26' && rd.__EMPTY_8
+            ? rd.__EMPTY_8.trim()
+            : `${givenName} ${rd.__EMPTY_2?.trim() ?? ''}`.trim(),
         Address: '',
-        Email: rd.__EMPTY_4.trim(),
+        Email: typeof rd.__EMPTY_4 === 'string' ? rd.__EMPTY_4.trim() : '',
         Phone: '',
         Mobile: '',
       };

@@ -49,20 +49,31 @@ export default defineEventHandler(async (event) => {
     })
     .map((rd) => {
       provNumber++;
-      let givenName = rd.__EMPTY_1;
+      const splits = rd.__EMPTY_1?.split(' ') ?? [];
+      let familiarName = splits[0];
+      let reconstruct = true;
+      // If the givenName has a name in brackets - like "(James) Ian", then that should just become "Ian"
+      if (familiarName?.includes('(')) {
+        familiarName = splits[1].trim();
+        reconstruct = false;
+      }
+      let givenName = familiarName;
+      if (splits.length > 1 && reconstruct) {
+        givenName = `${familiarName} ${splits[1].trim()}`;
+      }
       let familyName = rd.__EMPTY_2;
       if (!givenName && !familyName && rd[' ']) {
-        // Area chairman
+        // Area chairman on 25-26 format
         const names = rd[' '].split(' ');
         givenName = names[0];
         familyName = names[1];
         // Add in the "Area Chairman" to the familyName
         familyName = `${familyName} - ${rd.__EMPTY.replace('Area Chairman', 'AC').trim()}`;
       }
-      let rank = rd.__EMPTY_3 ? rd.__EMPTY_3.trim() : null;
+      let rank = rd.__EMPTY_3 ? rd.__EMPTY_3.trim().toUpperCase().replace('PROV', '') : null;
       if (!rank) {
         if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
-          rank = 'DGSUPT';
+          rank = 'DEPGSUPT';
         }
         if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
           rank = '2NDPGP';
@@ -71,14 +82,19 @@ export default defineEventHandler(async (event) => {
           rank = '3RDPGP';
         }
       }
+      if (rank === 'RA AREA CHAIR' && rd.__EMPTY) {
+        givenName = rd.__EMPTY.replace('Area Chairman', '').trim();
+        familyName = 'Area Chairman';
+        rank = null;
+      }
       return {
         Number: provNumber,
         'Provincial Rank': rank,
         'Given Name': givenName ?? null,
         'Family Name': familyName ?? null,
-        'Familiar Name': givenName ?? null,
+        'Familiar Name': familiarName ?? null,
         'Post Nominals': null,
-        'Primary Email': rd.__EMPTY_4.trim(),
+        'Primary Email': year === '25-26' && rd.__EMPTY_4 ? rd.__EMPTY_4.trim() : null,
         'Preferred Phone No.': null,
       };
     });
@@ -110,7 +126,7 @@ export default defineEventHandler(async (event) => {
       if (field === 'primaryEmail' && value) {
         const emails = officers.filter((o) => o['Primary Email'] === value);
         if (emails.length > 1) {
-          importErrors.push(`${value} is not a unique email address for the imnported officers`);
+          importErrors.push(`${value} is not a unique email address for the imported officers`);
         }
       }
       mapped[field] = value;

@@ -15,5 +15,7 @@ export const useMasonicYear = () => {
     return `${String(startYear).padStart(2, '0')} - ${String(endYear).padStart(2, '0')}`;
   };
 
-  return { masonicYear, paddedMasonicYear };
+  const fullMasonicYear = `20${String(startYear).padStart(2, '0')}-20${String(endYear).padStart(2, '0')}`;
+
+  return { masonicYear, paddedMasonicYear, fullMasonicYear };
 };

@@ -36,6 +36,16 @@
   </div>
 
   <template v-if="(carpetSplitMode && isRowsExceedingCarpetCapacity) || !carpetSplitMode">
+    <div v-if="officialVisit?.ovType === 'ra' && standardBearer" class="d-flex justify-center mb-4">
+      <v-card class="pa-3 text-center ml-1 officer-card standard-bearer" color="#FFF59D">
+        <div class="d-flex justify-center align-center">
+          <strong>{{ standardBearer.name }}</strong>
+          <v-icon color="black" icon="mdi-flag" size="small" class="ms-2" />
+        </div>
+        <div class="text-caption">Standard Bearer</div>
+      </v-card>
+    </div>
+
     <div v-if="vip" class="d-flex justify-center mb-4">
       <v-card v-if="vip" class="pa-3 text-center officer-card vip" color="yellow">
         <div class="d-flex justify-center align-center">
@@ -61,7 +71,7 @@
       </v-card>
 
       <v-card
-        v-if="standardBearer"
+        v-if="standardBearer && officialVisit?.ovType !== 'ra'"
         class="pa-3 text-center ml-1 officer-card standard-bearer"
         color="#FFF59D"
       >

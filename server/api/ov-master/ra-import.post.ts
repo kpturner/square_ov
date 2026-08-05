@@ -56,11 +56,17 @@ export default defineEventHandler(async (event) => {
     return found ?? null;
   };
 
-  const vipColour = getCell('B6')?.colour;
-  const dcColour = getCell('B7')?.colour;
-  const stdbColour = [getCell('B8')?.colour, '00B0F0'];
-  const adcColour = getCell('B9')?.colour;
-  const swdbColour = getCell('B10')?.colour;
+  const vipColourCell = year === '25-26' ? 'B6' : 'C4';
+  const dcColourCell = year === '25-26' ? 'B7' : 'C5';
+  const stdbColourCell = year === '25-26' ? 'B8' : 'C6';
+  const adcColourCell = year === '25-26' ? 'B9' : 'C7';
+  const swdbColourCell = year === '25-26' ? 'B10' : 'C8';
+
+  const vipColour = getCell(vipColourCell)?.colour;
+  const dcColour = getCell(dcColourCell)?.colour;
+  const stdbColour = [getCell(stdbColourCell)?.colour, '00B0F0'];
+  const adcColour = getCell(adcColourCell)?.colour;
+  const swdbColour = getCell(swdbColourCell)?.colour;
 
   const activeOfficers = await prisma.activeOfficer.findMany({
     where: {
@@ -91,39 +97,43 @@ export default defineEventHandler(async (event) => {
   };
 
   // The first row contains the visit numbers from column I onwards
-  const ovNumbers = getRowValues(data[0]!, 'I1');
+  const ovNumbers = year === '25-26' ? getRowValues(data[0]!, 'I1') : getRowValues(data[2]!, 'F1');
 
   // The next row contains all the OV chapter names
-  const chapterNames = getRowValues(data[1]!, 'I1');
+  const chapterNames =
+    year === '25-26' ? getRowValues(data[1]!, 'I1') : getRowValues(data[3]!, 'F1');
 
   // The next row contains all the OV chapter numbers
-  const chapterNos = getRowValues(data[2]!, 'I1');
+  const chapterNos = year === '25-26' ? getRowValues(data[2]!, 'I1') : getRowValues(data[4]!, 'F1');
 
   // The next row contains all the locations
-  const locations = getRowValues(data[3]!, 'I1');
+  const locations = year === '25-26' ? getRowValues(data[3]!, 'I1') : getRowValues(data[5]!, 'F1');
 
   // The next row contains all the VIPs
-  const ovVips = getRowValues(data[4]!, 'I1').map((v) => {
-    if (v.indexOf('MEGS') >= 0) {
-      return 'MEGS';
-    }
-    if (v.indexOf('DGSUPT') >= 0) {
-      return 'DGSUPT';
-    }
-    if (v.indexOf('Scribe N') >= 0) {
-      return 'GSN';
-    }
-    if (v.indexOf('3PGP') >= 0) {
-      return '3RDPGP';
-    }
-    if (v.indexOf('2PGP') >= 0) {
-      return '2NDPGP';
-    }
-    return null;
-  });
+  const ovVips =
+    year === '25-26'
+      ? getRowValues(data[4]!, 'I1').map((v) => {
+          if (v.indexOf('MEGS') >= 0) {
+            return 'MEGS';
+          }
+          if (v.indexOf('DGSUPT') >= 0 || v.indexOf('DEPGSUPT') >= 0) {
+            return 'DEPGSUPT';
+          }
+          if (v.indexOf('Scribe N') >= 0) {
+            return 'GSN';
+          }
+          if (v.indexOf('3PGP') >= 0) {
+            return '3RDPGP';
+          }
+          if (v.indexOf('2PGP') >= 0) {
+            return '2NDPGP';
+          }
+          return null;
+        })
+      : null;
 
   // The next row contains all the dates
-  const ovDates = getRowValues(data[5]!, 'I1');
+  const ovDates = year === '25-26' ? getRowValues(data[5]!, 'I1') : getRowValues(data[6]!, 'F1');
 
   const getVIP = (rank: string | null) => {
     if (!rank) return null;
@@ -138,12 +148,13 @@ export default defineEventHandler(async (event) => {
       'Lodge number': chapterNos[n]?.toString(),
       'Lodge name': chapterNames[n],
       Location: locations[n],
-      VIP: ovVips[n] ? getVIP(ovVips[n] as string)?.name : null,
+      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
     });
   }
 
-  // Now from row 10 onwards we have the officers for each visit
-  for (let r = 10; r <= data.length; r++) {
+  // Traverse the officers for each visit
+  const startRow = year === '25-26' ? 10 : 9;
+  for (let r = startRow; r <= data.length; r++) {
     // We only want active officers,
     const row = data[r];
     if (row) {
