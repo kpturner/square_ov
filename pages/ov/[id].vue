@@ -314,6 +314,12 @@
             type="tel"
             autocomplete="tel"
           />
+
+          <v-text-field
+            v-model="officerToEdit!.salutationOverride"
+            label="Salutation Override"
+            density="compact"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -577,6 +583,7 @@ async function addOfficer() {
       rank: ao.provincialRank?.replace('Prov', '').toUpperCase() ?? null,
       email: ao.primaryEmail ?? '',
       phone: ao.preferredPhoneNo ?? '',
+      salutationOverride: null,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -610,6 +617,7 @@ async function addVIP() {
       rank: vip.provincialRank,
       email: vip.email ?? '',
       phone: vip.mobile ? vip.mobile : (vip.phone ?? ''),
+      salutationOverride: null,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -639,7 +647,9 @@ function addEmptyOfficer(position?: Position) {
     rank: null,
     email: '',
     phone: '',
+    salutationOverride: null,
     provOfficerYear: null,
+
     grandOfficer: false,
     grandOfficerYear: null,
     grandActive: false,

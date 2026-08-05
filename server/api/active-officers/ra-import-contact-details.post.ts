@@ -12,6 +12,7 @@ const officerSchema = z.object({
   postNominals: z.string().nullable().optional(),
   primaryEmail: z.string().nullable().optional(),
   preferredPhoneNo: z.string().nullable().optional(),
+  salutationOverride: z.string().nullable().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -38,6 +39,7 @@ export default defineEventHandler(async (event) => {
     const primaryEmail = rd['Primary Email']?.trim() ?? null;
     const preferredPhoneNo = rd['Preferred Phone No.']?.trim() ?? null;
     const postNominals = rd['Post Nominals']?.trim() ?? null;
+    const salutationOverride = rd['Masonic Prefix'] === 'Comp' ? 'COMP.' : null;
     return {
       'Provincial Rank': rank,
       'Given Name': givenName ?? null,
@@ -46,6 +48,7 @@ export default defineEventHandler(async (event) => {
       'Post Nominals': postNominals ?? null,
       'Primary Email': primaryEmail ?? null,
       'Preferred Phone No.': preferredPhoneNo ?? null,
+      'Salutation Override': salutationOverride,
     };
   });
 
@@ -57,6 +60,7 @@ export default defineEventHandler(async (event) => {
     'Post Nominals': 'postNominals',
     'Primary Email': 'primaryEmail',
     'Preferred Phone No.': 'preferredPhoneNo',
+    'Salutation Override': 'salutationOverride',
   };
 
   const validatedOfficers = officers.map((row) => {
@@ -104,6 +108,7 @@ export default defineEventHandler(async (event) => {
           preferredPhoneNo: officer.preferredPhoneNo,
           postNominals: officer.postNominals,
           familyName: officer.familyName,
+          salutationOverride: officer.salutationOverride,
         },
       });
     } else {

@@ -247,6 +247,14 @@
               </v-select>
             </v-col>
 
+            <v-col cols="12">
+              <v-text-field
+                v-model="item.salutationOverride"
+                label="Salutation Override"
+                density="compact"
+              />
+            </v-col>
+
             <v-col cols="6">
               <v-checkbox v-model="item.active" label="Active" hide-details density="compact" />
             </v-col>

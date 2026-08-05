@@ -18,22 +18,14 @@ export default defineEventHandler(async (event) => {
           },
         });
       } else {
+        const { id, ...officerData } = o;
         await prisma.officer.create({
           data: {
-            name: o.name,
-            rank: o.rank?.trim() ? o.rank : null,
-            provOfficerYear: o.provOfficerYear,
-            active: o.active,
-            grandOfficer: o.grandOfficer,
-            grandRank: o.grandRank?.trim() ? o.grandRank : null,
-            grandOfficerYear: o.grandOfficerYear,
-            grandActive: o.grandActive,
-            position: o.position,
-            excludeFromProcession: o.excludeFromProcession,
-            attending: o.attending,
-            original: o.original,
-            email: o.email?.trim() ? o.email : null,
-            phone: o.phone?.trim() ? o.phone : null,
+            ...officerData,
+            rank: officerData.rank?.trim() ? officerData.rank : null,
+            grandRank: officerData.grandRank?.trim() ? officerData.grandRank : null,
+            email: officerData.email?.trim() ? officerData.email : null,
+            phone: officerData.phone?.trim() ? officerData.phone : null,
             ovId,
           },
         });

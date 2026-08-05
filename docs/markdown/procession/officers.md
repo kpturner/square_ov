@@ -49,6 +49,10 @@ IMPORTANT NOTE: Changes you make to officers directly in the officer list will o
 - Help - Click this button at the top of the page for interactive help. If you are reading this it is a fair chance you have already found this option!
 - Support - From the Help page you can click the "Support" button to send a request for support to the administrator.
 
+## Can I change the officer's salutation?
+
+The system works out the correct salution based on rank - for example V.W BRO. or R.W BRO. or E. COMP. etc. However you can override this to anything you want. The "Salutation Override" field is visible on the Officer card when viewing on a mobile device. For larger screens it is a little less intuitive to find it. It is editable on the Officer Contact Details dialog, which is the blue button on at the end of each officer row.
+
 ---
 
 ## When to use it
