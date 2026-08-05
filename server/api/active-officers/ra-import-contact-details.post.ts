@@ -108,6 +108,7 @@ export default defineEventHandler(async (event) => {
           preferredPhoneNo: officer.preferredPhoneNo,
           postNominals: officer.postNominals,
           familyName: officer.familyName,
+          familiarName: officer.familiarName ?? officer.givenName,
           salutationOverride: officer.salutationOverride,
         },
       });
