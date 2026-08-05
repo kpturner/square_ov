@@ -237,7 +237,7 @@ export default defineEventHandler(async (event) => {
                 if (col.colour === vipColour) {
                   ov.VIP = vip?.name;
                 } else if (col.colour === dcColour) {
-                  ov.DC = `${ao?.givenName} ${ao?.familyName}`;
+                  ov.DC = `${ao?.familiarName} ${ao?.familyName}`;
                 } else if (col.colour === adcColour) {
                   ov.ADC = ao?.number;
                 } else if (stdbColour.includes(col.colour)) {
