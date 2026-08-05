@@ -1,5 +1,5 @@
 <template>
-  <div v-if="positionedOfficerTotal !== processionTotal">
+  <div v-if="positionedOfficerTotal !== processionTotal" class="no-print">
     <v-alert type="warning" dense class="mb-4">
       <strong>Warning:</strong> The number of officers in the procession ({{
         positionedOfficerTotal
@@ -8,9 +8,39 @@
       and get it fixed.
     </v-alert>
   </div>
-  <hr v-if="carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print" />
   <div
-    v-if="carpetSplitMode && isRowsExceedingCarpetCapacity"
+    v-if="!carpetSplitMode && isRowsExceedingCarpetCapacity && officialVisit?.ovType === 'ra'"
+    class="no-print"
+  >
+    <v-alert type="warning" dense class="mb-4">
+      <div>
+        <strong>Warning:</strong> Your officer total total ({{ positionedOfficerTotal }}) means that
+        your procession is too big for a carpet capacity of {{ officialVisit?.carpetCapacity }}.
+        <p>
+          For the Royal Arch the recommendation is to split your party into two separate
+          processions.
+        </p>
+        <p>
+          Simply make sure all the officer details are correct, then "copy" the OV to get a
+          duplicate.
+        </p>
+        <p>
+          Then use the "Excl" (exclude) checkbox to exclude officers from each OV procession as
+          appropriate to get a more even split.
+        </p>
+        <p>
+          NOTE: If the carpet capacity is different to {{ officialVisit?.carpetCapacity }} at the OV
+          venue then you can change it.
+        </p>
+      </div>
+    </v-alert>
+  </div>
+  <hr
+    v-if="carpetSplitMode && isRowsExceedingCarpetCapacity && officialVisit?.ovType === 'craft'"
+    class="no-print"
+  />
+  <div
+    v-if="carpetSplitMode && isRowsExceedingCarpetCapacity && officialVisit?.ovType === 'craft'"
     class="d-flex flex-column justify-center align-center mt-6 mb-4"
   >
     <strong class="no-print">SPLIT COLUMNS ON CARPET</strong>
@@ -35,7 +65,12 @@
     </v-btn>
   </div>
 
-  <template v-if="(carpetSplitMode && isRowsExceedingCarpetCapacity) || !carpetSplitMode">
+  <template
+    v-if="
+      (carpetSplitMode && isRowsExceedingCarpetCapacity && officialVisit?.ovType === 'craft') ||
+      !carpetSplitMode
+    "
+  >
     <div v-if="officialVisit?.ovType === 'ra' && standardBearer" class="d-flex justify-center mb-4">
       <v-card class="pa-3 text-center ml-1 officer-card standard-bearer" color="#FFF59D">
         <div class="d-flex justify-center align-center">
@@ -120,130 +155,132 @@
   </template>
 
   <template v-else>
-    <div v-if="isRowsExceedingCarpetCapacity">
-      <v-checkbox
-        v-model="splitByRow"
-        class="d-flex justify-center no-print ms-md-3"
-        label="Senior to rear?"
-        dense
-        hide-details
-      />
-      <div class="d-flex justify-center flex-wrap mb-2 text-center">
-        <div class="row-number no-print"></div>
+    <template v-if="isRowsExceedingCarpetCapacity">
+      <div v-if="officialVisit?.ovType === 'craft'">
+        <v-checkbox
+          v-model="splitByRow"
+          class="d-flex justify-center no-print ms-md-3"
+          label="Senior to rear?"
+          dense
+          hide-details
+        />
+        <div class="d-flex justify-center flex-wrap mb-2 text-center">
+          <div class="row-number no-print"></div>
 
-        <!-- SOUTH spans 2 columns -->
-        <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
-          <strong>SOUTH</strong>
+          <!-- SOUTH spans 2 columns -->
+          <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
+            <strong>SOUTH</strong>
+          </div>
+          <v-divider vertical class="mx-2 d-none d-md-flex" />
+          <!-- NORTH spans 2 columns -->
+          <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
+            <strong>NORTH</strong>
+          </div>
         </div>
-        <v-divider vertical class="mx-2 d-none d-md-flex" />
-        <!-- NORTH spans 2 columns -->
-        <div class="pa-1 group-header" style="flex: 1 1 40%; max-width: 600px">
-          <strong>NORTH</strong>
+
+        <div class="d-flex justify-center flex-wrap mb-2 text-center sub-header">
+          <div class="row-number no-print"></div>
+
+          <!-- SOUTH subcolumns -->
+          <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+            <small>OUTER</small>
+          </div>
+          <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+            <small>INNER</small>
+          </div>
+          <v-divider vertical class="mx-2 d-none d-md-flex" />
+          <!-- NORTH subcolumns -->
+          <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+            <small>INNER</small>
+          </div>
+          <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
+            <small>OUTER</small>
+          </div>
+        </div>
+
+        <div
+          v-for="(row, idx) in splitRows"
+          :key="idx"
+          class="d-flex align-center justify-center flex-wrap mb-2"
+        >
+          <div class="row-number no-print">{{ idx + 1 }}</div>
+          <!-- South column 1-->
+          <div
+            v-if="row.south"
+            class="pa-1"
+            style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+          >
+            <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
+          </div>
+          <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+            <!-- Nobody here! -->
+          </div>
+          <!-- South column 2-->
+          <div
+            v-if="row.south2"
+            class="pa-1"
+            style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+          >
+            <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south2" />
+          </div>
+          <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+            <!-- Nobody here! -->
+          </div>
+          <v-divider vertical class="mx-2 d-none d-md-flex" />
+          <!-- North column -->
+          <div
+            v-if="row.north"
+            class="pa-1"
+            style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+          >
+            <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
+          </div>
+          <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+            <!-- Nobody here! -->
+          </div>
+          <div
+            v-if="row.north2"
+            class="pa-1"
+            style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
+          >
+            <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north2" />
+          </div>
+          <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
+            <!-- Nobody here! -->
+          </div>
+        </div>
+        <div
+          v-if="headSouth || headNorth"
+          class="d-flex align-center justify-center flex-wrap mt-4 mb-2 head-row"
+        >
+          <div class="row-number no-print">H</div>
+
+          <!-- SOUTH side (centred across OUTER + INNER) -->
+          <div
+            class="pa-1"
+            style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
+          >
+            <OfficerCard
+              v-if="headSouth"
+              :ov-type="officialVisit?.ovType ?? null"
+              :officer="headSouth"
+            />
+          </div>
+          <v-divider vertical class="mx-2 d-none d-md-flex" />
+          <!-- NORTH side -->
+          <div
+            class="pa-1"
+            style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
+          >
+            <OfficerCard
+              v-if="headNorth"
+              :ov-type="officialVisit?.ovType ?? null"
+              :officer="headNorth"
+            />
+          </div>
         </div>
       </div>
-
-      <div class="d-flex justify-center flex-wrap mb-2 text-center sub-header">
-        <div class="row-number no-print"></div>
-
-        <!-- SOUTH subcolumns -->
-        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
-          <small>OUTER</small>
-        </div>
-        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
-          <small>INNER</small>
-        </div>
-        <v-divider vertical class="mx-2 d-none d-md-flex" />
-        <!-- NORTH subcolumns -->
-        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
-          <small>INNER</small>
-        </div>
-        <div class="pa-1" style="flex: 1 1 20%; max-width: 300px">
-          <small>OUTER</small>
-        </div>
-      </div>
-
-      <div
-        v-for="(row, idx) in splitRows"
-        :key="idx"
-        class="d-flex align-center justify-center flex-wrap mb-2"
-      >
-        <div class="row-number no-print">{{ idx + 1 }}</div>
-        <!-- South column 1-->
-        <div
-          v-if="row.south"
-          class="pa-1"
-          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
-        >
-          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south" />
-        </div>
-        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
-          <!-- Nobody here! -->
-        </div>
-        <!-- South column 2-->
-        <div
-          v-if="row.south2"
-          class="pa-1"
-          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
-        >
-          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.south2" />
-        </div>
-        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
-          <!-- Nobody here! -->
-        </div>
-        <v-divider vertical class="mx-2 d-none d-md-flex" />
-        <!-- North column -->
-        <div
-          v-if="row.north"
-          class="pa-1"
-          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
-        >
-          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north" />
-        </div>
-        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
-          <!-- Nobody here! -->
-        </div>
-        <div
-          v-if="row.north2"
-          class="pa-1"
-          style="flex: 1 1 20%; max-width: 300px; min-width: 150px"
-        >
-          <OfficerCard :ov-type="officialVisit?.ovType ?? null" :officer="row.north2" />
-        </div>
-        <div v-else class="pa-1" style="flex: 1 1 20%; max-width: 300px; min-width: 150px">
-          <!-- Nobody here! -->
-        </div>
-      </div>
-      <div
-        v-if="headSouth || headNorth"
-        class="d-flex align-center justify-center flex-wrap mt-4 mb-2 head-row"
-      >
-        <div class="row-number no-print">H</div>
-
-        <!-- SOUTH side (centred across OUTER + INNER) -->
-        <div
-          class="pa-1"
-          style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
-        >
-          <OfficerCard
-            v-if="headSouth"
-            :ov-type="officialVisit?.ovType ?? null"
-            :officer="headSouth"
-          />
-        </div>
-        <v-divider vertical class="mx-2 d-none d-md-flex" />
-        <!-- NORTH side -->
-        <div
-          class="pa-1"
-          style="flex: 1 1 40%; max-width: 600px; display: flex; justify-content: center"
-        >
-          <OfficerCard
-            v-if="headNorth"
-            :ov-type="officialVisit?.ovType ?? null"
-            :officer="headNorth"
-          />
-        </div>
-      </div>
-    </div>
+    </template>
   </template>
 </template>
 

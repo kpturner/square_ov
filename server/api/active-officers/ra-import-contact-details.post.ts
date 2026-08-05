@@ -37,12 +37,13 @@ export default defineEventHandler(async (event) => {
     const rank = ranks.find((r) => r.title.toUpperCase() === verboseRank)?.value ?? null;
     const primaryEmail = rd['Primary Email']?.trim() ?? null;
     const preferredPhoneNo = rd['Preferred Phone No.']?.trim() ?? null;
+    const postNominals = rd['Post Nominals']?.trim() ?? null;
     return {
       'Provincial Rank': rank,
       'Given Name': givenName ?? null,
       'Family Name': familyName ?? null,
       'Familiar Name': familiarName ?? null,
-      'Post Nominals': null,
+      'Post Nominals': postNominals ?? null,
       'Primary Email': primaryEmail ?? null,
       'Preferred Phone No.': preferredPhoneNo ?? null,
     };
@@ -90,8 +91,9 @@ export default defineEventHandler(async (event) => {
     // Try to find the officer to update
     const ao = activeOfficers.filter(
       (ao) =>
-        ao.familyName?.toUpperCase().replace('MBE,RN', '').trim() ===
-          officer.familyName?.toUpperCase().trim() &&
+        (ao.familyName?.toUpperCase().trim() === officer.familyName?.toUpperCase().trim() ||
+          ao.familyName?.toUpperCase().trim() ===
+            `${officer.familyName?.toUpperCase().trim()} ${officer.postNominals ?? ''}`.trim()) &&
         ao.provincialRank?.toUpperCase().trim() === officer.provincialRank?.toUpperCase().trim()
     );
     if (ao && ao.length === 1) {
@@ -100,6 +102,8 @@ export default defineEventHandler(async (event) => {
         data: {
           primaryEmail: officer.primaryEmail,
           preferredPhoneNo: officer.preferredPhoneNo,
+          postNominals: officer.postNominals,
+          familyName: officer.familyName,
         },
       });
     } else {

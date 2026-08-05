@@ -38,6 +38,9 @@ export default defineEventHandler(async (event) => {
       if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
         return true;
       }
+      if (rd.__EMPTY?.toUpperCase() === 'DEPUTY GRAND SUPERINTENDENT') {
+        return true;
+      }
       if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
         return true;
       }
@@ -55,6 +58,9 @@ export default defineEventHandler(async (event) => {
         office = 'MEGS';
       }
       if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
+        office = 'DEPGSUPT';
+      }
+      if (rd.__EMPTY?.toUpperCase() === 'DEPUTY GRAND SUPERINTENDENT') {
         office = 'DEPGSUPT';
       }
       if (rd.__EMPTY?.toUpperCase() === 'SECOND PROVINCIAL GRAND PRINCIPAL') {
@@ -76,7 +82,7 @@ export default defineEventHandler(async (event) => {
         Name:
           year === '25-26' && rd.__EMPTY_8
             ? rd.__EMPTY_8.trim()
-            : `${givenName} ${rd.__EMPTY_2?.trim() ?? ''}`.trim(),
+            : `${givenName} ${rd.__EMPTY_2?.toUpperCase().trim() ?? ''}`.trim(),
         Address: '',
         Email: typeof rd.__EMPTY_4 === 'string' ? rd.__EMPTY_4.trim() : '',
         Phone: '',

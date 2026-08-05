@@ -97,17 +97,17 @@ export default defineEventHandler(async (event) => {
   };
 
   // The first row contains the visit numbers from column I onwards
-  const ovNumbers = year === '25-26' ? getRowValues(data[0]!, 'I1') : getRowValues(data[2]!, 'F1');
+  const ovNumbers = year === '25-26' ? getRowValues(data[0]!, 'I1') : getRowValues(data[1]!, 'F1');
 
   // The next row contains all the OV chapter names
   const chapterNames =
-    year === '25-26' ? getRowValues(data[1]!, 'I1') : getRowValues(data[3]!, 'F1');
+    year === '25-26' ? getRowValues(data[1]!, 'I1') : getRowValues(data[2]!, 'F1');
 
   // The next row contains all the OV chapter numbers
-  const chapterNos = year === '25-26' ? getRowValues(data[2]!, 'I1') : getRowValues(data[4]!, 'F1');
+  const chapterNos = year === '25-26' ? getRowValues(data[2]!, 'I1') : getRowValues(data[3]!, 'F1');
 
   // The next row contains all the locations
-  const locations = year === '25-26' ? getRowValues(data[3]!, 'I1') : getRowValues(data[5]!, 'F1');
+  const locations = year === '25-26' ? getRowValues(data[3]!, 'I1') : getRowValues(data[4]!, 'F1');
 
   // The next row contains all the VIPs
   const ovVips =
@@ -133,7 +133,7 @@ export default defineEventHandler(async (event) => {
       : null;
 
   // The next row contains all the dates
-  const ovDates = year === '25-26' ? getRowValues(data[5]!, 'I1') : getRowValues(data[6]!, 'F1');
+  const ovDates = year === '25-26' ? getRowValues(data[5]!, 'I1') : getRowValues(data[5]!, 'F1');
 
   const getVIP = (rank: string | null) => {
     if (!rank) return null;
@@ -145,30 +145,89 @@ export default defineEventHandler(async (event) => {
     ovs.push({
       'Visit No': ovNumbers[n],
       Date: ovDates[n],
-      'Lodge number': chapterNos[n]?.toString(),
+      'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
       'Lodge name': chapterNames[n],
       Location: locations[n],
       VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
     });
   }
 
+  function getActiveOfficerFromRow(row: EnrichedCell[]) {
+    // We can use email in the 25-26 matrix
+    if (year === '25-26') {
+      const email = row[5]?.value ? (row[5]?.value as string).trim() : '';
+      return activeOfficers.find((ao) => ao.primaryEmail === email);
+    }
+
+    // Find the active officer by rank and family name (exclusing post nominals)
+    const rank = row[3]?.value
+      ? (row[3]?.value as string).trim().toUpperCase().replace('PROV', '')
+      : '';
+
+    if (rank !== 'RA AREA CHAIR') {
+      const familyName = row[2]?.value
+        ? (row[2]?.value as string).trim().toUpperCase().split(' ')[0]
+        : '';
+      return activeOfficers.find(
+        (ao) =>
+          ao.provincialRank?.toUpperCase().trim() === rank &&
+          ao.familyName?.toUpperCase().trim() === familyName
+      );
+    } else {
+      // Column 0 will say which area chair (i.e North Central Area Chairman)
+      const area = row[0]?.value ? (row[0]?.value as string).replace('Area Chairman', '') : '';
+      return activeOfficers.find(
+        (ao) =>
+          ao.familyName?.toUpperCase().trim() === 'AREA CHAIRMAN' &&
+          ao.givenName?.toUpperCase().trim() === area.toUpperCase().trim()
+      );
+    }
+  }
+
+  function getVIPFromRow(row: EnrichedCell[]) {
+    // We can use email in the 25-26 matrix
+    if (year === '25-26') {
+      const email = row[5]?.value ? (row[5]?.value as string).trim() : '';
+      return VIPs.find((ao) => ao.email === email);
+    }
+
+    // Find the VIP by rank and name (exclusing post nominals)
+    const rank = row[3]?.value
+      ? (row[3]?.value as string).trim().toUpperCase().replace('PROV', '')
+      : '';
+    const familyName = row[2]?.value
+      ? (row[2]?.value as string).trim().toUpperCase().split(' ')[0]
+      : '';
+    let givenName = (row[1]?.value as string) ?? '';
+    if (givenName.indexOf('(') === 0) {
+      // Cater for "(James) Ian"
+      givenName = givenName.split(' ')[1] ?? '';
+    }
+    const name = `${givenName} ${familyName}`.toUpperCase().trim();
+    return VIPs.find(
+      (vip) =>
+        vip.provincialRank?.toUpperCase().trim() === rank && vip.name?.toUpperCase().trim() === name
+    );
+  }
+
   // Traverse the officers for each visit
   const startRow = year === '25-26' ? 10 : 9;
+  const columnToCheck = year === '25-26' ? 1 : 3;
   for (let r = startRow; r <= data.length; r++) {
     // We only want active officers,
     const row = data[r];
     if (row) {
-      if (row[1]?.value) {
+      if (row[columnToCheck]?.value) {
         // Officer is named, so add to every visit where the column value is YES
-        const email = row[5]?.value ? (row[5]?.value as string).trim() : '';
-        const ao = activeOfficers.find((ao) => ao.primaryEmail === email);
-        const vip = VIPs.find((ao) => ao.email === email);
+        const ao = getActiveOfficerFromRow(row);
+        const vip = getVIPFromRow(row);
 
         if (ao || vip) {
           row.forEach((col, index) => {
             if (col.value === 'YES') {
               // Get the OV for this
-              const ovNumber = data[0] ? data[0][index]?.value : null;
+              const ovRow = year === '25-26' ? 0 : 1;
+              const ovNumber = data[ovRow] ? data[ovRow][index]?.value : null;
               const ov = ovs.find((ov) => ov['Visit No'] === ovNumber);
               if (!ov) {
                 logger.error({ col }, 'Unable to find OV');
@@ -204,7 +263,7 @@ export default defineEventHandler(async (event) => {
 
   logger.debug({ ovs }, 'OVs');
 
-  // Filter out the erroneous OVs - i.e. so DC or no Standard
+  // Filter out the erroneous OVs - i.e. No VIP
   const cleaned = ovs.filter((ov) => {
     return !!(ov.VIP && ov.DC);
   });

@@ -91,7 +91,7 @@ export default defineEventHandler(async (event) => {
         Number: provNumber,
         'Provincial Rank': rank,
         'Given Name': givenName ?? null,
-        'Family Name': familyName ?? null,
+        'Family Name': familyName.toUpperCase() ?? null,
         'Familiar Name': familiarName ?? null,
         'Post Nominals': null,
         'Primary Email': year === '25-26' && rd.__EMPTY_4 ? rd.__EMPTY_4.trim() : null,

@@ -538,8 +538,12 @@ const addVIP = async (ovId: number, vipName: string, year: string): Promise<Offi
 
 const addDC = async (ovId: number, name: string): Promise<Officer> => {
   const dc = activeOfficers.value.find((ao) => {
-    const compareName = `${ao.familiarName ? ao.familiarName : ao.givenName} ${ao.familyName}`;
-    return compareName.toUpperCase() === name.toUpperCase();
+    const compareName1 = `${ao.familiarName ? ao.familiarName : ao.givenName} ${ao.familyName}`;
+    const compareName2 = `${ao.givenName} ${ao.familyName}`;
+    return (
+      compareName1.toUpperCase() === name.toUpperCase() ||
+      compareName2.toUpperCase() === name.toUpperCase()
+    );
   });
   const position = ovType.value === 'craft' ? 'head_of_south' : 'head_of_north';
   if (!dc) {
@@ -592,7 +596,8 @@ const addOfficer = (
 ) => {
   const firstName =
     activeOfficer.familiarName ??
-    (activeOfficer.givenName ? activeOfficer.givenName.split(' ')[0] : '');
+    // (activeOfficer.givenName ? activeOfficer.givenName.split(' ')[0] : '');
+    activeOfficer.givenName;
   const suffix = `${activeOfficer.postNominals ? activeOfficer.postNominals : ''} (${activeOfficer.number})`;
   officers.push({
     id: 0,
