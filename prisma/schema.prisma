@@ -53,6 +53,7 @@ model Officer {
   rank                  String?
   rankOverride          String?
   salutationOverride    String?
+  additionalSeatingInfo String?
   provOfficerYear       Int?
   grandOfficer          Boolean
   grandOfficerYear      Int?
@@ -79,18 +80,19 @@ enum Position {
 }
 
 model ActiveOfficer {
-  id                 Int     @id @default(autoincrement())
-  ovType             OVType  @default(craft)
-  year               String
-  number             Int
-  salutationOverride String?
-  provincialRank     String?
-  givenName          String?
-  familyName         String?
-  familiarName       String?
-  postNominals       String?
-  primaryEmail       String?
-  preferredPhoneNo   String?
+  id                    Int     @id @default(autoincrement())
+  ovType                OVType  @default(craft)
+  year                  String
+  number                Int
+  salutationOverride    String?
+  additionalSeatingInfo String?
+  provincialRank        String?
+  givenName             String?
+  familyName            String?
+  familiarName          String?
+  postNominals          String?
+  primaryEmail          String?
+  preferredPhoneNo      String?
 
   // Reverse relations (optional, but handy if you want to query back)
   oVMastersAsSword           OVMaster[]                  @relation("SwordRelation")

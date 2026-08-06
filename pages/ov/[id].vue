@@ -320,6 +320,12 @@
             label="Salutation Override"
             density="compact"
           />
+
+          <v-text-field
+            v-model="officerToEdit!.additionalSeatingInfo"
+            label="Additional Seating Info"
+            density="compact"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -584,6 +590,7 @@ async function addOfficer() {
       email: ao.primaryEmail ?? '',
       phone: ao.preferredPhoneNo ?? '',
       salutationOverride: null,
+      additionalSeatingInfo: null,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -618,6 +625,7 @@ async function addVIP() {
       email: vip.email ?? '',
       phone: vip.mobile ? vip.mobile : (vip.phone ?? ''),
       salutationOverride: null,
+      additionalSeatingInfo: null,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -648,8 +656,8 @@ function addEmptyOfficer(position?: Position) {
     email: '',
     phone: '',
     salutationOverride: null,
+    additionalSeatingInfo: null,
     provOfficerYear: null,
-
     grandOfficer: false,
     grandOfficerYear: null,
     grandActive: false,

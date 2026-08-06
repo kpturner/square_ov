@@ -32,6 +32,9 @@
             <v-row class="justify-center">
               <div class="text-h5">{{ provincialRankPrefix(item) }} {{ provincialRank(item) }}</div>
             </v-row>
+            <v-row v-if="item.additionalSeatingInfo" class="justify-center">
+              <div class="text-h5">{{ item.additionalSeatingInfo }}</div>
+            </v-row>
           </v-col>
         </v-row>
       </v-card>

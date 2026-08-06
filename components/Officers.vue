@@ -147,7 +147,7 @@
       </template>
 
       <template #item.actions="{ item }">
-        <v-tooltip text="Update officer contact details">
+        <v-tooltip text="Additional officer information">
           <template #activator="{ props: cdprops }">
             <v-btn
               v-bind="cdprops"
@@ -251,6 +251,14 @@
               <v-text-field
                 v-model="item.salutationOverride"
                 label="Salutation Override"
+                density="compact"
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-model="item.additionalSeatingInfo"
+                label="Additional Seating Info"
                 density="compact"
               />
             </v-col>

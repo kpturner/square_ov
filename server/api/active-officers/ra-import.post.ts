@@ -13,6 +13,7 @@ const officerSchema = z.object({
   postNominals: z.string().nullable().optional(),
   primaryEmail: z.string().nullable().optional(),
   preferredPhoneNo: z.string().nullable().optional(),
+  additionalSeatingInfo: z.string().nullable().optional(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -58,6 +59,7 @@ export default defineEventHandler(async (event) => {
         reconstruct = false;
       }
       let givenName = familiarName;
+      let additionalSeatingInfo = null;
       if (splits.length > 1 && reconstruct) {
         givenName = `${familiarName} ${splits[1].trim()}`;
       }
@@ -85,6 +87,7 @@ export default defineEventHandler(async (event) => {
       if (rank === 'RA AREA CHAIR' && rd.__EMPTY) {
         givenName = rd.__EMPTY.replace('Area Chairman', '').trim();
         familyName = 'Area Chairman';
+        additionalSeatingInfo = rd.__EMPTY;
         rank = null;
       }
       return {
@@ -96,6 +99,7 @@ export default defineEventHandler(async (event) => {
         'Post Nominals': null,
         'Primary Email': year === '25-26' && rd.__EMPTY_4 ? rd.__EMPTY_4.trim() : null,
         'Preferred Phone No.': null,
+        'Additional Seating Info': additionalSeatingInfo,
       };
     });
 
@@ -108,6 +112,7 @@ export default defineEventHandler(async (event) => {
     'Post Nominals': 'postNominals',
     'Primary Email': 'primaryEmail',
     'Preferred Phone No.': 'preferredPhoneNo',
+    'Additional Seating Info': 'additionalSeatingInfo',
   };
 
   const validatedOfficers = officers.map((row) => {
