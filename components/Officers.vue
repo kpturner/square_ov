@@ -154,7 +154,6 @@
               icon="mdi-card-account-details-outline"
               size="small"
               color="primary"
-              title="Contact details"
               @click="emits('officer-contact-details', item)"
             />
           </template>
@@ -166,7 +165,6 @@
               icon="mdi-delete"
               size="small"
               color="red"
-              title="Delete officer"
               @click="emits('delete-officer', item)"
             />
           </template>
