@@ -123,9 +123,7 @@ const rankCaption = (officer: Officer) => {
     if (officer.grandOfficerYear) {
       caption += ` (${officer.grandOfficerYear})`;
     }
-  }
-
-  if (officer.rankOverride) {
+  } else if (officer.rankOverride) {
     caption += `${provincialRankOverridePrefixAbbrev(officer)}${officer.rankOverride}`;
   }
 

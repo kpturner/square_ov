@@ -24,7 +24,7 @@
             <v-row class="justify-center">
               <div class="text-h5">{{ grandRankPrefix(item) }} {{ grandRank(item) }}</div>
             </v-row>
-            <v-row v-if="item.rankOverride" class="justify-center">
+            <v-row v-if="item.rankOverride && !item.grandOfficer" class="justify-center">
               <div class="text-h5">
                 {{ provincialRankOverridePrefix(item) }} {{ provincialRankOverride(item) }}
               </div>
