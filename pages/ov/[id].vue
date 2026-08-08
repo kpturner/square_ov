@@ -591,7 +591,7 @@ async function addOfficer() {
       email: ao.primaryEmail ?? '',
       phone: ao.preferredPhoneNo ?? '',
       salutationOverride: null,
-      additionalSeatingInfo: null,
+      additionalSeatingInfo: ao.additionalSeatingInfo,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
