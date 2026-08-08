@@ -491,7 +491,7 @@ const activeVIPSelectionList = computed(() => {
       value: vip.id,
       title: `${vip.provincialRank} - ${vip.name}`,
       props: {
-        disabled: officers.value.find((o) => o.email === vip.email) ? true : false,
+        disabled: vip.email && officers.value.find((o) => o.email === vip.email) ? true : false,
       },
     };
   });
@@ -503,7 +503,8 @@ const activeOfficerSelectionList = computed(() => {
       value: ao.id,
       title: `${ao.number}: ${ao.givenName} ${ao.familyName}`,
       props: {
-        disabled: officers.value.find((o) => o.email === ao.primaryEmail) ? true : false,
+        disabled:
+          ao.primaryEmail && officers.value.find((o) => o.email === ao.primaryEmail) ? true : false,
       },
     };
   });
