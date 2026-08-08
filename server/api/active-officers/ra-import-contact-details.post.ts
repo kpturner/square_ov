@@ -147,33 +147,84 @@ export default defineEventHandler(async (event) => {
         familyName?.toUpperCase().trim() === ao.familyName?.toUpperCase().trim()
       );
     });
+
     if (pot && pot.length === 1) {
       // We have a match
       const officer = pot[0];
-      await prisma.oVMaster.updateMany({
-        where: {
-          activeOfficerId: ac.id,
-        },
-        data: {
-          activeOfficerId: officer?.id,
-        },
-      });
-      await prisma.oVMasterAdditionalOfficer.updateMany({
-        where: {
-          activeOfficerId: ac.id,
-        },
-        data: {
-          activeOfficerId: officer?.id,
-        },
-      });
-      await prisma.activeOfficer.delete({
-        where: { id: ac.id },
-      });
-      await prisma.activeOfficer.update({
-        where: { id: officer?.id },
-        data: {
-          additionalSeatingInfo: ac.additionalSeatingInfo,
-        },
+
+      if (!officer) continue;
+
+      await prisma.$transaction(async (tx) => {
+        // 1. Transfer any direct OVMaster.activeOfficerId references
+        await tx.oVMaster.updateMany({
+          where: {
+            activeOfficerId: ac.id,
+          },
+          data: {
+            activeOfficerId: officer.id,
+          },
+        });
+
+        // 2. Find any additional-officer references to the Area Chairman
+        const additionalOfficerRefs = await tx.oVMasterAdditionalOfficer.findMany({
+          where: {
+            activeOfficerId: ac.id,
+          },
+          select: {
+            id: true,
+            ovMasterId: true,
+          },
+        });
+
+        // 3. Transfer the additional-officer references.
+        //    Because of @@unique([ovMasterId, activeOfficerId]), the
+        //    replacement may already exist, in which case just remove
+        //    the duplicate Area Chairman junction record.
+        for (const ref of additionalOfficerRefs) {
+          const existing = await tx.oVMasterAdditionalOfficer.findUnique({
+            where: {
+              ovMasterId_activeOfficerId: {
+                ovMasterId: ref.ovMasterId,
+                activeOfficerId: officer.id,
+              },
+            },
+          });
+
+          if (existing) {
+            await tx.oVMasterAdditionalOfficer.delete({
+              where: {
+                id: ref.id,
+              },
+            });
+          } else {
+            await tx.oVMasterAdditionalOfficer.update({
+              where: {
+                id: ref.id,
+              },
+              data: {
+                activeOfficerId: officer.id,
+              },
+            });
+          }
+        }
+
+        // 4. Transfer the Area Chairman's additional seating information
+        await tx.activeOfficer.update({
+          where: {
+            id: officer.id,
+          },
+          data: {
+            additionalSeatingInfo: ac.additionalSeatingInfo,
+          },
+        });
+
+        // 5. Now that all foreign-key references have been transferred,
+        //    the Area Chairman record can safely be deleted.
+        await tx.activeOfficer.delete({
+          where: {
+            id: ac.id,
+          },
+        });
       });
     }
   }
