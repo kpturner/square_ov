@@ -590,7 +590,7 @@ async function addOfficer() {
       rank: ao.provincialRank?.replace('Prov', '').toUpperCase() ?? null,
       email: ao.primaryEmail ?? '',
       phone: ao.preferredPhoneNo ?? '',
-      salutationOverride: null,
+      salutationOverride: ao.salutationOverride,
       additionalSeatingInfo: ao.additionalSeatingInfo,
       provOfficerYear: null,
       grandOfficer: false,
