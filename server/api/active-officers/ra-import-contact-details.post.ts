@@ -150,6 +150,22 @@ export default defineEventHandler(async (event) => {
     if (pot && pot.length === 1) {
       // We have a match
       const officer = pot[0];
+      await prisma.oVMaster.updateMany({
+        where: {
+          activeOfficerId: ac.id,
+        },
+        data: {
+          activeOfficerId: officer?.id,
+        },
+      });
+      await prisma.oVMasterAdditionalOfficer.updateMany({
+        where: {
+          activeOfficerId: ac.id,
+        },
+        data: {
+          activeOfficerId: officer?.id,
+        },
+      });
       await prisma.activeOfficer.delete({
         where: { id: ac.id },
       });
