@@ -123,5 +123,44 @@ export default defineEventHandler(async (event) => {
 
   await Promise.all(promises);
 
+  // Finally see if any active officers are classified as "Area Chairman" have an equivalent
+  // ordinary ActiveOfficer record then update the active officer record and remove the area chairman
+  // record.  We don't need them in here twice.
+  const acs = activeOfficers.filter(
+    (ao) =>
+      ao.additionalSeatingInfo?.length &&
+      ao.additionalSeatingInfo?.toUpperCase().indexOf('AREA CHAIRMAN') > 0
+  );
+
+  for (const ac of acs) {
+    const pot = activeOfficers.filter((ao) => {
+      // Ignore Area Chairmen
+      if (
+        ao.additionalSeatingInfo?.length &&
+        ao.additionalSeatingInfo?.toUpperCase().indexOf('AREA CHAIRMAN') > 0
+      )
+        return false;
+      const familyName = ac.familyName?.replace(ao.postNominals ?? '', '').trim();
+      return (
+        (ac.givenName?.toUpperCase().trim() === ao.givenName?.toUpperCase().trim() ||
+          ac.givenName?.toUpperCase().trim() === ao.familiarName?.toUpperCase().trim()) &&
+        familyName?.toUpperCase().trim() === ao.familyName?.toUpperCase().trim()
+      );
+    });
+    if (pot && pot.length === 1) {
+      // We have a match
+      const officer = pot[0];
+      await prisma.activeOfficer.delete({
+        where: { id: ac.id },
+      });
+      await prisma.activeOfficer.update({
+        where: { id: officer?.id },
+        data: {
+          additionalSeatingInfo: ac.additionalSeatingInfo,
+        },
+      });
+    }
+  }
+
   return { success: true, imported: validatedOfficers.length, importErrors };
 });

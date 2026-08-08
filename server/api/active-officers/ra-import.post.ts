@@ -84,9 +84,9 @@ export default defineEventHandler(async (event) => {
           rank = '3RDPGP';
         }
       }
-      if (rank === 'RA AREA CHAIR' && rd.__EMPTY) {
-        givenName = rd.__EMPTY.replace('Area Chairman', '').trim();
-        familyName = 'Area Chairman';
+      if (rank === 'RA AREA CHAIR' || rd.__EMPTY?.toUpperCase().indexOf('AREA CHAIRMAN') > 0) {
+        if (!givenName) givenName = rd.__EMPTY.replace('Area Chairman', '').trim();
+        if (!familyName) familyName = 'Area Chairman';
         additionalSeatingInfo = rd.__EMPTY;
         rank = null;
       }

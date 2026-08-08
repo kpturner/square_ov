@@ -165,14 +165,21 @@ export default defineEventHandler(async (event) => {
       : '';
 
     if (rank !== 'RA AREA CHAIR') {
-      const familyName = row[2]?.value
-        ? (row[2]?.value as string).trim().toUpperCase().split(' ')[0]
-        : '';
-      return activeOfficers.find(
-        (ao) =>
-          ao.provincialRank?.toUpperCase().trim() === rank &&
-          ao.familyName?.toUpperCase().trim() === familyName
-      );
+      const additionalSeatingInfo = (row[0]?.value ?? null) as string | null;
+      const familyName = (row[2]?.value as string) ?? '';
+      return activeOfficers.find((ao) => {
+        const cleanFamilyName = familyName
+          .replace(ao.postNominals ?? '', '')
+          .trim()
+          .toUpperCase();
+        return (
+          (((!ao.provincialRank && rank === '') ||
+            ao.provincialRank?.toUpperCase().trim() === rank) &&
+            ao.familyName?.toUpperCase().trim() === cleanFamilyName) ||
+          additionalSeatingInfo?.toUpperCase().trim() ===
+            ao.additionalSeatingInfo?.toUpperCase().trim()
+        );
+      });
     } else {
       // Column 0 will say which area chair (i.e North Central Area Chairman)
       const area = row[0]?.value ? (row[0]?.value as string).replace('Area Chairman', '') : '';
@@ -210,14 +217,17 @@ export default defineEventHandler(async (event) => {
     );
   }
 
+  function isOfficerRow(row: EnrichedCell[]) {
+    return row.some((c) => c.value === 'YES');
+  }
+
   // Traverse the officers for each visit
   const startRow = year === '25-26' ? 10 : 9;
-  const columnToCheck = year === '25-26' ? 1 : 3;
   for (let r = startRow; r <= data.length; r++) {
     // We only want active officers,
     const row = data[r];
     if (row) {
-      if (row[columnToCheck]?.value) {
+      if (isOfficerRow(row)) {
         // Officer is named, so add to every visit where the column value is YES
         const ao = getActiveOfficerFromRow(row);
         const vip = getVIPFromRow(row);
