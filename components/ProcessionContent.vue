@@ -20,7 +20,7 @@
   <div v-if="!carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print">
     <v-alert type="warning" dense class="mb-4">
       <div>
-        <strong>Warning:</strong> Your officer total in this procession of ({{
+        <strong>Warning:</strong> Your officer total in this procession ({{
           positionedOfficerTotal
         }}) means that your procession is too big for a carpet capacity of
         {{ officialVisit?.carpetCapacity }} per column.
