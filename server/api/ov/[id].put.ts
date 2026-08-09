@@ -19,6 +19,10 @@ export default defineEventHandler(async (event) => {
         typeof body.carpetCapacity === 'string'
           ? parseInt(body.carpetCapacity)
           : body.carpetCapacity,
+      noOfProcessions:
+        typeof body.noOfProcessions === 'string'
+          ? parseInt(body.noOfProcessions)
+          : body.noOfProcessions,
       splitByRow: body.splitByRow,
       ovDate: body.ovDate ? new Date(body.ovDate) : undefined,
     },

@@ -56,12 +56,25 @@
       <template #item.attending="{ item }">
         <div class="checkbox-cell">
           <v-tooltip text="Attending">
-            <template #activator="{ props: tooltipProps }">
-              <v-checkbox
-                v-bind="tooltipProps"
-                v-model="item.attending"
-                hide-details
+            <template #activator="{ props: aProps }">
+              <v-checkbox v-bind="aProps" v-model="item.attending" hide-details density="compact" />
+            </template>
+          </v-tooltip>
+        </div>
+      </template>
+
+      <template #item.processionNo="{ item }">
+        <div>
+          <v-tooltip text="Assigned procession number">
+            <template #activator="{ props: pProps }">
+              <v-text-field
+                v-bind="pProps"
+                v-model="item.processionNo"
+                type="number"
+                min="1"
+                :max="noOfProcessions"
                 density="compact"
+                hide-details
               />
             </template>
           </v-tooltip>
@@ -208,7 +221,21 @@
                 label="Name"
                 density="compact"
                 :autofocus="item.id === justAddedId"
-                @focus="justAddedId = null"
+                hide-details
+                hide-detai@focus="justAddI = nul"
+              />
+            </v-col>
+
+            <v-col cols="12">
+              <v-text-field
+                v-if="noOfProcessions && noOfProcessions > 1"
+                v-model="item.processionNo"
+                label="Procession Number"
+                type="number"
+                min="1"
+                :max="noOfProcessions"
+                density="compact"
+                hide-details
               />
             </v-col>
 
@@ -219,6 +246,7 @@
                 label="Provincial Rank"
                 density="compact"
                 placeholder="Prov rank"
+                hide-details
               />
             </v-col>
 
@@ -231,6 +259,7 @@
                 placeholder="override procession position"
                 clearable
                 clear-icon="mdi-close-circle"
+                hide-details
                 @click:clear="item.rankOverride = null"
               >
                 <template #append-inner>
@@ -250,6 +279,7 @@
                 v-model="item.salutationOverride"
                 label="Salutation Override"
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -258,11 +288,12 @@
                 v-model="item.additionalSeatingInfo"
                 label="Additional Seating Info"
                 density="compact"
+                hide-details
               />
             </v-col>
 
             <v-col cols="6">
-              <v-checkbox v-model="item.active" label="Active" hide-details density="compact" />
+              <v-checkbox v-model="item.active" label="Active" density="compact" hide-details />
             </v-col>
 
             <v-col cols="12">
@@ -271,6 +302,7 @@
                 type="number"
                 label="Provincial Officer Year"
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -280,6 +312,7 @@
                 :items="availablePositions"
                 label="Position"
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -287,8 +320,8 @@
               <v-checkbox
                 v-model="item.grandOfficer"
                 label="Grand Officer"
-                hide-details
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -296,8 +329,8 @@
               <v-checkbox
                 v-model="item.grandActive"
                 label="Active"
-                hide-details
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -312,6 +345,7 @@
                 label="Grand rank"
                 density="compact"
                 placeholder="Grand rank"
+                hide-details
               />
             </v-col>
 
@@ -321,6 +355,7 @@
                 type="number"
                 label="Grand Officer Year"
                 density="compact"
+                hide-details
               />
             </v-col>
 
@@ -328,17 +363,29 @@
               <v-checkbox
                 v-model="item.excludeFromProcession"
                 label="Exclude from procession"
-                hide-details
                 density="compact"
+                hide-details
               />
             </v-col>
 
             <v-col cols="12">
-              <v-text-field v-model="item.email" type="string" label="Email" density="compact" />
+              <v-text-field
+                v-model="item.email"
+                type="string"
+                label="Email"
+                density="compact"
+                hide-details
+              />
             </v-col>
 
             <v-col cols="12">
-              <v-text-field v-model="item.phone" type="string" label="Phone" density="compact" />
+              <v-text-field
+                v-model="item.phone"
+                type="string"
+                label="Phone"
+                density="compact"
+                hide-details
+              />
             </v-col>
           </v-row>
           <v-row dense align="center" justify="end" class="mt-2">
@@ -368,7 +415,11 @@
 import type { Rank } from '~/types/officers';
 import type { Officer, Position, OVType } from '@prisma/client';
 
-const props = defineProps<{ ovType: OVType | null; officers: Officer[] }>();
+const props = defineProps<{
+  ovType: OVType | null;
+  officers: Officer[];
+  noOfProcessions: number | null;
+}>();
 
 const justAddedId = ref<string | number | null>(null);
 
@@ -468,6 +519,9 @@ const lastRowNorth = computed(() => `row_${processionRows.value}_north`);
 
 const availablePositions = computed(() => {
   return allPositions.value.filter((pos: string) => {
+    // If we are defining multiple processions then allow everything
+    if (props.noOfProcessions && props.noOfProcessions > 1) return true;
+
     // 'automatic' always allowed
     if (pos === 'automatic') return true;
 
@@ -504,8 +558,18 @@ const availablePositions = computed(() => {
   });
 });
 
-const headers = [
+const headers = computed(() => [
   { title: 'Att', key: 'attending', align: 'center' as const },
+  ...(props.noOfProcessions && props.noOfProcessions > 1
+    ? [
+        {
+          title: 'Proc.No',
+          key: 'processionNo',
+          align: 'center' as const,
+          width: '80px',
+        },
+      ]
+    : []),
   { title: 'Name', key: 'name', minWidth: '230px' },
   { title: 'Provincial Rank', key: 'rank', width: '180px' },
   { title: '', key: 'rankOverride' },
@@ -518,7 +582,7 @@ const headers = [
   { title: 'GR year', key: 'grandOfficerYear', width: '115px' },
   { title: 'Excl', key: 'excludeFromProcession', align: 'center' as const },
   { title: '', key: 'actions', sortable: false, align: 'center' as const, width: '120px' },
-];
+]);
 
 watch(
   () => props.officers.length,

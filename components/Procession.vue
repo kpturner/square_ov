@@ -1,11 +1,19 @@
 <template>
-  <v-card class="pa-0 pa-lg-4">
+  <hr v-if="processionNo && processionNo > 1" />
+  <v-card
+    class="pa-0 pa-lg-4"
+    :class="{
+      'new-page': processionNo && processionNo > 1 && !printProcessionNo,
+      'no-print': printProcessionNo !== processionNo && !isPrintSplitProcession,
+    }"
+  >
     <v-card-title class="mb-2">
       <v-row class="align-center" no-gutters>
         <!-- Text: always centered -->
         <v-col cols="12" md="auto" class="text-center">
           <span class="text-subtitle-1 text-lg-h6">
-            Procession for OV to {{ officialVisit?.name || '...' }}
+            {{ `Procession ${noOfProcessions ? processionNo : ''}` }} for OV to
+            {{ officialVisit?.name || '...' }}
           </span>
         </v-col>
 
@@ -19,7 +27,7 @@
             prepend-icon="mdi-printer"
             class="no-print"
             block
-            @click="printProcession"
+            @click="printProcessionNumber(processionNo)"
           >
             Print
           </v-btn>
@@ -28,7 +36,9 @@
     </v-card-title>
 
     <v-card-text>
-      <v-row :class="isPrintSplitProcession ? 'no-print' : ''">
+      <v-row
+        :class="isPrintSplitProcession || printProcessionNo !== processionNo ? 'no-print' : ''"
+      >
         <v-col cols="3" class="d-none d-sm-block sm:pa-0">
           <rank-order :ov-type="officialVisit?.ovType ?? null" />
         </v-col>
@@ -38,16 +48,20 @@
             :officers="officers"
             :official-visit="officialVisit"
             :procession-total
+            :no-of-processions
+            :procession-no
           />
         </v-col>
       </v-row>
 
-      <v-row :class="isPrintSplitProcession ? '' : 'no-print'">
+      <v-row v-if="noOfProcessions === 1" :class="isPrintSplitProcession ? '' : 'no-print'">
         <v-col cols="12">
           <ProcessionContent
             :officers="officers"
             :official-visit="officialVisit"
             :procession-total
+            :no-of-processions
+            :procession-no
             carpet-split-mode
             @split-by-row-change="splitByRowChange"
             @print-split-procession="printSplitProcession"
@@ -65,10 +79,13 @@ defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
   processionTotal: number | null;
+  noOfProcessions: number | null;
+  processionNo: number | null;
 }>();
 
 const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
 const isPrintSplitProcession = ref(false);
+const printProcessionNo = ref<number | null>(null);
 
 async function printProcession() {
   window.print();
@@ -85,11 +102,26 @@ async function printSplitProcession() {
   await nextTick();
   isPrintSplitProcession.value = false;
 }
+
+async function printProcessionNumber(processionNo: number | null) {
+  if (!processionNo) return;
+  printProcessionNo.value = processionNo;
+  await nextTick();
+  printProcession();
+  await nextTick();
+  printProcessionNo.value = null;
+}
 </script>
 
 <style lang="scss" scoped>
 .v-card-text {
   display: flex;
   flex-direction: column;
+}
+
+@media print {
+  .new-page {
+    break-before: page;
+  }
 }
 </style>

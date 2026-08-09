@@ -105,6 +105,7 @@
         <Officers
           :ov-type="officialVisit?.ovType ?? null"
           :officers
+          :no-of-processions
           @delete-officer="deleteOfficer"
           @officer-contact-details="officerContactDetails"
           @rank-override="rankOverride"
@@ -150,7 +151,7 @@
           v-model="processionTotal"
           type="number"
           label="Procession total"
-          class="no-print ms-md-3 carpet-capacity"
+          class="no-print ms-md-3 procession-total"
           dense
           disabled
           readonly
@@ -203,16 +204,30 @@
           dense
           hide-details
         />
+        <v-text-field
+          v-model.number="noOfProcessions"
+          type="number"
+          label="No. Of Processions"
+          class="no-print ms-md-3 no-of-processions"
+          min="1"
+          dense
+          hide-details
+        />
       </div>
     </v-card>
 
-    <Procession
-      v-if="!loading && officialVisit"
-      :officers="officers.filter((o) => !o.excludeFromProcession && o.attending)"
-      :official-visit
-      :procession-total
-      @split-by-row-change="splitByRowChange"
-    />
+    <template v-if="!loading && officialVisit">
+      <Procession
+        v-for="processionNo in noOfProcessions"
+        :key="processionNo"
+        :officers="officers.filter((o) => !o.excludeFromProcession && o.attending)"
+        :official-visit
+        :procession-total
+        :procession-no
+        :no-of-processions
+        @split-by-row-change="splitByRowChange"
+      />
+    </template>
 
     <v-card v-if="!loading" class="no-print">
       <v-card-title class="d-flex justify-space-between align-center">
@@ -449,6 +464,7 @@ const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
 const reverseStewardOrder = ref(false);
 const carpetCapacity = ref(0);
+const noOfProcessions = ref(1);
 
 const loading = ref(true);
 
@@ -550,6 +566,7 @@ async function loadOfficers() {
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
   carpetCapacity.value = officialVisit.value?.carpetCapacity ?? minCapacity.value;
+  noOfProcessions.value = officialVisit.value?.noOfProcessions ?? 1;
   loading.value = false;
 }
 
@@ -593,6 +610,7 @@ async function addOfficer() {
       phone: ao.preferredPhoneNo ?? '',
       salutationOverride: ao.salutationOverride,
       additionalSeatingInfo: ao.additionalSeatingInfo,
+      processionNo: 1,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -628,6 +646,7 @@ async function addVIP() {
       phone: vip.mobile ? vip.mobile : (vip.phone ?? ''),
       salutationOverride: null,
       additionalSeatingInfo: null,
+      processionNo: 1,
       provOfficerYear: null,
       grandOfficer: false,
       grandOfficerYear: null,
@@ -659,6 +678,7 @@ function addEmptyOfficer(position?: Position) {
     phone: '',
     salutationOverride: null,
     additionalSeatingInfo: null,
+    processionNo: 1,
     provOfficerYear: null,
     grandOfficer: false,
     grandOfficerYear: null,
@@ -824,6 +844,39 @@ async function saveAll() {
     });
     return false;
   }
+  // Check for duplicate positions
+  const dupPositions = officers.value
+    .filter((o) => {
+      if (o.position === 'automatic') return false;
+      const others = officers.value.filter((oo) => {
+        return (
+          oo.name !== o.name && oo.processionNo === o.processionNo && oo.position === o.position
+        );
+      });
+      return others.length;
+    })
+    .map((dp) => {
+      return {
+        processionNo: dp.processionNo,
+        position: dp.position,
+      };
+    });
+
+  if (dupPositions.length) {
+    const reported: { processionNo: number; position: string }[] = [];
+    dupPositions.forEach((d) => {
+      if (!reported.some((r) => r.processionNo === d.processionNo && r.position === d.position)) {
+        makeToast(
+          `You have duplicated position "${d.position}"" in procession ${d.processionNo}.`,
+          'error'
+        );
+        reported.push(d);
+      }
+    });
+
+    return false;
+  }
+
   const ovId = Number(route.params.id);
   await useApi()(`/api/officers?ovId=${ovId}`, {
     method: 'PUT',
@@ -831,6 +884,7 @@ async function saveAll() {
       ...o,
       provOfficerYear: o.provOfficerYear ? Number(o.provOfficerYear) : null,
       grandOfficerYear: o.grandOfficerYear ? Number(o.grandOfficerYear) : null,
+      processionNo: o.processionNo ? Number(o.processionNo) : null,
     })),
   });
   makeToast('All changes saved successfully.');
@@ -872,6 +926,7 @@ const saveControls = () => {
         includeGrandOfficers: includeGrandOfficers.value,
         reverseStewardOrder: reverseStewardOrder.value,
         carpetCapacity: carpetCapacity.value,
+        noOfProcessions: noOfProcessions.value,
       };
       officialVisit.value = await useApi()<OV>(`/api/ov/${officialVisit.value?.id}.put`, {
         method: 'PUT',
@@ -899,6 +954,7 @@ watch(
     activeDepsFront,
     includeGrandOfficers,
     carpetCapacity,
+    noOfProcessions,
   ],
   saveControls
 );
@@ -910,7 +966,13 @@ watch(year, () => {
 </script>
 
 <style lang="scss" scoped>
+.procession-total {
+  max-width: 150px;
+}
 .carpet-capacity {
+  max-width: 150px;
+}
+.no-of-processions {
   max-width: 150px;
 }
 </style>

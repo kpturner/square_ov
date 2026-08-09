@@ -1,5 +1,5 @@
 <template>
-  <div v-if="positionedOfficerTotal !== processionTotal" class="no-print">
+  <div v-if="positionedOfficerTotal !== processionTotal && noOfProcessions === 1" class="no-print">
     <v-alert type="warning" dense class="mb-4">
       <strong>Warning:</strong> The number of officers in the procession ({{
         positionedOfficerTotal
@@ -8,29 +8,43 @@
       and get it fixed.
     </v-alert>
   </div>
-  <div
-    v-if="!carpetSplitMode && isRowsExceedingCarpetCapacity && officialVisit?.ovType === 'ra'"
-    class="no-print"
-  >
+  <div v-if="!carpetSplitMode && positionedOfficerTotal === 0 && noOfProcessions" class="no-print">
     <v-alert type="warning" dense class="mb-4">
       <div>
-        <strong>Warning:</strong> Your officer total total ({{ positionedOfficerTotal }}) means that
-        your procession is too big for a carpet capacity of {{ officialVisit?.carpetCapacity }}.
+        <strong>Warning:</strong> You have no officers in this procession.
+        <p>Have you allocated officers to this procession in your officer list above?</p>
+      </div>
+    </v-alert>
+  </div>
+
+  <div v-if="!carpetSplitMode && isRowsExceedingCarpetCapacity" class="no-print">
+    <v-alert type="warning" dense class="mb-4">
+      <div>
+        <strong>Warning:</strong> Your officer total in this procession of ({{
+          positionedOfficerTotal
+        }}) means that your procession is too big for a carpet capacity of
+        {{ officialVisit?.carpetCapacity }}.
+        <p v-if="officialVisit?.ovType === 'craft'"></p>
+        <template v-if="officialVisit?.ovType === 'craft' && noOfProcessions === 1">
+          <p>
+            At the bottom of the screen you will see an example where your procession has the North
+            and South columns split into 2 on the carpet to accomodate everyone.
+          </p>
+          <p>
+            Alternatively you can increase the carpet capacity beyond
+            {{ officialVisit?.carpetCapacity }} if appropriate for the venue, or increase the number
+            of processions to 2 or more.
+          </p>
+        </template>
+        <template v-else>
+          <p>
+            You can increase the carpet capacity beyond {{ officialVisit?.carpetCapacity }} if
+            appropriate for the venue, or increase the number of processions to 2 or more.
+          </p>
+        </template>
         <p>
-          For the Royal Arch the recommendation is to split your party into two separate
-          processions.
-        </p>
-        <p>
-          Simply make sure all the officer details are correct, then "copy" the OV to get a
-          duplicate.
-        </p>
-        <p>
-          Then use the "Excl" (exclude) checkbox to exclude officers from each OV procession as
-          appropriate to get a more even split.
-        </p>
-        <p>
-          NOTE: If the carpet capacity is different to {{ officialVisit?.carpetCapacity }} at the OV
-          venue then you can change it.
+          If you increase the number of processions you must then assign each officer to the
+          appropriate procession in the list above.
         </p>
       </div>
     </v-alert>
@@ -292,6 +306,8 @@ const props = defineProps<{
   officers: Officer[];
   officialVisit: OV | null;
   processionTotal: number | null;
+  noOfProcessions: number | null;
+  processionNo: number | null;
   carpetSplitMode?: boolean;
 }>();
 
@@ -307,18 +323,31 @@ const ranks = computed(
 
 const emits = defineEmits(['split-by-row-change', 'print-split-procession']);
 
-// Special roles
-const vip = computed(() => props.officers.find((o) => o.position === 'vip'));
-const swordBearer = computed(() => props.officers.find((o) => o.position === 'sword_bearer'));
-const standardBearer = computed(() => props.officers.find((o) => o.position === 'standard_bearer'));
+const processionOfficers = computed(() =>
+  props.officers.filter((o) => o.processionNo === props.processionNo)
+);
 
-const headSouth = computed(() => props.officers.find((o) => o.position === 'head_of_south'));
-const headNorth = computed(() => props.officers.find((o) => o.position === 'head_of_north'));
+// Special roles
+const vip = computed(() => processionOfficers.value.find((o) => o.position === 'vip'));
+const swordBearer = computed(() =>
+  processionOfficers.value.find((o) => o.position === 'sword_bearer')
+);
+const standardBearer = computed(() =>
+  processionOfficers.value.find((o) => o.position === 'standard_bearer')
+);
+
+const headSouth = computed(() =>
+  processionOfficers.value.find((o) => o.position === 'head_of_south')
+);
+const headNorth = computed(() =>
+  processionOfficers.value.find((o) => o.position === 'head_of_north')
+);
+
 const seniorWarden = computed(() =>
-  props.officers.find((o) => o.position === 'automatic' && o.rank === 'SGW' && o.active)
+  processionOfficers.value.find((o) => o.position === 'automatic' && o.rank === 'SGW' && o.active)
 );
 const juniorWarden = computed(() =>
-  props.officers.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
+  processionOfficers.value.find((o) => o.position === 'automatic' && o.rank === 'JGW' && o.active)
 );
 
 const splitByRow = ref(props.officialVisit?.splitByRow ?? false);
@@ -467,7 +496,7 @@ const isPastVIP = (o: Officer) => {
 
 // Automatic officers sorted by seniority
 const automatic = computed(() =>
-  props.officers
+  processionOfficers.value
     .filter((o) => o.position === 'automatic')
     .sort((a, b) => {
       // Deal with active VIPs classed as automatic
@@ -606,7 +635,7 @@ function parseFixedPosition(position?: string) {
 
 const fixedPositionMap = computed(() => {
   const fixedPositionMap: Record<number, ProcessionRow> = {};
-  for (const officer of props.officers) {
+  for (const officer of processionOfficers.value) {
     const parsed = parseFixedPosition(officer.position);
 
     if (parsed) {

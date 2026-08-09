@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `OV` ADD COLUMN `noOfProcessions` INTEGER NOT NULL DEFAULT 1;
+
+-- AlterTable
+ALTER TABLE `Officer` ADD COLUMN `processionNo` INTEGER NOT NULL DEFAULT 1;
