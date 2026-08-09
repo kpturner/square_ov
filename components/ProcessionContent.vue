@@ -23,7 +23,7 @@
         <strong>Warning:</strong> Your officer total in this procession of ({{
           positionedOfficerTotal
         }}) means that your procession is too big for a carpet capacity of
-        {{ officialVisit?.carpetCapacity }}.
+        {{ officialVisit?.carpetCapacity }} per column.
         <p v-if="officialVisit?.ovType === 'craft'"></p>
         <template v-if="officialVisit?.ovType === 'craft' && noOfProcessions === 1">
           <p>
