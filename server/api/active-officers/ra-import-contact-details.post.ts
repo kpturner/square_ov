@@ -87,43 +87,11 @@ export default defineEventHandler(async (event) => {
     return officerSchema.parse(mapped);
   });
 
-  const activeOfficers = await prisma.activeOfficer.findMany({
+  let activeOfficers = await prisma.activeOfficer.findMany({
     where: { ovType, year },
   });
 
-  const promises = validatedOfficers.map((officer) => {
-    // Try to find the officer to update
-    const ao = activeOfficers.filter(
-      (ao) =>
-        (ao.familyName?.toUpperCase().trim() === officer.familyName?.toUpperCase().trim() ||
-          ao.familyName?.toUpperCase().trim() ===
-            `${officer.familyName?.toUpperCase().trim()} ${officer.postNominals ?? ''}`.trim()) &&
-        ao.provincialRank?.toUpperCase().trim() === officer.provincialRank?.toUpperCase().trim()
-    );
-    if (ao && ao.length === 1) {
-      return prisma.activeOfficer.update({
-        where: { id: ao[0]?.id },
-        data: {
-          primaryEmail: officer.primaryEmail,
-          preferredPhoneNo: officer.preferredPhoneNo,
-          postNominals: officer.postNominals,
-          familyName: officer.familyName,
-          familiarName: officer.familiarName ?? officer.givenName,
-          salutationOverride: officer.salutationOverride,
-        },
-      });
-    } else {
-      importErrors.push(
-        `Could not find a unique officer to update for ${officer.givenName} ${officer.familyName} (${officer.provincialRank})`
-      );
-      // Return a resolved promise to avoid breaking the Promise.all
-      return Promise.resolve();
-    }
-  });
-
-  await Promise.all(promises);
-
-  // Finally see if any active officers are classified as "Area Chairman" have an equivalent
+  // See if any active officers are classified as "Area Chairman" have an equivalent
   // ordinary ActiveOfficer record then update the active officer record and remove the area chairman
   // record.  We don't need them in here twice.
   const acs = activeOfficers.filter(
@@ -228,6 +196,43 @@ export default defineEventHandler(async (event) => {
       });
     }
   }
+
+  // Refetch
+  activeOfficers = await prisma.activeOfficer.findMany({
+    where: { ovType, year },
+  });
+
+  const promises = validatedOfficers.map((officer) => {
+    // Try to find the officer to update
+    const ao = activeOfficers.filter(
+      (ao) =>
+        (ao.familyName?.toUpperCase().trim() === officer.familyName?.toUpperCase().trim() ||
+          ao.familyName?.toUpperCase().trim() ===
+            `${officer.familyName?.toUpperCase().trim()} ${officer.postNominals ?? ''}`.trim()) &&
+        ao.provincialRank?.toUpperCase().trim() === officer.provincialRank?.toUpperCase().trim()
+    );
+    if (ao && ao.length === 1) {
+      return prisma.activeOfficer.update({
+        where: { id: ao[0]?.id },
+        data: {
+          primaryEmail: officer.primaryEmail,
+          preferredPhoneNo: officer.preferredPhoneNo,
+          postNominals: officer.postNominals,
+          familyName: officer.familyName,
+          familiarName: officer.familiarName ?? officer.givenName,
+          salutationOverride: officer.salutationOverride,
+        },
+      });
+    } else {
+      importErrors.push(
+        `Could not find a unique officer to update for ${officer.givenName} ${officer.familyName} (${officer.provincialRank})`
+      );
+      // Return a resolved promise to avoid breaking the Promise.all
+      return Promise.resolve();
+    }
+  });
+
+  await Promise.all(promises);
 
   return { success: true, imported: validatedOfficers.length, importErrors };
 });

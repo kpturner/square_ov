@@ -72,7 +72,14 @@ export default defineEventHandler(async (event) => {
         // Add in the "Area Chairman" to the familyName
         familyName = `${familyName} - ${rd.__EMPTY.replace('Area Chairman', 'AC').trim()}`;
       }
-      let rank = rd.__EMPTY_3 ? rd.__EMPTY_3.trim().toUpperCase().replace('PROV', '') : null;
+      let rank = rd.__EMPTY_3
+        ? rd.__EMPTY_3
+            .trim()
+            .toUpperCase()
+            .replace('PROV', '')
+            .replace('PP', '')
+            .replace('PPROV', '')
+        : null;
       if (!rank) {
         if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
           rank = 'DEPGSUPT';
@@ -88,7 +95,6 @@ export default defineEventHandler(async (event) => {
         if (!givenName) givenName = rd.__EMPTY.replace('Area Chairman', '').trim();
         if (!familyName) familyName = 'Area Chairman';
         additionalSeatingInfo = rd.__EMPTY;
-        rank = null;
       }
       return {
         Number: provNumber,
