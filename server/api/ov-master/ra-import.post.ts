@@ -148,7 +148,8 @@ export default defineEventHandler(async (event) => {
       'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
       'Lodge name': chapterNames[n],
       Location: locations[n],
-      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
+      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : '',
+      DC: '',
     });
   }
 
@@ -273,15 +274,15 @@ export default defineEventHandler(async (event) => {
 
   logger.debug({ ovs }, 'OVs');
 
-  // Filter out the erroneous OVs - i.e. No VIP
+  // Filter out the erroneous OVs
   const cleaned = ovs.filter((ov) => {
-    return !!(ov.VIP && ov.DC);
+    return !!ov.VIP || !!ov['Lodge name'] || !!ov['Lodge number'];
   });
 
   // Report errors
   const badOVs = ovs.filter((ov) => !cleaned.some((c) => c['Visit No'] === ov['Visit No']));
   badOVs.forEach((ov) =>
-    importErrors.push(`Unable to import errorneous OV for ${ov['Lodge name']}`)
+    importErrors.push(`Unable to import erroneous OV for ${ov['Lodge name']}`)
   );
 
   const columnMap: Record<string, keyof typeof officialVisitSchema.shape> = {
@@ -311,7 +312,7 @@ export default defineEventHandler(async (event) => {
 
     for (const [column, field] of Object.entries(columnMap)) {
       let value = row[column];
-      if (value === undefined || value === '') value = null;
+      if (value === undefined || (value === '' && field !== 'dc' && field !== 'vip')) value = null;
       if (['Sword', 'Standard'].includes(column) && value === 'X') {
         value = null;
       }

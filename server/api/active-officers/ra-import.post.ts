@@ -75,7 +75,7 @@ export default defineEventHandler(async (event) => {
       }
       const ssValue = rd.__EMPTY_3?.trim().toUpperCase();
       let rank = ssValue
-        ? ssValue.replace('PROV', '').replace('PP', '').replace('PPROV', '')
+        ? ssValue.replace('PPROV', '').replace('PROV', '').replace('PP', '')
         : null;
       const active = ssValue
         ? !(ssValue.indexOf('PP') >= 0 || ssValue.indexOf('PPROV') >= 0)

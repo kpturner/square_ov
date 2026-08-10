@@ -34,8 +34,16 @@ export default defineEventHandler(async (event) => {
     const givenName = rd['Given Name']?.trim() ?? null;
     const familyName = rd['Family Name']?.trim() ?? null;
     const familiarName = rd['Familiar Name']?.trim() ?? null;
-    const verboseRank = rd['Active Rank']?.trim().toUpperCase().replace('PROVINCIAL ', '') ?? null;
-    const rank = ranks.find((r) => r.title.toUpperCase() === verboseRank)?.value ?? null;
+    const verboseRank =
+      rd['Active Rank']
+        ?.trim()
+        .toUpperCase()
+        .replace('PAST PROVINCIAL ', '')
+        .replace('PROVINCIAL ', '') ?? null;
+    const rank =
+      ranks.find(
+        (r) => r.title.toUpperCase() === verboseRank || r.value.toUpperCase() === verboseRank
+      )?.value ?? null;
     const primaryEmail = rd['Primary Email']?.trim() ?? null;
     const preferredPhoneNo = rd['Preferred Phone No.']?.trim() ?? null;
     const postNominals = rd['Post Nominals']?.trim() ?? null;
@@ -202,6 +210,11 @@ export default defineEventHandler(async (event) => {
     where: { ovType, year },
   });
 
+  // Get VIPs
+  const VIPs = await prisma.vIP.findMany({
+    where: { ovType, year },
+  });
+
   const promises = validatedOfficers.map((officer) => {
     // Try to find the officer to update
     const ao = activeOfficers.filter(
@@ -211,17 +224,44 @@ export default defineEventHandler(async (event) => {
             `${officer.familyName?.toUpperCase().trim()} ${officer.postNominals ?? ''}`.trim()) &&
         ao.provincialRank?.toUpperCase().trim() === officer.provincialRank?.toUpperCase().trim()
     );
+    let aoFound = false;
+    let vipFound = false;
     if (ao && ao.length === 1) {
-      return prisma.activeOfficer.update({
-        where: { id: ao[0]?.id },
-        data: {
-          primaryEmail: officer.primaryEmail,
-          preferredPhoneNo: officer.preferredPhoneNo,
-          postNominals: officer.postNominals,
-          familyName: officer.familyName,
-          familiarName: officer.familiarName ?? officer.givenName,
-          salutationOverride: officer.salutationOverride,
-        },
+      aoFound = true;
+    }
+    // Are they a VIP?
+    const vip = VIPs.filter(
+      (vip) =>
+        vip.provincialRank?.toUpperCase().trim() === officer.provincialRank?.toUpperCase().trim()
+    );
+    if (vip && vip.length === 1) {
+      vipFound = true;
+    }
+
+    if (aoFound || vipFound) {
+      return prisma.$transaction(async (tx) => {
+        if (aoFound) {
+          await tx.activeOfficer.update({
+            where: { id: ao[0]?.id },
+            data: {
+              primaryEmail: officer.primaryEmail,
+              preferredPhoneNo: officer.preferredPhoneNo,
+              postNominals: officer.postNominals,
+              familyName: officer.familyName,
+              familiarName: officer.familiarName ?? officer.givenName,
+              salutationOverride: officer.salutationOverride,
+            },
+          });
+        }
+        if (vipFound) {
+          await tx.vIP.update({
+            where: { id: vip[0]?.id },
+            data: {
+              email: officer.primaryEmail,
+              mobile: officer.preferredPhoneNo,
+            },
+          });
+        }
       });
     } else {
       importErrors.push(
