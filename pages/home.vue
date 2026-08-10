@@ -622,7 +622,7 @@ const addOfficer = (
     grandOfficerYear: null,
     grandActive: false,
     grandRank: null,
-    active: true,
+    active: activeOfficer.active ?? true,
     position,
     excludeFromProcession: null,
     original: true,

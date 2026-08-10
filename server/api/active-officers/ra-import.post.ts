@@ -14,6 +14,7 @@ const officerSchema = z.object({
   primaryEmail: z.string().nullable().optional(),
   preferredPhoneNo: z.string().nullable().optional(),
   additionalSeatingInfo: z.string().nullable().optional(),
+  active: z.boolean(),
 });
 
 export default defineEventHandler(async (event) => {
@@ -72,14 +73,13 @@ export default defineEventHandler(async (event) => {
         // Add in the "Area Chairman" to the familyName
         familyName = `${familyName} - ${rd.__EMPTY.replace('Area Chairman', 'AC').trim()}`;
       }
-      let rank = rd.__EMPTY_3
-        ? rd.__EMPTY_3
-            .trim()
-            .toUpperCase()
-            .replace('PROV', '')
-            .replace('PP', '')
-            .replace('PPROV', '')
+      const ssValue = rd.__EMPTY_3?.trim().toUpperCase();
+      let rank = ssValue
+        ? ssValue.replace('PROV', '').replace('PP', '').replace('PPROV', '')
         : null;
+      const active = ssValue
+        ? !(ssValue.indexOf('PP') >= 0 || ssValue.indexOf('PPROV') >= 0)
+        : true;
       if (!rank) {
         if (rd.__EMPTY?.toUpperCase() === 'DEPUTY') {
           rank = 'DEPGSUPT';
@@ -106,6 +106,7 @@ export default defineEventHandler(async (event) => {
         'Primary Email': year === '25-26' && rd.__EMPTY_4 ? rd.__EMPTY_4.trim() : null,
         'Preferred Phone No.': null,
         'Additional Seating Info': additionalSeatingInfo,
+        Active: active,
       };
     });
 
@@ -119,6 +120,7 @@ export default defineEventHandler(async (event) => {
     'Primary Email': 'primaryEmail',
     'Preferred Phone No.': 'preferredPhoneNo',
     'Additional Seating Info': 'additionalSeatingInfo',
+    Active: 'active',
   };
 
   const validatedOfficers = officers.map((row) => {

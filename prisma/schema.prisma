@@ -82,8 +82,8 @@ enum Position {
 }
 
 model ActiveOfficer {
-  id                    Int     @id @default(autoincrement())
-  ovType                OVType  @default(craft)
+  id                    Int      @id @default(autoincrement())
+  ovType                OVType   @default(craft)
   year                  String
   number                Int
   salutationOverride    String?
@@ -95,6 +95,7 @@ model ActiveOfficer {
   postNominals          String?
   primaryEmail          String?
   preferredPhoneNo      String?
+  active                Boolean? @default(true) // For the RA, some officers are not active (inc Area Chairmen etc)
 
   // Reverse relations (optional, but handy if you want to query back)
   oVMastersAsSword           OVMaster[]                  @relation("SwordRelation")
