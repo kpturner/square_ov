@@ -616,7 +616,7 @@ async function addOfficer() {
       grandOfficerYear: null,
       grandActive: false,
       grandRank: null,
-      active: true,
+      active: ao.active ?? true,
       position: 'automatic',
       excludeFromProcession: false,
       original: false,
