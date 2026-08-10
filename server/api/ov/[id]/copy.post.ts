@@ -16,9 +16,16 @@ export default defineEventHandler(async (event) => {
   if (!ov) throw createError({ statusCode: 404, statusMessage: 'OV not found' });
 
   // Create a new OV with a modified name and duplicated officers
+
+  let name = `${ov.name} (Copy)`;
+  if (toUserId) {
+    const fromUser = await prisma.user.findUnique({ where: { id: ov.userId } });
+    name = `${ov.name} (${fromUser?.name})`;
+  }
+
   const newOV = await prisma.oV.create({
     data: {
-      name: `${ov.name} (Copy)`,
+      name,
       ovType: ov.ovType,
       ovDate: ov.ovDate,
       userId: toUserId ? Number(toUserId) : ov.userId,
