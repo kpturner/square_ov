@@ -148,8 +148,8 @@ export default defineEventHandler(async (event) => {
       'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
       'Lodge name': chapterNames[n],
       Location: locations[n],
-      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : '',
-      DC: '',
+      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
+      DC: 'UNKNOWN',
     });
   }
 
