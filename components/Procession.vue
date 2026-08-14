@@ -12,7 +12,8 @@
         <!-- Text: always centered -->
         <v-col cols="12" md="auto" class="text-center">
           <span class="text-subtitle-1 text-lg-h6">
-            {{ `Procession ${noOfProcessions ? processionNo : ''}` }} for OV to
+            {{ `Procession ${noOfProcessions && noOfProcessions > 1 ? processionNo : ''}` }} for OV
+            to
             {{ officialVisit?.name || '...' }}
           </span>
         </v-col>

@@ -18,7 +18,8 @@
             Home
           </v-btn>
           <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
-            >Officers for OV to {{ officialVisit?.name || '...' }}</span
+            >Officers for OV to {{ officialVisit?.name || '...' }} on
+            {{ formatDate(officialVisit.ovDate) }}</span
           >
           <v-row v-if="officialVisit" class="mb-2" dense>
             <v-col cols="12" sm="auto">
