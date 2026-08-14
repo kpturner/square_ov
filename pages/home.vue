@@ -478,7 +478,11 @@ async function exportToUser() {
 }
 
 const myOvMasters = computed(() =>
-  ovMasters.value.filter((ov) => ov.dcOfficer?.primaryEmail === authStore.user?.email)
+  ovMasters.value.filter(
+    (ov) =>
+      ov.dcOfficer?.primaryEmail === authStore.user?.email ||
+      ov.dcOfficer?.primaryEmail?.replace('gmail', 'googlemail') === authStore.user?.email
+  )
 );
 
 const maybeMissingOVs = computed(() =>
