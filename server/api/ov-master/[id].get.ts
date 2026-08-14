@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const ov = await prisma.oVMaster.findUnique({
     where: { id },
     include: {
+      dcOfficer: true,
       swordOfficer: true,
       standardOfficer: true,
       stewardOfficer: true,

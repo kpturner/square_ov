@@ -12,6 +12,7 @@ const officialVisitSchema = z.object({
   location: z.string(),
   vip: z.string(),
   dc: z.string(),
+  dcId: z.number().nullable().optional(),
   adc: z.number().nullable().optional(),
   sword: z.number().nullable().optional(),
   standard: z.number().nullable().optional(),
@@ -249,6 +250,7 @@ export default defineEventHandler(async (event) => {
                   ov.VIP = vip?.name;
                 } else if (col.colour === dcColour) {
                   ov.DC = `${ao?.familiarName} ${ao?.familyName}`;
+                  ov['DC Id'] = ao?.number;
                 } else if (col.colour === adcColour) {
                   ov.ADC = ao?.number;
                 } else if (stdbColour.includes(col.colour)) {
@@ -293,6 +295,7 @@ export default defineEventHandler(async (event) => {
     Location: 'location',
     VIP: 'vip',
     DC: 'dc',
+    'DC Id': 'dcId',
     ADC: 'adc',
     Sword: 'sword',
     Standard: 'standard',
@@ -316,7 +319,6 @@ export default defineEventHandler(async (event) => {
       if (['Sword', 'Standard'].includes(column) && value === 'X') {
         value = null;
       }
-
       // Handle Excel serial date
       if (field === 'date' && typeof value === 'number') {
         value = excelSerialToDate(value);
@@ -341,7 +343,6 @@ export default defineEventHandler(async (event) => {
 
     for (const ov of validatedOfficialVisits) {
       const { additionalOfficers, ...fields } = ov;
-
       const created = await tx.oVMaster.create({
         data: {
           ...fields,

@@ -98,6 +98,7 @@ model ActiveOfficer {
   active                Boolean? @default(true) // For the RA, some officers are not active (inc Area Chairmen etc)
 
   // Reverse relations (optional, but handy if you want to query back)
+  oVMastersAsDC              OVMaster[]                  @relation("DCRelation")
   oVMastersAsSword           OVMaster[]                  @relation("SwordRelation")
   oVMastersAsStandard        OVMaster[]                  @relation("StandardRelation")
   oVMastersAsSteward         OVMaster[]                  @relation("StewardRelation")
@@ -126,7 +127,8 @@ model OVMaster {
   lodgeNumber String
   location    String
   vip         String
-  dc          String
+  dc          String // Legacy text value
+  dcId        Int? // Replaces "dc" as the main key for the DC officer details
   sword       Int?
   standard    Int?
   adc         Int? // Royal Arch only have an ADC as well as a DC
@@ -140,6 +142,7 @@ model OVMaster {
   officer7    Int?
 
   // Composite foreign key relations to (year, number) in ActiveOfficer
+  dcOfficer       ActiveOfficer? @relation("DCRelation", fields: [ovType, year, dcId], references: [ovType, year, number])
   swordOfficer    ActiveOfficer? @relation("SwordRelation", fields: [ovType, year, sword], references: [ovType, year, number])
   standardOfficer ActiveOfficer? @relation("StandardRelation", fields: [ovType, year, standard], references: [ovType, year, number])
   stewardOfficer  ActiveOfficer? @relation("StewardRelation", fields: [ovType, year, steward], references: [ovType, year, number])
@@ -150,7 +153,7 @@ model OVMaster {
   officer5Officer ActiveOfficer? @relation("Officer5Relation", fields: [ovType, year, officer5], references: [ovType, year, number])
   officer6Officer ActiveOfficer? @relation("Officer6Relation", fields: [ovType, year, officer6], references: [ovType, year, number])
   officer7Officer ActiveOfficer? @relation("Officer7Relation", fields: [ovType, year, officer7], references: [ovType, year, number])
-  ADCOfficer      ActiveOfficer? @relation("ADCRelation", fields: [ovType, year, adc], references: [ovType, year, number])
+  adcOfficer      ActiveOfficer? @relation("ADCRelation", fields: [ovType, year, adc], references: [ovType, year, number])
 
   additionalOfficers OVMasterAdditionalOfficer[]
   activeOfficer      ActiveOfficer?              @relation(fields: [activeOfficerId], references: [id])

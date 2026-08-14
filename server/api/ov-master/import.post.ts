@@ -10,6 +10,7 @@ const officialVisitSchema = z.object({
   location: z.string(),
   vip: z.string(),
   dc: z.string(),
+  dcId: z.number().nullable().optional(),
   sword: z.number().nullable().optional(),
   standard: z.number().nullable().optional(),
   steward: z.number().nullable().optional(),
@@ -131,6 +132,7 @@ export default defineEventHandler(async (event) => {
         if (dc.length === 1) {
           const firstName = dc[0]?.familiarName ?? dc[0]?.givenName?.split(' ')[0];
           value = `${firstName} ${dc[0]?.familyName}`;
+          mapped.dcId = dc[0]?.number;
         }
       }
 

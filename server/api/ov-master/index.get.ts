@@ -9,6 +9,7 @@ export default defineEventHandler(async (event) => {
     where: { ovType, year },
     orderBy: { number: 'asc' },
     include: {
+      dcOfficer: true,
       swordOfficer: true,
       standardOfficer: true,
       stewardOfficer: true,
@@ -19,7 +20,7 @@ export default defineEventHandler(async (event) => {
       officer5Officer: true,
       officer6Officer: true,
       officer7Officer: true,
-      ADCOfficer: true,
+      adcOfficer: true,
       additionalOfficers: {
         include: {
           activeOfficer: true,

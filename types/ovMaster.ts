@@ -15,7 +15,7 @@ export type OVMasterWithAdditionalOfficers = OVMaster & {
   officer5Officer: ActiveOfficer;
   officer6Officer: ActiveOfficer;
   officer7Officer: ActiveOfficer;
-  ADCOfficer: ActiveOfficer;
+  adcOfficer: ActiveOfficer;
   additionalOfficers: OVMasterAdditionalOfficerWithOfficer[];
 };
 
