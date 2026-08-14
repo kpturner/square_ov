@@ -64,6 +64,16 @@
               @keyup.enter="loadOVs"
             />
 
+            <!-- Add maybe missing OVs -->
+            <v-btn
+              color="secondary"
+              class="w-100 w-sm-auto"
+              prepend-icon="mdi-plus"
+              @click="maybeMissingDialog = true"
+            >
+              Add OVs assigned to me
+            </v-btn>
+
             <!-- Add Official Visit button on the right -->
             <v-btn
               color="success"
@@ -219,6 +229,15 @@
 
           <!-- Bottom Actions -->
           <div v-if="!loading" class="d-flex flex-column flex-sm-row justify-end mb-2 no-print">
+            <!-- Add maybe missing OVs -->
+            <v-btn
+              color="secondary"
+              class="w-100 w-sm-auto me-2"
+              prepend-icon="mdi-plus"
+              @click="maybeMissingDialog = true"
+            >
+              Add OVs assigned to me
+            </v-btn>
             <v-btn
               color="success"
               class="me-sm-2 mb-2 mb-sm-0 w-100 w-sm-auto"
@@ -308,6 +327,29 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="maybeMissingDialog" max-width="400">
+      <v-card>
+        <v-card-title>Add your missing OVs?</v-card-title>
+        <v-card-text v-show="!editedOV.id">
+          This will add those OVs that you have yet to add where you appear to be the allocated
+          managing DC. The list is as follows:
+          <ul class="mt-1">
+            <template v-if="maybeMissingOVs.length">
+              <li v-for="ov of maybeMissingOVs" :key="ov.id">
+                {{ `${ov.lodgeName} No. ${ov.lodgeNumber} on ${formatDate(ov.date)}` }}
+              </li>
+            </template>
+            <li v-else><em>No missing OVs found</em></li>
+          </ul>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="maybeMissingDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="addMissing">Add</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <DialogConfirm
       v-model="showDeleteConfirm"
       title="Delete Official Visit"
@@ -339,6 +381,7 @@ const isAdmin = useIsAdmin();
 const isImpersonating = ref(false);
 
 const userDialog = ref(false);
+const maybeMissingDialog = ref(false);
 const selectedUserId = ref<number | null>(null);
 const ovToExport = ref<OV | null>(null);
 const users = ref<User[]>([]);
@@ -424,14 +467,37 @@ async function exportToUser() {
     });
     await loadOVs();
     makeToast(
-      `Official visit"${ovToExport.value.name}" exported to ${users.value.find((u) => u.id === selectedUserId.value)?.name} successfully`,
-      'error'
+      `Official visit"${ovToExport.value.name}" exported to ${users.value.find((u) => u.id === selectedUserId.value)?.name} successfully`
     );
   } catch (err) {
     logger.error('Failed to export OV:', err);
     alert('An error occurred while exporting this OV.');
   } finally {
     loading.value = false;
+  }
+}
+
+const myOvMasters = computed(() =>
+  ovMasters.value.filter((ov) => ov.dcOfficer?.primaryEmail === authStore.user?.email)
+);
+
+const maybeMissingOVs = computed(() =>
+  myOvMasters.value.filter(
+    (ov) =>
+      !ovs.value.some(
+        (mOv) =>
+          mOv.ovType === ov.ovType &&
+          mOv.ovDate === ov.date &&
+          mOv.name === `${ov.lodgeName.trim()} No. ${ov.lodgeNumber}`
+      )
+  )
+);
+
+async function addMissing() {
+  maybeMissingDialog.value = false;
+  for (const ov of maybeMissingOVs.value) {
+    selectedMasterOvId.value = ov.id;
+    await saveOV(false);
   }
 }
 
@@ -632,7 +698,7 @@ const addOfficer = (
   });
 };
 
-async function saveOV() {
+async function saveOV(navigateToOV: boolean = true) {
   if (editedOV.value.id) {
     await useApi()(`/api/ov/${editedOV.value.id}`, {
       method: 'PUT',
@@ -676,11 +742,20 @@ async function saveOV() {
           body: [vip],
         });
         // DC second
-        const dc = await addDC(updatedOV.id, selectedMasterOV.value.dc);
-        await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
-          method: 'PUT',
-          body: [dc],
-        });
+        if (selectedMasterOV.value.dcId) {
+          addOfficer(
+            updatedOV.id,
+            officers,
+            selectedMasterOV.value.dcOfficer,
+            selectedMasterOV.value.ovType === 'craft' ? 'head_of_south' : 'head_of_north'
+          );
+        } else {
+          const dc = await addDC(updatedOV.id, selectedMasterOV.value.dc);
+          await useApi()(`/api/officers?ovId=${updatedOV.id}`, {
+            method: 'PUT',
+            body: [dc],
+          });
+        }
         // For the RA there will be a specific ADC
         if (selectedMasterOV.value.adc) {
           addOfficer(updatedOV.id, officers, selectedMasterOV.value.adcOfficer, 'head_of_south');
@@ -731,7 +806,7 @@ async function saveOV() {
           body: officers,
         });
       }
-      navigateTo(`/ov/${updatedOV.id}`);
+      if (navigateToOV) navigateTo(`/ov/${updatedOV.id}`);
     } catch (err) {
       makeToast((err as Error).message, 'error');
       return;

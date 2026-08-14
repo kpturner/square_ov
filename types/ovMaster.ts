@@ -5,6 +5,7 @@ export type OVMasterAdditionalOfficerWithOfficer = OVMasterAdditionalOfficer & {
 };
 
 export type OVMasterWithAdditionalOfficers = OVMaster & {
+  dcOfficer: ActiveOfficer;
   swordOfficer: ActiveOfficer;
   standardOfficer: ActiveOfficer;
   stewardOfficer: ActiveOfficer;
