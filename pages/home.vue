@@ -330,22 +330,29 @@
     <v-dialog v-model="maybeMissingDialog" max-width="400">
       <v-card>
         <v-card-title>Add your missing OVs?</v-card-title>
-        <v-card-text v-show="!editedOV.id">
-          This will add those OVs that you have yet to add where you appear to be the allocated
-          managing DC. The list is as follows:
-          <ul class="mt-1">
-            <template v-if="maybeMissingOVs.length">
+        <v-card-text>
+          <template v-if="maybeMissingOVs.length">
+            <v-alert>
+              This feature will add missing OVs where the DC's email address matches yours ({{
+                authStore?.user?.email
+              }}). The list is as follows:
+            </v-alert>
+            <ul class="mt-1">
               <li v-for="ov of maybeMissingOVs" :key="ov.id">
                 {{ `${ov.lodgeName} No. ${ov.lodgeNumber} on ${formatDate(ov.date)}` }}
               </li>
-            </template>
-            <li v-else><em>No missing OVs found</em></li>
-          </ul>
+            </ul>
+          </template>
+          <v-alert v-else type="warning">
+            This feature finds OVs where the DC's email address matches yours ({{
+              authStore?.user?.email
+            }}) and at the moment there are none (that you have not already added).
+          </v-alert>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
           <v-btn variant="text" @click="maybeMissingDialog = false">Cancel</v-btn>
-          <v-btn color="primary" @click="addMissing">Add</v-btn>
+          <v-btn :disabled="!maybeMissingOVs.length" color="primary" @click="addMissing">Add</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
