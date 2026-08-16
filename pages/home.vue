@@ -329,7 +329,7 @@
 
     <v-dialog v-model="maybeMissingDialog" max-width="400">
       <v-card>
-        <v-card-title>Add your missing OVs?</v-card-title>
+        <v-card-title>Add your missing {{ ovTypeLabel(ovType) }} OVs?</v-card-title>
         <v-card-text>
           <template v-if="maybeMissingOVs.length">
             <v-alert>
