@@ -46,13 +46,32 @@ export default defineEventHandler(async (event) => {
   const validatedOfficers = officers.map((row) => {
     const mapped: Record<string, unknown> = {};
     for (const [column, field] of Object.entries(columnMap)) {
-      let value = row[column];
+      // Convert to 26-27 format if required
+      let col = column;
+      if (year === '26-27') {
+        if (column === 'Number') col = 'Prov No.';
+        if (column === 'Provincial Rank') col = 'Actual Rank';
+        if (column === 'Given Name') col = 'Nominee';
+        if (column === 'Family Name') col = 'Nominee';
+      }
+
+      let value = row[col];
       if (value === undefined || value === '') value = null;
       // Validate the rank
       if (field === 'provincialRank' && value) {
         const bareRank = value.replace('Prov', '').toUpperCase();
         if (!ranks.find((r) => r.value === bareRank)) {
           importErrors.push(`${bareRank} rank found in spreadsheet but not in config`);
+        }
+      }
+      // Deal with names in 26-27 format
+      if (year === '26-27' && col === 'Nominee') {
+        const names = value.split(' ');
+        if (field === 'givenName') {
+          value = value.replace(names[0], '').trim();
+        }
+        if (field === 'familyName') {
+          value = names[0];
         }
       }
 
@@ -62,13 +81,15 @@ export default defineEventHandler(async (event) => {
     return officerSchema.parse(mapped);
   });
 
-  const promises = validatedOfficers.map((officer) =>
-    prisma.activeOfficer.upsert({
-      where: { type_year_number: { ovType, year, number: officer.number } },
-      update: officer,
-      create: { ...officer, year, ovType },
-    })
-  );
+  const promises = validatedOfficers.map((officer) => {
+    const o = { ...officer, year, ovType };
+    logger.debug(o, 'Creating active officer');
+    return prisma.activeOfficer.upsert({
+      where: { type_year_number: { ovType, year, number: o.number } },
+      update: o,
+      create: o,
+    });
+  });
 
   await Promise.all(promises);
 

@@ -156,7 +156,7 @@ const aoSheetName = computed(() =>
 );
 
 const vipSheetName = computed(() =>
-  ovType.value === 'craft' ? 'VIP Contact Details' : raVipSheetName.value
+  ovType.value === 'craft' ? 'VIPs Contact Details' : raVipSheetName.value
 );
 
 const ovSheetName = computed(() =>

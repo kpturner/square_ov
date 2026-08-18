@@ -114,7 +114,7 @@ model ActiveOfficer {
   ovmasters                  OVMaster[]
 
   @@unique([ovType, year, number], name: "type_year_number")
-  @@unique([ovType, year, primaryEmail], name: "type_year_email")
+  @@unique([ovType, year, provincialRank, primaryEmail], name: "type_year_rank_email")
 }
 
 model OVMaster {

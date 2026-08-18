@@ -113,7 +113,7 @@
           :items="
             [{ value: '' }, ...ranks].filter(
               (r) =>
-                !['PGM', 'DPGM', 'APGM', 'MEGS', 'DGS', '2NDGP', '3RDGP', 'AGP'].includes(r.value)
+                !['PGM', 'DEPPGM', 'APGM', 'MEGS', 'DGS', '2NDGP', '3RDGP', 'AGP'].includes(r.value)
             )
           "
           item-title="value"
@@ -339,7 +339,7 @@
                 v-model="item.grandRank"
                 :items="
                   [{ value: '', title: '' }, ...ranks].filter(
-                    (r) => !['PGM', 'DPGM', 'APGM'].includes(r.value)
+                    (r) => !['PGM', 'DEPPGM', 'APGM'].includes(r.value)
                   )
                 "
                 label="Grand rank"

@@ -16,7 +16,7 @@ export const useSalutations = (ovType?: OVType | null) => {
     if (officer.rank === 'PGM') {
       return 'R. W. BRO.';
     }
-    if (officer.rank === 'DPGM') {
+    if (officer.rank === 'DEPPGM') {
       return 'V. W. BRO.';
     }
     return 'W. BRO.';

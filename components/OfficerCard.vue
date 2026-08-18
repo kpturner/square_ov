@@ -52,7 +52,7 @@ const craftRankIcons: Record<string, string> = {
   SGW: 'mdi-star',
   JGW: 'mdi-star',
   APGM: 'mdi-star',
-  DPGM: 'mdi-star',
+  DEPPGM: 'mdi-star',
 };
 
 const raRankIcons: Record<string, string> = {

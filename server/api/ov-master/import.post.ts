@@ -66,11 +66,11 @@ export default defineEventHandler(async (event) => {
     },
   });
 
-  const DPGM = await prisma.vIP.findMany({
+  const DEPPGM = await prisma.vIP.findMany({
     where: {
       ovType,
       year,
-      provincialRank: 'DPGM',
+      provincialRank: 'DEPPGM',
     },
   });
 
@@ -127,23 +127,27 @@ export default defineEventHandler(async (event) => {
       }
 
       // Try to get the DC full name rather than just the surname we see on the spreadsheet
-      if (column === 'DC' && value) {
-        const dc = activeDCs.filter((dc) => dc.familyName?.toLowerCase() === value.toLowerCase());
-        if (dc.length === 1) {
-          const firstName = dc[0]?.familiarName ?? dc[0]?.givenName?.split(' ')[0];
-          value = `${firstName} ${dc[0]?.familyName}`;
-          mapped.dcId = dc[0]?.number;
+      if (column === 'DC') {
+        if (value) {
+          const dc = activeDCs.filter((dc) => dc.familyName?.toLowerCase() === value.toLowerCase());
+          if (dc.length === 1) {
+            const firstName = dc[0]?.familiarName ?? dc[0]?.givenName?.split(' ')[0];
+            value = `${firstName} ${dc[0]?.familyName}`;
+            mapped.dcId = dc[0]?.number;
+          }
+        } else {
+          value = 'TBD';
         }
       }
 
       if (column === 'VIP' && value) {
-        if (value === 'PGM') {
+        if (value.toUpperCase() === 'PGM') {
           value = PGM[0]?.name;
-        } else if (value === 'DPGM') {
-          value = DPGM[0]?.name;
-        } else if (value === 'Junior Warden') {
+        } else if (value.toUpperCase() === 'DEPPGM') {
+          value = DEPPGM[0]?.name;
+        } else if (value === 'Junior Warden' || value.indexOf('JW-') >= 0) {
           value = JGW[0]?.name;
-        } else if (value === 'Senior Warden') {
+        } else if (value === 'Senior Warden' || value.indexOf('SW-') >= 0) {
           value = SGW[0]?.name;
         } else {
           // Try to get the VIP full name rather than just the surname we see on the spreadsheet
