@@ -17,9 +17,14 @@
           >
             Home
           </v-btn>
-          <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6"
+          <span v-if="officialVisit" class="text-subtitle-1 text-lg-h6 text-wrap"
             >Officers for OV to {{ officialVisit?.name || '...' }} on
             {{ formatDate(officialVisit.ovDate) }}</span
+          >
+          <v-row v-if="officialVisit?.comments" class="mt-1 mb-1"
+            ><span class="ms-3 text-subtitle-2 text-lg-h7 text-wrap">
+              Comments: {{ officialVisit.comments }}</span
+            ></v-row
           >
           <v-row v-if="officialVisit" class="mb-2" dense>
             <v-col cols="12" sm="auto">

@@ -10,6 +10,7 @@ export default defineEventHandler(async (event) => {
     where: { id },
     data: {
       name: body.name,
+      comments: body.comments,
       alignWardens: body.alignWardens,
       activeDCsFront: body.activeDCsFront,
       activeDepsFront: body.activeDepsFront,

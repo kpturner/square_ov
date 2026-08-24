@@ -409,7 +409,13 @@ const selectedMasterOvId = ref<number | null>(null);
 const ovs = ref<OV[]>([]);
 const ovMasters = ref<OVMasterWithAdditionalOfficers[]>([]);
 const dialog = ref(false);
-type EditedOV = { id?: number; name?: string; ovDate?: string; ovType?: OVType };
+type EditedOV = {
+  id?: number;
+  name?: string;
+  ovDate?: string;
+  ovType?: OVType;
+  comments?: string | null;
+};
 const editedOV = ref<EditedOV>({});
 const { ovType, saveOvType } = useOvType();
 const headers = [
@@ -728,6 +734,7 @@ async function saveOV(navigateToOV: boolean = true) {
         editedOV.value = {
           ovType: selectedMasterOV.value.ovType,
           name,
+          comments: selectedMasterOV.value.comments,
           ovDate: formatForDateInput(selectedMasterOV.value.date),
         };
       }

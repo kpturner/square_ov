@@ -2,7 +2,7 @@ import prisma from '~/server/utils/dbClient';
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { ovType, name, ovDate, userId } = body;
+  const { ovType, name, ovDate, userId, comments } = body;
 
   if (!ovType || !name || !ovDate || !userId) {
     throw createError({ statusCode: 400, statusMessage: 'Missing required fields' });
@@ -12,6 +12,7 @@ export default defineEventHandler(async (event) => {
     data: {
       ovType,
       name,
+      comments,
       ovDate: new Date(ovDate),
       userId,
     },

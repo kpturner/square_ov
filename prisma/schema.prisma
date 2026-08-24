@@ -32,6 +32,7 @@ model OV {
   createdAt            DateTime  @default(now())
   userId               Int
   user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments             String?
   officers             Officer[]
   alignWardens         Boolean   @default(true)
   activeDCsFront       Boolean   @default(true)
@@ -126,6 +127,7 @@ model OVMaster {
   lodgeName   String
   lodgeNumber String
   location    String
+  comments    String?
   vip         String
   dc          String // Legacy text value
   dcId        Int? // Replaces "dc" as the main key for the DC officer details
