@@ -222,6 +222,7 @@
                 density="compact"
                 :autofocus="item.id === justAddedId"
                 hide-details
+                @focus="justAddedId = null"
               />
             </v-col>
 
