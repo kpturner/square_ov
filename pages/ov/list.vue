@@ -179,12 +179,6 @@ const steward = ref<ActiveOfficer | null>(null);
 const officers = ref<{ name: string | null }[]>([]);
 const { ovType, saveOvType } = useOvType();
 
-function formatDate(dateStr: string | Date) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString();
-}
-
 const { masonicYear } = useMasonicYear();
 const ovMasters = ref<OVMasterWithAdditionalOfficers[]>([]);
 

@@ -27,7 +27,7 @@ model User {
 model OV {
   id                   Int       @id @default(autoincrement())
   name                 String
-  ovDate               DateTime
+  ovDate               DateTime?
   ovType               OVType    @default(craft)
   createdAt            DateTime  @default(now())
   userId               Int
@@ -119,14 +119,14 @@ model ActiveOfficer {
 }
 
 model OVMaster {
-  id          Int      @id @default(autoincrement())
-  ovType      OVType   @default(craft)
+  id          Int       @id @default(autoincrement())
+  ovType      OVType    @default(craft)
   year        String
   number      Int
-  date        DateTime
+  date        DateTime?
   lodgeName   String
   lodgeNumber String
-  location    String
+  location    String?
   comments    String?
   vip         String
   dc          String // Legacy text value

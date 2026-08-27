@@ -60,12 +60,6 @@ const props = defineProps<{
   printMode?: boolean;
 }>();
 
-function formatDate(dateStr?: string | Date) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString();
-}
-
 const { salutation, provincialRankPrefixAbbrev, grandRankPrefixAbbrev } = useSalutations(
   props.officialVisit.ovType
 );

@@ -113,7 +113,7 @@ async function loadOfficers() {
     ? {
         ...res.ov,
         createdAt: new Date(res.ov.createdAt),
-        ovDate: new Date(res.ov.ovDate),
+        ovDate: res.ov.ovDate ? new Date(res.ov.ovDate) : null,
       }
     : null;
   loading.value = false;

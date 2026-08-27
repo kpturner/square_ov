@@ -46,8 +46,10 @@ export default defineEventHandler(async (event) => {
     { header: 'Procession?', key: 'excludeFromProcession', width: 20 },
   ];
 
-  const ovDate = new Date(ov!.ovDate);
-  const ovDateStr = `${ovDate.getFullYear()}-${ovDate.getMonth()}-${ovDate.getDay()}`;
+  const ovDate = ov.ovDate ? new Date(ov.ovDate) : null;
+  const ovDateStr = ovDate
+    ? `${ovDate.getFullYear()}-${ovDate.getMonth()}-${ovDate.getDay()}`
+    : 'TBD';
 
   // Add rows
   officers.forEach((o) => {

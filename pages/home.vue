@@ -397,12 +397,6 @@ const authStore = useAuthStore();
 
 const loading = ref(true);
 
-function formatDate(dateStr: string | Date) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString();
-}
-
 const { masonicYear } = useMasonicYear();
 const year = ref(masonicYear);
 const selectedMasterOvId = ref<number | null>(null);

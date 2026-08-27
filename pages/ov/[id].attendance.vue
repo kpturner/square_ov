@@ -128,12 +128,6 @@ const download = () => {
   window.location.href = url;
 };
 
-function formatDate(dateStr: string | Date) {
-  if (!dateStr) return '';
-  const date = new Date(dateStr);
-  return date.toLocaleDateString();
-}
-
 async function loadOfficers() {
   const res = await useApi()<{ officers: Officer[]; ov: OV }>(`/api/officers?ovId=${ovId}`);
   officers.value = res.officers;
@@ -141,7 +135,7 @@ async function loadOfficers() {
     ? {
         ...res.ov,
         createdAt: new Date(res.ov.createdAt),
-        ovDate: new Date(res.ov.ovDate),
+        ovDate: res.ov.ovDate ? new Date(res.ov.ovDate) : null,
       }
     : null;
   loading.value = false;

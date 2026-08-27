@@ -4,10 +4,10 @@ import { OVType } from '@prisma/client';
 
 const officialVisitSchema = z.object({
   number: z.number(),
-  date: z.date(),
+  date: z.date().nullable().optional(),
   lodgeName: z.string(),
   lodgeNumber: z.string(),
-  location: z.string(),
+  location: z.string().nullable().optional(),
   comments: z.string().nullable().optional(),
   vip: z.string(),
   dc: z.string(),
@@ -118,7 +118,7 @@ export default defineEventHandler(async (event) => {
 
     for (const [column, field] of Object.entries(columnMap)) {
       let value = row[column];
-      if (value === undefined || value === '') value = null;
+      if (value === undefined || value === '' || value === 'TBC' || value === 'TBD') value = null;
       if (['Sword', 'Standard'].includes(column) && value === 'X') {
         value = null;
       }

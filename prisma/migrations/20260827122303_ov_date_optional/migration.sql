@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `OV` MODIFY `ovDate` DATETIME(3) NULL;
