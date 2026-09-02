@@ -23,3 +23,6 @@ logs
 .env.*
 !.env.example
 config/development.json
+
+# xlsx worksheets
+samples/**/~*.xlsx
