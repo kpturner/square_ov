@@ -35,18 +35,51 @@
         </div>
       </v-card-title>
 
-      <v-text-field
-        v-model="spares"
-        type="number"
-        label="Spares"
-        class="w-auto"
-        style="max-width: 100px"
-      />
+      <div class="d-flex flex-column flex-sm-row align-start ga-3 mb-4">
+        <v-text-field
+          v-model="spares"
+          type="number"
+          label="Spares"
+          hide-details
+          style="width: 100px; max-width: 100px"
+        />
+
+        <v-select
+          v-model="selectedOfficerIds"
+          :items="attendingOfficers"
+          item-title="name"
+          item-value="id"
+          label="Officers to include"
+          multiple
+          hide-details
+          class="flex-grow-1"
+          style="max-width: 500px"
+        >
+          <template #prepend-item>
+            <v-list-item title="Select all" @click="selectAllOfficers">
+              <template #prepend>
+                <v-checkbox-btn
+                  :model-value="allOfficersSelected"
+                  :indeterminate="someOfficersSelected"
+                />
+              </template>
+            </v-list-item>
+
+            <v-divider />
+          </template>
+
+          <template #selection="{ index }">
+            <span v-if="index === 0" class="text-body-2">
+              {{ selectedOfficerSummary }}
+            </span>
+          </template>
+        </v-select>
+      </div>
 
       <SeatReservations
         v-if="officialVisit"
         :ov-type="officialVisit.ovType"
-        :officers="attendingOfficers"
+        :officers="selectedOfficers"
         :spares
       />
     </v-card>
@@ -79,7 +112,7 @@
       v-if="officialVisit"
       class="only-print"
       :ov-type="officialVisit.ovType"
-      :officers="attendingOfficers"
+      :officers="selectedOfficers"
       print-mode
       :spares
     />
@@ -94,6 +127,38 @@ const route = useRoute();
 const officers = ref<Officer[]>([]);
 const officialVisit = ref<OV | null>(null);
 const spares = ref(2);
+const selectedOfficerIds = ref<number[]>([]);
+
+const allOfficerIds = computed(() => attendingOfficers.value.map((o) => o.id));
+
+const allOfficersSelected = computed(
+  () => selectedOfficerIds.value.length === allOfficerIds.value.length
+);
+
+const someOfficersSelected = computed(
+  () =>
+    selectedOfficerIds.value.length > 0 &&
+    selectedOfficerIds.value.length < allOfficerIds.value.length
+);
+
+const selectedOfficerSummary = computed(() => {
+  const count = selectedOfficerIds.value.length;
+  const total = allOfficerIds.value.length;
+
+  if (count === total) {
+    return `All officers (${total})`;
+  }
+
+  return `${count} of ${total} officers`;
+});
+
+function selectAllOfficers() {
+  if (allOfficersSelected.value) {
+    selectedOfficerIds.value = [];
+  } else {
+    selectedOfficerIds.value = [...allOfficerIds.value];
+  }
+}
 
 const loading = ref(true);
 
@@ -103,6 +168,10 @@ onMounted(async () => {
 
 const attendingOfficers = computed(() => {
   return officers.value.filter((o) => o.attending);
+});
+
+const selectedOfficers = computed(() => {
+  return attendingOfficers.value.filter((o) => selectedOfficerIds.value.includes(o.id));
 });
 
 async function loadOfficers() {
@@ -116,6 +185,9 @@ async function loadOfficers() {
         ovDate: res.ov.ovDate ? new Date(res.ov.ovDate) : null,
       }
     : null;
+
+  selectedOfficerIds.value = attendingOfficers.value.map((o) => o.id);
+
   loading.value = false;
 }
 
