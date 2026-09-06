@@ -320,7 +320,7 @@
     </v-dialog>
     <v-dialog v-model="contactDetailsDialog" max-width="400">
       <v-card>
-        <v-card-title>Officer Contacts Details</v-card-title>
+        <v-card-title>Officer Additional Info</v-card-title>
         <v-card-text>
           {{ officerToEdit?.name }}<br />
           <v-text-field
