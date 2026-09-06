@@ -344,7 +344,7 @@
 
           <v-text-field
             v-model="officerToEdit!.additionalSeatingInfo"
-            label="Additional Seating Info"
+            label="Additional Seat Reservation Info"
             density="compact"
           />
         </v-card-text>

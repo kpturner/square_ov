@@ -286,7 +286,7 @@
             <v-col cols="12">
               <v-text-field
                 v-model="item.additionalSeatingInfo"
-                label="Additional Seating Info"
+                label="Additional Seat Reservation Info"
                 density="compact"
                 hide-details
               />
