@@ -39,20 +39,12 @@
               </v-btn>
             </v-col>
             <v-col cols="12" sm="auto">
-              <v-btn
-                v-if="officialVisit"
-                color="info"
-                prepend-icon="mdi-file"
-                class="w-100"
-                small
-                @click="attendance"
-              >
+              <v-btn color="info" prepend-icon="mdi-file" class="w-100" small @click="attendance">
                 Attendance report
               </v-btn>
             </v-col>
             <v-col cols="12" sm="auto">
               <v-btn
-                v-if="officialVisit"
                 color="success"
                 prepend-icon="mdi-email"
                 class="w-100"
@@ -60,6 +52,17 @@
                 @click="emailTheTeam"
               >
                 Email the team
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                color="success"
+                prepend-icon="mdi-email"
+                class="w-100"
+                small
+                @click="drumUpSupportDialog = true"
+              >
+                Drum up support
               </v-btn>
             </v-col>
             <v-col cols="12" sm="auto">
@@ -251,20 +254,12 @@
               </v-btn>
             </v-col>
             <v-col cols="12" sm="auto">
-              <v-btn
-                v-if="officialVisit"
-                color="info"
-                prepend-icon="mdi-file"
-                class="w-100"
-                small
-                @click="attendance"
-              >
+              <v-btn color="info" prepend-icon="mdi-file" class="w-100" small @click="attendance">
                 Attendance report
               </v-btn>
             </v-col>
             <v-col cols="12" sm="auto">
               <v-btn
-                v-if="officialVisit"
                 color="success"
                 prepend-icon="mdi-email"
                 class="w-100"
@@ -272,6 +267,17 @@
                 @click="emailTheTeam"
               >
                 Email the team
+              </v-btn>
+            </v-col>
+            <v-col cols="12" sm="auto">
+              <v-btn
+                color="success"
+                prepend-icon="mdi-email"
+                class="w-100"
+                small
+                @click="drumUpSupportDialog = true"
+              >
+                Drum up support
               </v-btn>
             </v-col>
           </v-row>
@@ -418,6 +424,46 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="drumUpSupportDialog" max-width="600">
+      <v-card>
+        <v-card-title>Drum up Support</v-card-title>
+        <v-card-text>
+          Select officers you wish to email to drum up support for the OV. This will send an email
+          to all selected officers. You compose the email, but the BCC list is done for you.
+          <v-select
+            v-model="drumUpSupportOfficerIds"
+            :items="potentialSupportOfficers"
+            item-title="name"
+            item-value="id"
+            label="Officers to email"
+            multiple
+            chips
+            closable-chips
+            hide-details
+            class="flex-grow-1"
+            style="max-width: 500px"
+          >
+            <template #prepend-item>
+              <v-list-item title="Select all" @click="selectAllOfficers">
+                <template #prepend>
+                  <v-checkbox-btn
+                    :model-value="allOfficersSelected"
+                    :indeterminate="someOfficersSelected"
+                  />
+                </template>
+              </v-list-item>
+
+              <v-divider />
+            </template>
+          </v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn variant="text" @click="drumUpSupportDialog = false">Cancel</v-btn>
+          <v-btn color="primary" @click="drumUpSupport">OK</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <DialogConfirm
       v-model="showDeleteConfirm"
       title="Delete Officer"
@@ -446,6 +492,7 @@ const makeToast = useToast();
 
 const processionControls = ref<HTMLElement | null>(null);
 const showDeleteConfirm = ref(false);
+const drumUpSupportDialog = ref(false);
 const officerToDelete = ref<Officer | null>(null);
 const officerToEdit = ref<Officer | null>(null);
 const contactDetailsDialog = ref(false);
@@ -453,6 +500,7 @@ const route = useRoute();
 const router = useRouter();
 const ovId = Number(route.params.id);
 const officers = ref<Officer[]>([]);
+const drumUpSupportOfficerIds = ref<number[]>([]);
 const officialVisit = ref<OV | null>(null);
 const addOfficerDialog = ref(false);
 const rankOverrideDialog = ref(false);
@@ -471,6 +519,44 @@ const alignActiveWardens = ref(true);
 const reverseStewardOrder = ref(false);
 const carpetCapacity = ref(0);
 const noOfProcessions = ref(1);
+
+const potentialSupportOfficers = computed(() => {
+  return activeOfficers.value
+    .filter((o) => {
+      return (
+        o.primaryEmail &&
+        o.primaryEmail.trim().length > 0 &&
+        !officers.value.find((of) => of.email === o.primaryEmail)
+      );
+    })
+    .map((o) => ({
+      id: o.id,
+      name: `${o.number}: ${o.givenName} ${o.familyName} - ${o.provincialRank}`,
+      email: o.primaryEmail,
+    }));
+});
+
+const allOfficerIds = computed(() => potentialSupportOfficers.value.map((o) => o.id));
+
+const allOfficersSelected = computed(
+  () =>
+    allOfficerIds.value.length > 0 &&
+    drumUpSupportOfficerIds.value.length === allOfficerIds.value.length
+);
+
+const someOfficersSelected = computed(
+  () =>
+    drumUpSupportOfficerIds.value.length > 0 &&
+    drumUpSupportOfficerIds.value.length < allOfficerIds.value.length
+);
+
+function selectAllOfficers() {
+  if (allOfficersSelected.value) {
+    drumUpSupportOfficerIds.value = [];
+  } else {
+    drumUpSupportOfficerIds.value = [...allOfficerIds.value];
+  }
+}
 
 const loading = ref(true);
 
@@ -526,7 +612,7 @@ const activeOfficerSelectionList = computed(() => {
   });
 });
 
-const hasVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
+const theVIP = computed(() => officers.value.find((o) => o.position === 'vip'));
 
 async function loadActiveOfficers() {
   if (!officialVisit.value) return;
@@ -653,7 +739,7 @@ async function addVIP() {
       grandActive: false,
       grandRank: null,
       active: true,
-      position: hasVIP.value ? 'automatic' : 'vip',
+      position: theVIP.value ? 'automatic' : 'vip',
       excludeFromProcession: false,
       original: true,
       attending: true,
@@ -742,6 +828,8 @@ function emailTheTeam() {
   const ovId = officialVisit.value?.id;
   if (!ovId) return;
 
+  const { salutation } = useSalutations(officialVisit.value?.ovType);
+
   let saveDetails = false;
 
   const missingEmails = officers.value.filter(
@@ -795,7 +883,35 @@ function emailTheTeam() {
 
   if (emailList.length === 0) return;
 
-  const subject = `Official Visit to ${officialVisit.value?.name} on ${formatDate(officialVisit.value?.ovDate)}`;
+  const subject = `Official Visit${theVIP.value?.name ? ` of ${salutation(theVIP.value)} ${theVIP.value.name}` : ''} to ${officialVisit.value?.name} on ${formatDate(officialVisit.value?.ovDate)}`;
+
+  const mailtoLink =
+    `mailto:?bcc=${encodeURIComponent(emailList.join(','))}` +
+    `&subject=${encodeURIComponent(subject)}`;
+  window.location.href = mailtoLink;
+}
+
+function drumUpSupport() {
+  const ovId = officialVisit.value?.id;
+  if (!ovId) return;
+
+  const { salutation } = useSalutations(officialVisit.value?.ovType);
+
+  const selectedOfficers = activeOfficers.value.filter((o) =>
+    drumUpSupportOfficerIds.value.includes(o.id)
+  );
+
+  const emailList = selectedOfficers
+    .filter((o) => o.primaryEmail && o.primaryEmail.trim().length > 0)
+    // filter out the user's own email
+    .filter(
+      (o) => o.primaryEmail?.trim().toLowerCase() !== authStore.user?.email?.trim().toLowerCase()
+    )
+    .map((o) => o.primaryEmail?.trim());
+
+  if (emailList.length === 0) return;
+
+  const subject = `Official Visit${theVIP.value?.name ? ` of ${salutation(theVIP.value)} ${theVIP.value.name}` : ''} to ${officialVisit.value?.name} on ${formatDate(officialVisit.value?.ovDate)}`;
 
   const mailtoLink =
     `mailto:?bcc=${encodeURIComponent(emailList.join(','))}` +
