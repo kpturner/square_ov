@@ -192,7 +192,7 @@
           v-if="activeDCsFront"
           v-model="activeADCsFront"
           class="no-print ms-md-3"
-          label="ADCs at front also?"
+          label="ADCs at front?"
           dense
           hide-details
         />
@@ -200,7 +200,7 @@
           v-if="activeDCsFront"
           v-model="activeDepsFront"
           class="no-print ms-md-3"
-          label="Deps at front also?"
+          label="Deps at front?"
           dense
           hide-details
         />
@@ -208,7 +208,7 @@
           v-if="activeDCsFront"
           v-model="includeGrandOfficers"
           class="no-print ms-md-3"
-          label="GO DCs at front also?"
+          label="GO DCs at front?"
           dense
           hide-details
         />

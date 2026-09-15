@@ -620,8 +620,8 @@ const activeDCs = computed(() => {
       }
 
       return 0;
-    })
-    .reverse();
+    });
+  // .reverse();
 });
 
 function parseFixedPosition(position?: string) {
