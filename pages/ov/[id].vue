@@ -184,7 +184,7 @@
         <v-checkbox
           v-model="activeDCsFront"
           class="no-print ms-md-3"
-          label="Active ADCs at front?"
+          label="Active DCs at front?"
           dense
           hide-details
         />
