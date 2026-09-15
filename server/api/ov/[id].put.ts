@@ -13,6 +13,7 @@ export default defineEventHandler(async (event) => {
       comments: body.comments,
       alignWardens: body.alignWardens,
       activeDCsFront: body.activeDCsFront,
+      activeADCsFront: body.activeADCsFront,
       activeDepsFront: body.activeDepsFront,
       includeGrandOfficers: body.includeGrandOfficers,
       reverseStewardOrder: body.reverseStewardOrder,

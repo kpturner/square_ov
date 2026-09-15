@@ -190,6 +190,14 @@
         />
         <v-checkbox
           v-if="activeDCsFront"
+          v-model="activeADCsFront"
+          class="no-print ms-md-3"
+          label="ADCs at front also?"
+          dense
+          hide-details
+        />
+        <v-checkbox
+          v-if="activeDCsFront"
           v-model="activeDepsFront"
           class="no-print ms-md-3"
           label="Deps at front also?"
@@ -513,6 +521,7 @@ const vips = ref<VIP[]>([]);
 const selectedVIPId = ref(null);
 
 const activeDCsFront = ref(false);
+const activeADCsFront = ref(false);
 const activeDepsFront = ref(false);
 const includeGrandOfficers = ref(false);
 const alignActiveWardens = ref(true);
@@ -648,6 +657,7 @@ async function loadOfficers() {
     : null;
   alignActiveWardens.value = officialVisit.value?.alignWardens ?? false;
   activeDCsFront.value = officialVisit.value?.activeDCsFront ?? false;
+  activeADCsFront.value = officialVisit.value?.activeADCsFront ?? false;
   activeDepsFront.value = officialVisit.value?.activeDepsFront ?? false;
   includeGrandOfficers.value = officialVisit.value?.includeGrandOfficers ?? false;
   reverseStewardOrder.value = officialVisit.value?.reverseStewardOrder ?? false;
@@ -1038,6 +1048,7 @@ const saveControls = () => {
         ...officialVisit.value,
         alignWardens: alignActiveWardens.value,
         activeDCsFront: activeDCsFront.value,
+        activeADCsFront: activeADCsFront.value,
         activeDepsFront: activeDepsFront.value,
         includeGrandOfficers: includeGrandOfficers.value,
         reverseStewardOrder: reverseStewardOrder.value,
@@ -1067,6 +1078,7 @@ watch(
     alignActiveWardens,
     reverseStewardOrder,
     activeDCsFront,
+    activeADCsFront,
     activeDepsFront,
     includeGrandOfficers,
     carpetCapacity,

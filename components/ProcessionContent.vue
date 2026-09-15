@@ -602,6 +602,7 @@ const automatic = computed(() =>
 const activeDCs = computed(() => {
   return automatic.value
     .filter((o) => o.active && (o.rank === 'GDC' || o.rank === 'DEPGDC' || o.rank === 'AGDC'))
+    .filter((o) => (props.officialVisit?.activeADCsFront ? true : o.rank !== 'AGDC'))
     .filter((o) => (props.officialVisit?.activeDepsFront ? true : o.rank !== 'DEPGDC'))
     .filter((o) =>
       props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer && o.rank !== 'GDC'
@@ -619,8 +620,8 @@ const activeDCs = computed(() => {
       }
 
       return 0;
-    });
-  // .reverse();  We will want Deps between the Stewards and the ADCs, so do not reverse the order
+    })
+    .reverse();
 });
 
 function parseFixedPosition(position?: string) {

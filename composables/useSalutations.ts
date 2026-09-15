@@ -16,9 +16,16 @@ export const useSalutations = (ovType?: OVType | null) => {
     if (officer.rank === 'PGM') {
       return 'R. W. BRO.';
     }
-    if (officer.rank === 'DEPPGM') {
-      return 'V. W. BRO.';
+    if (officer.grandOfficer && officer.grandRank) {
+      const grandRankIndex = ranks.value.findIndex((r) => r.value === officer.grandRank);
+
+      const gswdbIndex = ranks.value.findIndex((r) => r.value === 'GSWDB');
+
+      if (grandRankIndex <= gswdbIndex) {
+        return 'V. W. BRO.';
+      }
     }
+
     return 'W. BRO.';
   };
 

@@ -25,17 +25,9 @@ export default defineEventHandler(async (event) => {
 
   const newOV = await prisma.oV.create({
     data: {
+      ...ov,
       name,
-      ovType: ov.ovType,
-      ovDate: ov.ovDate,
       userId: toUserId ? Number(toUserId) : ov.userId,
-      alignWardens: ov.alignWardens,
-      activeDCsFront: ov.activeDCsFront,
-      activeDepsFront: ov.activeDepsFront,
-      includeGrandOfficers: ov.includeGrandOfficers,
-      reverseStewardOrder: ov.reverseStewardOrder,
-      carpetCapacity: ov.carpetCapacity,
-      splitByRow: ov.splitByRow,
       officers: {
         create: ov.officers.map(({ id, ovId, ...officer }) => officer),
       },
