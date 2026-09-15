@@ -608,8 +608,8 @@ const activeDCs = computed(() => {
       props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer && o.rank !== 'GDC'
     )
     .sort((a, b) => {
-      // When at the front of the procession, Grand Officers take precedence,
-      // followed by Deputy GDCs, then ADCs, then the GDC.
+      // When at the front of the procession, GDC & Grand Officers take precedence,
+      // followed by Deputy GDCs, then ADCs
       if (props.officialVisit?.activeDCsFront) {
         const frontPriority = (officer: Officer) => {
           if (officer.rank === 'GDC') return 3;
