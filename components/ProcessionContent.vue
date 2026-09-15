@@ -608,20 +608,40 @@ const activeDCs = computed(() => {
       props.officialVisit?.includeGrandOfficers ? true : !o.grandOfficer && o.rank !== 'GDC'
     )
     .sort((a, b) => {
+      // When at the front of the procession, Grand Officers take precedence,
+      // followed by Deputy GDCs, then ADCs, then the GDC.
+      if (props.officialVisit?.activeDCsFront) {
+        const frontPriority = (officer: Officer) => {
+          if (officer.rank === 'GDC') return 3;
+          if (officer.grandOfficer) return 2;
+          if (officer.rank === 'DEPGDC') return 1;
+          if (officer.rank === 'AGDC') return 0;
+          return 0;
+        };
+
+        const priorityDiff = frontPriority(a) - frontPriority(b);
+
+        if (priorityDiff !== 0) {
+          return priorityDiff;
+        }
+      }
+
       // Provincial year compare
       const pyRes = provYearCompare(a, b);
+
       if (pyRes !== null) {
         return pyRes;
       }
+
       // Active officer number
       const aonRes = activeOfficerNumberCompare(a, b);
+
       if (aonRes !== null) {
         return aonRes;
       }
 
       return 0;
     });
-  // .reverse();
 });
 
 function parseFixedPosition(position?: string) {
