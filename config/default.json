@@ -299,7 +299,7 @@
       "value": "2NDAGSOJ",
       "title": "2nd Assistant Grand Sojourner"
     },
-    {"value":"AGSOJ","Assistant Grand Sojourner"},
+    {"value":"AGSOJ","title": "Assistant Grand Sojourner"},
     {
       "value": "AGSE",
       "title": "Assistant Grand Scribe E"
