@@ -94,6 +94,15 @@
                       />
                     </v-col>
 
+                    <v-col cols="12">
+                      <v-text-field
+                        v-model="item.comments"
+                        label="Comments"
+                        density="compact"
+                        readonly
+                      />
+                    </v-col>
+
                     <v-col cols="6">
                       <v-text-field v-model="item.vip" label="VIP" density="compact" readonly />
                     </v-col>
@@ -196,6 +205,7 @@ const headers = [
   { title: 'Name', key: 'lodgeName' },
   { title: 'No', key: 'lodgeNumber' },
   { title: 'Date', key: 'date' },
+  { title: 'Comments', key: 'comments' },
   { title: 'VIP', key: 'vip' },
   { title: 'DC', key: 'dc' },
   { title: '', key: 'actions', sortable: false },
