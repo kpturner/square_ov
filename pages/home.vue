@@ -612,6 +612,7 @@ const addVIP = async (ovId: number, vipName: string, year: string): Promise<Offi
     attending: true,
     excludeFromProcession: null,
     rankOverride: null,
+    provOfficerYearOverride: null,
     ovId,
   };
 };
@@ -647,6 +648,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
       attending: true,
       excludeFromProcession: null,
       rankOverride: null,
+      provOfficerYearOverride: null,
       ovId,
     };
   }
@@ -670,6 +672,7 @@ const addDC = async (ovId: number, name: string): Promise<Officer> => {
     attending: true,
     excludeFromProcession: null,
     rankOverride: null,
+    provOfficerYearOverride: null,
     ovId,
   };
 };
@@ -705,6 +708,7 @@ const addOfficer = (
     original: true,
     attending: true,
     rankOverride: null,
+    provOfficerYearOverride: null,
     ovId,
   });
 };

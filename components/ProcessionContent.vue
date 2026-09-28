@@ -411,6 +411,12 @@ const provRankToConsider = (officer: Officer) => {
   return officer.rankOverride ?? officer.rank;
 };
 
+const provOfficerYearToConsider = (officer: Officer) => {
+  return officer.provOfficerYearOverride
+    ? officer.provOfficerYearOverride
+    : officer.provOfficerYear;
+};
+
 const rankToConsider = (officer: Officer) => {
   return officer.grandOfficer
     ? (officer.grandRank ?? provRankToConsider(officer))
@@ -429,15 +435,21 @@ const activeNumberToConsider = (officer: Officer): number | null => {
   return null;
 };
 
-const provYearCompare = (a: Officer, b: Officer): number | null => {
+const provYearCompare = (a: Officer, b: Officer, disregardActiveFlag?: boolean): number | null => {
+  const aYear = provOfficerYearToConsider(a);
+  const bYear = provOfficerYearToConsider(b);
+  const aRank = provRankToConsider(a);
+  const bRank = provRankToConsider(b);
+
   if (
-    !!a.active === !!b.active && // Treat null and false as equal
-    a.provOfficerYear &&
-    b.provOfficerYear &&
-    a.rank === b.rank
+    (!!a.active === !!b.active || disregardActiveFlag) && // Treat null and false as equal
+    aYear !== null &&
+    bYear !== null &&
+    aRank === bRank
   ) {
-    if (a.provOfficerYear !== b.provOfficerYear) return a.provOfficerYear - b.provOfficerYear;
+    if (aYear !== bYear) return aYear - bYear;
   }
+
   return null;
 };
 
@@ -502,7 +514,7 @@ const automatic = computed(() =>
       // Deal with active VIPs classed as automatic
       if (isActiveVIP(a) && isActiveVIP(b)) {
         // VIP Rank seniority
-        const rankRes = rankCompare(a.rank, b.rank);
+        const rankRes = rankCompare(provRankToConsider(a), provRankToConsider(b));
         if (rankRes !== null) {
           return rankRes;
         } else {
@@ -542,7 +554,7 @@ const automatic = computed(() =>
         !!a.grandActive === !!b.grandActive &&
         a.grandOfficerYear === b.grandOfficerYear
       ) {
-        const rRes = rankCompare(a.rank, b.rank);
+        const rRes = rankCompare(provRankToConsider(a), provRankToConsider(b));
         if (rRes !== null) {
           return rRes;
         }
@@ -575,6 +587,15 @@ const automatic = computed(() =>
       const rankRes = rankCompare(rankToConsider(a), rankToConsider(b));
       if (rankRes !== null) {
         return rankRes;
+      }
+
+      // We could get two provincial officers with rank and year overrides but different active status
+      // so compare their year overrides
+      if (a.rankOverride && b.rankOverride && !a.grandOfficer && !b.grandOfficer) {
+        const pyRes = provYearCompare(a, b, true);
+        if (pyRes !== null) {
+          return pyRes;
+        }
       }
 
       // Grand Officers: active grand rank outranks non-active

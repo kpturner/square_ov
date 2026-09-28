@@ -49,27 +49,28 @@ model OV {
 }
 
 model Officer {
-  id                    Int      @id @default(autoincrement())
-  name                  String
-  email                 String?
-  phone                 String?
-  rank                  String?
-  rankOverride          String?
-  salutationOverride    String?
-  additionalSeatingInfo String?
-  provOfficerYear       Int?
-  grandOfficer          Boolean
-  grandOfficerYear      Int?
-  active                Boolean
-  ovId                  Int
-  position              String
-  grandActive           Boolean?
-  grandRank             String?
-  original              Boolean?
-  attending             Boolean?
-  excludeFromProcession Boolean?
-  processionNo          Int      @default(1)
-  ov                    OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
+  id                      Int      @id @default(autoincrement())
+  name                    String
+  email                   String?
+  phone                   String?
+  rank                    String?
+  rankOverride            String?
+  provOfficerYearOverride Int?
+  salutationOverride      String?
+  additionalSeatingInfo   String?
+  provOfficerYear         Int?
+  grandOfficer            Boolean
+  grandOfficerYear        Int?
+  active                  Boolean
+  ovId                    Int
+  position                String
+  grandActive             Boolean?
+  grandRank               String?
+  original                Boolean?
+  attending               Boolean?
+  excludeFromProcession   Boolean?
+  processionNo            Int      @default(1)
+  ov                      OV       @relation(fields: [ovId], references: [id], onDelete: Cascade)
 
   @@index([ovId], map: "Officer_ovId_fkey")
 }

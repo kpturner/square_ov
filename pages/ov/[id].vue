@@ -394,6 +394,16 @@
               </v-tooltip>
             </template>
           </v-select>
+          <v-text-field
+            v-model.number="officerToEdit.provOfficerYearOverride"
+            label="Provincial Officer Year Override"
+            type="number"
+            density="compact"
+            clearable
+            clear-icon="mdi-close-circle"
+            :min="1900"
+            @click:clear="officerToEdit.provOfficerYearOverride = null"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -718,6 +728,7 @@ async function addOfficer() {
       original: false,
       attending: true,
       rankOverride: null,
+      provOfficerYearOverride: null,
       ovId: Number(route.params.id),
     });
     makeToast(`${name} ${ao.provincialRank} added to list.`);
@@ -754,6 +765,7 @@ async function addVIP() {
       original: true,
       attending: true,
       rankOverride: null,
+      provOfficerYearOverride: null,
       ovId: Number(route.params.id),
     });
     makeToast(`${vip.name} ${vip.provincialRank} added to list.`);
@@ -786,6 +798,7 @@ function addEmptyOfficer(position?: Position) {
     original: false,
     attending: true,
     rankOverride: null,
+    provOfficerYearOverride: null,
     ovId: Number(route.params.id),
   });
 }
