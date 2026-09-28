@@ -600,7 +600,7 @@ const automatic = computed(() =>
 
       // We could get two provincial officers with rank and year overrides but different active status
       // so compare their year overrides
-      if (a.rankOverride && b.rankOverride && !a.grandOfficer && !b.grandOfficer) {
+      if ((a.rankOverride || b.rankOverride) && !a.grandOfficer && !b.grandOfficer) {
         const pyRes = provYearCompare(a, b, true);
         if (pyRes !== null) {
           return pyRes;
