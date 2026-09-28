@@ -10,6 +10,7 @@ const officialVisitSchema = z.object({
   lodgeName: z.string(),
   lodgeNumber: z.string(),
   location: z.string(),
+  comments: z.string().nullable().optional(),
   vip: z.string(),
   dc: z.string(),
   dcId: z.number().nullable().optional(),
@@ -86,7 +87,7 @@ export default defineEventHandler(async (event) => {
   const ovs: Record<string, any>[] = [];
   const invalidOvs: Record<string, any>[] = [];
 
-  const getRowValues = (row: EnrichedCell[], startCell: string) => {
+  const getRowValues = (row: EnrichedCell[], startCell: string, filterBoolean: boolean = true) => {
     const values: string[] = [];
     let llFound = false;
     for (const cell of row) {
@@ -95,7 +96,7 @@ export default defineEventHandler(async (event) => {
         values.push(cell.value as string);
       }
     }
-    return values.filter(Boolean);
+    return filterBoolean ? values.filter(Boolean) : values;
   };
 
   // The first row contains the visit numbers from column I onwards
@@ -136,6 +137,8 @@ export default defineEventHandler(async (event) => {
 
   // The next row contains all the dates
   const ovDates = year === '25-26' ? getRowValues(data[5]!, 'I1') : getRowValues(data[5]!, 'F1');
+  const comments =
+    year === '25-26' ? getRowValues(data[8]!, 'I1', false) : getRowValues(data[8]!, 'F1', false);
 
   const getVIP = (rank: string | null) => {
     if (!rank) return null;
@@ -162,6 +165,7 @@ export default defineEventHandler(async (event) => {
         'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
         'Lodge name': chapterNames[n],
         Location: locations[n],
+        Comments: comments[n],
         VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
         DC: 'UNKNOWN',
       });
@@ -315,6 +319,7 @@ export default defineEventHandler(async (event) => {
     'Lodge number': 'lodgeNumber',
     'Lodge name': 'lodgeName',
     Location: 'location',
+    Comments: 'comments',
     VIP: 'vip',
     DC: 'dc',
     'DC Id': 'dcId',
