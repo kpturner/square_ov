@@ -47,23 +47,31 @@
               label="Search"
               prepend-inner-icon="mdi-magnify"
               hide-details
+              clearable
+              clear-icon="mdi-close-circle"
               @click:prepend-inner="load"
               @keyup.enter="debouncedLoad"
+              @click:clear="
+                search = '';
+                load();
+              "
             />
           </div>
           <!-- DESKTOP -->
           <v-responsive class="hidden-md-and-down">
             <v-data-table :headers="headers" :items="officers" class="mt-4">
               <template #item.actions="{ item }">
-                <v-btn
-                  class="me-2"
-                  icon="mdi-pencil"
-                  size="small"
-                  color="primary"
-                  variant="elevated"
-                  title="Edit officer details"
-                  @click="editOfficer(item)"
-                />
+                <v-badge :model-value="hasOverrides(item)" color="red" dot>
+                  <v-btn
+                    class="me-2"
+                    icon="mdi-pencil"
+                    size="small"
+                    color="primary"
+                    variant="elevated"
+                    title="Edit officer details"
+                    @click="editOfficer(item)"
+                  />
+                </v-badge>
               </template>
             </v-data-table>
           </v-responsive>
@@ -104,15 +112,17 @@
                     </v-col>
                   </v-row>
                   <v-row dense align="center" justify="end" class="mt-2">
-                    <v-btn
-                      icon="mdi-pencil"
-                      size="small"
-                      color="primary"
-                      variant="elevated"
-                      title="Edit officer details"
-                      class="me-2"
-                      @click="editOfficer(item)"
-                    />
+                    <v-badge :model-value="hasOverrides(item)" color="red" dot>
+                      <v-btn
+                        icon="mdi-pencil"
+                        size="small"
+                        color="primary"
+                        variant="elevated"
+                        title="Edit officer details"
+                        class="me-2"
+                        @click="editOfficer(item)"
+                      />
+                    </v-badge>
                   </v-row>
                 </v-card>
               </v-col> </v-row
@@ -258,6 +268,10 @@ async function saveOfficer() {
   showOfficerDialog.value = false;
 
   await loadOfficers();
+}
+
+function hasOverrides(officer: ActiveOfficer): boolean {
+  return !!(officer.rankOverride || officer.provOfficerYearOverride || officer.salutationOverride);
 }
 
 const debouncedLoad = debounce(load, 500);

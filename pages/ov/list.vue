@@ -47,8 +47,14 @@
               label="Search"
               prepend-inner-icon="mdi-magnify"
               hide-details
+              clearable
+              clear-icon="mdi-close-circle"
               @click:prepend-inner="load"
               @keyup.enter="debouncedLoad"
+              @click:clear="
+                search = '';
+                load();
+              "
             />
           </div>
           <!-- DESKTOP -->
