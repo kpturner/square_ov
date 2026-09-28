@@ -438,16 +438,19 @@ const activeNumberToConsider = (officer: Officer): number | null => {
 const provYearCompare = (a: Officer, b: Officer, disregardActiveFlag?: boolean): number | null => {
   const aYear = provOfficerYearToConsider(a);
   const bYear = provOfficerYearToConsider(b);
+
   const aRank = provRankToConsider(a);
   const bRank = provRankToConsider(b);
 
-  if (
-    (!!a.active === !!b.active || disregardActiveFlag) && // Treat null and false as equal
-    aYear !== null &&
-    bYear !== null &&
-    aRank === bRank
-  ) {
-    if (aYear !== bYear) return aYear - bYear;
+  if ((!!a.active === !!b.active || disregardActiveFlag) && aRank === bRank) {
+    // Officers with a year come before those without one
+    if (aYear !== null && bYear === null) return -1;
+    if (aYear === null && bYear !== null) return 1;
+
+    // Both have a year, so sort by year
+    if (aYear !== null && bYear !== null && aYear !== bYear) {
+      return aYear - bYear;
+    }
   }
 
   return null;
@@ -456,12 +459,18 @@ const provYearCompare = (a: Officer, b: Officer, disregardActiveFlag?: boolean):
 const grandYearCompare = (a: Officer, b: Officer): number | null => {
   if (
     !!a.grandActive === !!b.grandActive && // Treat null and false as equal
-    a.grandOfficerYear &&
-    b.grandOfficerYear &&
     a.grandRank === b.grandRank
   ) {
-    if (a.grandOfficerYear !== b.grandOfficerYear) return a.grandOfficerYear - b.grandOfficerYear;
+    // Officers with a year come before those without one
+    if (a.grandOfficerYear && !b.grandOfficerYear) return -1;
+    if (!a.grandOfficerYear && b.grandOfficerYear) return 1;
+
+    // Both have a year, so sort by year
+    if (a.grandOfficerYear && b.grandOfficerYear && a.grandOfficerYear !== b.grandOfficerYear) {
+      return a.grandOfficerYear - b.grandOfficerYear;
+    }
   }
+
   return null;
 };
 
