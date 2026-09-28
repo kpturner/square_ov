@@ -707,8 +707,8 @@ const addOfficer = (
     excludeFromProcession: null,
     original: true,
     attending: true,
-    rankOverride: null,
-    provOfficerYearOverride: null,
+    rankOverride: activeOfficer.rankOverride,
+    provOfficerYearOverride: activeOfficer.provOfficerYearOverride,
     ovId,
   });
 };

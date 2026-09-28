@@ -10,15 +10,24 @@
         <v-card>
           <v-card-title class="d-flex justify-space-between align-center">
             <div class="w-100 d-flex flex-column align-start">
-              <v-btn
-                color="primary"
-                prepend-icon="mdi-home"
-                class="mb-2 w-100 w-sm-auto"
-                small
-                @click="$router.push('/home')"
-              >
-                Home
-              </v-btn>
+              <div class="d-flex gap-2">
+                <v-btn
+                  color="primary"
+                  prepend-icon="mdi-home"
+                  class="mb-2 w-100 w-sm-auto"
+                  small
+                  @click="$router.push('/home')"
+                >
+                  Home
+                </v-btn>
+                <v-btn
+                  color="secondary"
+                  class="ms-2"
+                  prepend-icon="mdi-account-group"
+                  @click="$router.push('/ov/active-officers')"
+                  >Active Officers
+                </v-btn>
+              </div>
               <span class="text-h5">Official Visit Master</span>
               <OVTypeSelector v-model="ovType" />
             </div>

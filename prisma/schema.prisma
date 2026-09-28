@@ -85,20 +85,22 @@ enum Position {
 }
 
 model ActiveOfficer {
-  id                    Int      @id @default(autoincrement())
-  ovType                OVType   @default(craft)
-  year                  String
-  number                Int
-  salutationOverride    String?
-  additionalSeatingInfo String?
-  provincialRank        String?
-  givenName             String?
-  familyName            String?
-  familiarName          String?
-  postNominals          String?
-  primaryEmail          String?
-  preferredPhoneNo      String?
-  active                Boolean? @default(true) // For the RA, some officers are not active (inc Area Chairmen etc)
+  id                      Int      @id @default(autoincrement())
+  ovType                  OVType   @default(craft)
+  year                    String
+  number                  Int
+  salutationOverride      String?
+  rankOverride            String?
+  provOfficerYearOverride Int?
+  additionalSeatingInfo   String?
+  provincialRank          String?
+  givenName               String?
+  familyName              String?
+  familiarName            String?
+  postNominals            String?
+  primaryEmail            String?
+  preferredPhoneNo        String?
+  active                  Boolean? @default(true) // For the RA, some officers are not active (inc Area Chairmen etc)
 
   // Reverse relations (optional, but handy if you want to query back)
   oVMastersAsDC              OVMaster[]                  @relation("DCRelation")
