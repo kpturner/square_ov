@@ -84,6 +84,7 @@ export default defineEventHandler(async (event) => {
   });
 
   const ovs: Record<string, any>[] = [];
+  const invalidOvs: Record<string, any>[] = [];
 
   const getRowValues = (row: EnrichedCell[], startCell: string) => {
     const values: string[] = [];
@@ -141,17 +142,34 @@ export default defineEventHandler(async (event) => {
     return VIPs.find((vip) => vip.provincialRank === rank);
   };
 
+  const isValidRow = (row: number): boolean => {
+    if (typeof ovDates[row] !== 'number') {
+      const msg = `Invalid OV date of ${ovDates[row]} found. Unable to import OV`;
+      logger.error(msg);
+      importErrors.push(msg);
+      return false;
+    }
+    return true;
+  };
+
   // Construct basic OVs
   for (let n = 0; n < ovNumbers.length; n++) {
-    ovs.push({
-      'Visit No': ovNumbers[n],
-      Date: ovDates[n],
-      'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
-      'Lodge name': chapterNames[n],
-      Location: locations[n],
-      VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
-      DC: 'UNKNOWN',
-    });
+    // Validate row
+    if (isValidRow(n)) {
+      ovs.push({
+        'Visit No': ovNumbers[n],
+        Date: ovDates[n],
+        'Lodge number': chapterNos[n] ? chapterNos[n]?.toString() : '0', // AGM has no lodge number
+        'Lodge name': chapterNames[n],
+        Location: locations[n],
+        VIP: ovVips?.[n] ? getVIP(ovVips[n] as string)?.name : null,
+        DC: 'UNKNOWN',
+      });
+    } else {
+      invalidOvs.push({
+        'Visit No': ovNumbers[n],
+      });
+    }
   }
 
   function getActiveOfficerFromRow(row: EnrichedCell[]) {
@@ -242,8 +260,12 @@ export default defineEventHandler(async (event) => {
               const ovNumber = data[ovRow] ? data[ovRow][index]?.value : null;
               const ov = ovs.find((ov) => ov['Visit No'] === ovNumber);
               if (!ov) {
-                logger.error({ col }, 'Unable to find OV');
-                importErrors.push(`Unable to find OV for ${col.address}`);
+                // Expected if an invalid OV
+                const invalidOv = invalidOvs.find((ov) => ov['Visit No'] === ovNumber);
+                if (!invalidOv) {
+                  logger.error({ col }, 'Unable to find OV');
+                  importErrors.push(`Unable to find OV for ${col.address}`);
+                }
               } else {
                 // Determine if cell is a special
                 if (col.colour === vipColour) {

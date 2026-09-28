@@ -165,12 +165,23 @@ const ovSheetName = computed(() =>
 
 const raCdSheetName = computed(() => 'Contact Details');
 
+const handleErrors = (sheet: string, success: boolean, imported: number) => {
+  if (success) {
+    makeToast(
+      `${imported} items imported from sheet ${sheet} for year ${year.value} successfully but some errors occurred`,
+      success ? 'warning' : 'error'
+    );
+    return;
+  }
+  makeToast(`Errors occurred importing sheet ${sheet} for year ${year.value}`, 'error');
+};
+
 const importActiveOfficers = async () => {
   if (!file.value) return alert('Select a file first.');
   loading.value = true;
   try {
     const data = await readExcel(file.value, aoSheetName.value);
-    const { importErrors } = await useActiveOfficerApi().import(
+    const { success, imported, importErrors } = await useActiveOfficerApi().import(
       ovType.value,
       data as Record<string, unknown>[],
       year.value
@@ -178,10 +189,7 @@ const importActiveOfficers = async () => {
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(
-        `Errors occurred importing sheet ${aoSheetName.value} for year ${year.value}`,
-        'error'
-      );
+      handleErrors(aoSheetName.value, success, imported);
     } else {
       makeToast(
         `Active Officers on sheet ${aoSheetName.value} imported successfully for year ${year.value}`
@@ -199,7 +207,7 @@ const importContactDetails = async () => {
   loading.value = true;
   try {
     const data = await readExcel(file.value, raCdSheetName.value);
-    const { importErrors } = await useContactDetailsApi().import(
+    const { success, imported, importErrors } = await useContactDetailsApi().import(
       ovType.value,
       data as Record<string, unknown>[],
       year.value
@@ -207,10 +215,7 @@ const importContactDetails = async () => {
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(
-        `Errors occurred importing sheet ${raCdSheetName.value} for year ${year.value}`,
-        'error'
-      );
+      handleErrors(raCdSheetName.value, success, imported);
     } else {
       makeToast(
         `Active Officers on sheet ${raCdSheetName.value} imported successfully for year ${year.value}`
@@ -228,7 +233,7 @@ const importOfficialVisits = async () => {
   loading.value = true;
   try {
     const data = await readExcel(file.value, ovSheetName.value, ovType.value === 'ra');
-    const { importErrors } = await useOVMasterApi().import(
+    const { success, imported, importErrors } = await useOVMasterApi().import(
       ovType.value,
       data as EnrichedCell[][],
       year.value
@@ -236,10 +241,7 @@ const importOfficialVisits = async () => {
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(
-        `Errors occurred importing sheet ${ovSheetName.value} for year ${year.value}`,
-        'error'
-      );
+      handleErrors(ovSheetName.value, success, imported);
     } else {
       makeToast(`OVs from sheet ${ovSheetName.value} imported successfully for year ${year.value}`);
     }
@@ -277,14 +279,15 @@ const importVIPs = async () => {
               return clean;
             })
             .filter((r) => r.Name !== 'Name');
-    const { importErrors } = await useVIPApi().import(ovType.value, tidy, year.value);
+    const { success, imported, importErrors } = await useVIPApi().import(
+      ovType.value,
+      tidy,
+      year.value
+    );
     if (importErrors.length) {
       importErrorsFound.value = importErrors;
       importErrorsExist.value = true;
-      makeToast(
-        `Errors occurred importing sheet ${vipSheetName.value} for year ${year.value}`,
-        'error'
-      );
+      handleErrors(vipSheetName.value, success, imported);
     } else {
       makeToast(
         `VIPs from sheet ${vipSheetName.value} imported successfully for year ${year.value}`
