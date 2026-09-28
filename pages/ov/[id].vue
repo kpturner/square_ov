@@ -727,8 +727,8 @@ async function addOfficer() {
       excludeFromProcession: false,
       original: false,
       attending: true,
-      rankOverride: null,
-      provOfficerYearOverride: null,
+      rankOverride: ao.rankOverride,
+      provOfficerYearOverride: ao.provOfficerYearOverride,
       ovId: Number(route.params.id),
     });
     makeToast(`${name} ${ao.provincialRank} added to list.`);
