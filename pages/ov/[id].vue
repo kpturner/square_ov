@@ -308,15 +308,7 @@
         <v-card-text>
           Either select a VIP from the master list or leave unselected to add the VIP details
           yourself
-          <v-text-field
-            v-model="year"
-            class="mb-4"
-            prepend-inner-icon="mdi-calendar"
-            label="Masonic year"
-            hide-details
-            @click:prepend-inner="loadActiveOfficersAndVIPs"
-            @keyup.enter="loadActiveOfficersAndVIPs"
-          />
+          <MasonicYearSelect v-model="year" />
           <v-autocomplete
             v-model="selectedVIPId"
             :items="activeVIPSelectionList"
@@ -418,15 +410,7 @@
         <v-card-text>
           Either select an officer from the master list or leave unselected to add the officer
           details yourself
-          <v-text-field
-            v-model="year"
-            class="mb-4"
-            prepend-inner-icon="mdi-calendar"
-            label="Masonic year"
-            hide-details
-            @click:prepend-inner="loadActiveOfficersAndVIPs"
-            @keyup.enter="loadActiveOfficersAndVIPs"
-          />
+          <MasonicYearSelect v-model="year" />
           <v-autocomplete
             v-model="selectedActiveOfficerId"
             :items="activeOfficerSelectionList"
@@ -497,7 +481,6 @@
 import { useRoute, useRouter } from 'vue-router';
 import type { OV, ActiveOfficer, Officer, VIP } from '@prisma/client';
 import { useAuthStore } from '~/stores/auth';
-import debounce from 'lodash/debounce';
 import type { Rank } from '~/types';
 definePageMeta({
   ssr: false,
@@ -646,9 +629,6 @@ async function loadVIPs() {
     `/api/vip?ovType=${officialVisit.value.ovType}&year=${year.value}`
   );
 }
-
-const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
-const debouncedLoadVIPs = debounce(loadVIPs, 500);
 
 async function loadActiveOfficersAndVIPs() {
   await loadActiveOfficers();
@@ -1101,8 +1081,7 @@ watch(
 );
 
 watch(year, () => {
-  debouncedLoadActiveOfficers();
-  debouncedLoadVIPs();
+  loadActiveOfficersAndVIPs();
 });
 </script>
 

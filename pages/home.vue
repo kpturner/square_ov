@@ -258,15 +258,7 @@
         </v-card-title>
         <v-card-text v-show="!editedOV.id">
           <div>Either select from the master list</div>
-          <v-text-field
-            v-model="year"
-            class="mb-4"
-            prepend-inner-icon="mdi-calendar"
-            label="Masonic year"
-            hide-details
-            @click:prepend-inner="loadMasterOVs"
-            @keyup.enter="loadMasterOVs"
-          />
+          <MasonicYearSelect v-model="year" />
           <v-autocomplete
             v-model="selectedMasterOvId"
             class="hidden-sm-and-down"
@@ -370,7 +362,6 @@
 
 <script setup lang="ts">
 import type { OV, ActiveOfficer, VIP, Officer, User, OVType } from '@prisma/client';
-import debounce from 'lodash/debounce';
 import type { OVMasterWithAdditionalOfficers } from '~/types';
 
 const makeToast = useToast();
@@ -428,7 +419,7 @@ async function loadMasterOVs() {
   );
 }
 
-const debouncedLoadMasterOVs = debounce(loadMasterOVs, 500);
+// const debouncedLoadMasterOVs = debounce(loadMasterOVs, 500);
 
 async function loadOVs() {
   ovs.value = await useApi()<OV[]>(`/api/ov?ovType=${ovType.value}&userId=${authStore.user?.id}`);
@@ -453,8 +444,6 @@ async function loadActiveOfficers() {
     `/api/active-officers?ovType=${ovType.value}&year=${year.value}`
   );
 }
-
-const debouncedLoadActiveOfficers = debounce(loadActiveOfficers, 500);
 
 function exportOV(item: OV) {
   ovToExport.value = item;
@@ -864,7 +853,7 @@ watch(ovType, async () => {
 });
 
 watch(year, () => {
-  debouncedLoadMasterOVs();
-  debouncedLoadActiveOfficers();
+  loadMasterOVs();
+  loadActiveOfficers();
 });
 </script>

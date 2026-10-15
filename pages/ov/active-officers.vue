@@ -34,14 +34,7 @@
           </v-card-title>
           <!-- Top Actions -->
           <div class="d-flex flex-column flex-sm-row justify-end ga-2 mb-2 no-print">
-            <v-text-field
-              v-model="year"
-              label="Masonic year"
-              prepend-inner-icon="mdi-calendar"
-              hide-details
-              @click:prepend-inner="debouncedLoad"
-              @keyup.enter="load"
-            />
+            <MasonicYearSelect v-model="year" />
             <v-text-field
               v-model="search"
               label="Search"
