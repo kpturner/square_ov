@@ -299,7 +299,10 @@
       "value": "2NDAGSOJ",
       "title": "2nd Assistant Grand Sojourner"
     },
-    {"value":"AGSOJ","title": "Assistant Grand Sojourner"},
+    {
+      "value": "AGSOJ",
+      "title": "Assistant Grand Sojourner"
+    },
     {
       "value": "AGSE",
       "title": "Assistant Grand Scribe E"
@@ -307,18 +310,6 @@
     {
       "value": "AGSN",
       "title": "Assistant Grand Scribe N"
-    },
-    {
-      "value": "AGDC",
-      "title": "Assistant Grand Director of Ceremonies"
-    },
-    {
-      "value": "AGSWDB",
-      "title": "Assistant Grand Sword Bearer"
-    },
-    {
-      "value": "GORG",
-      "title": "Grand Organist"
     },
     {
       "value": "GSTB",
@@ -329,8 +320,20 @@
       "title": "Assistant Grand Standard Bearer"
     },
     {
+      "value": "GORG",
+      "title": "Grand Organist"
+    },
+    {
       "value": "DEPGORG",
       "title": "Deputy Grand Organist"
+    },
+    {
+      "value": "AGDC",
+      "title": "Assistant Grand Director of Ceremonies"
+    },
+    {
+      "value": "AGSWDB",
+      "title": "Assistant Grand Sword Bearer"
     },
     {
       "value": "GSTWD",
