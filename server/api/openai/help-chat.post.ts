@@ -118,7 +118,7 @@ Answer:
 `;
 
     const response = await openai.chat.completions.create({
-      model: 'gpt-5-mini',
+      model: 'gpt-6-luna',
       messages: [{ role: 'user', content: prompt }],
     });
 
